@@ -1,0 +1,7 @@
+web:
+  image: gorillajs/apache-base
+  ports:  
+    - "80:80"
+  volumes:
+    - ../../templates/wordpress:/root/templates
+    - ../../${project.serverfolder}:/var/www/${apache.vhosturl}/${project.serverfolder}

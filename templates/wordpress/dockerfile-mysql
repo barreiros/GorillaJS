@@ -1,0 +1,9 @@
+FROM ubuntu
+
+RUN apt-get update
+RUN apt-get -y install mysql-server 
+RUN mysql -c "CREATE DATABASE ${db.dbname}; GRANT USAGE ON *.${db.dbname} to ${db.username}@localhost IDENTIFIED BY '${db.password}';"
+RUN mysql ${db.dbname} < ${db.populatefrom}
+
+
+CMD ["/usr/bin/supervisord"]
