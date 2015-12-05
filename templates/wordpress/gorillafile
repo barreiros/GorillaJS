@@ -1,0 +1,23 @@
+{
+    "local": {
+        "project": {
+            "serverfolder": ""
+        },
+        "apache": {
+            "vhosturl": ""
+        },
+        "system": {
+            "hostsfile": ""
+        },
+        "docker": {
+            "machinename": "",
+            "template": ""
+        },
+        "db": {
+            "username": "",
+            "password": "",
+            "dbname": "",
+            "populatefrom": ""
+        }
+    }
+}

@@ -10,7 +10,12 @@ var datef = require('dateformat');
 
 var tools, host, events, docker, git;
 var env = 'local';
-var configFile = __dirname + '/project.json';
+var gorillaPath = __dirname;
+var gorillaFolder = '.gorilla';
+var gorillaFile = 'gorillafile';
+var projectPath = process.cwd();
+var templatesPath = gorillaPath + '/templates';
+var composeFile = 'docker-compose.yml';
 
 
 if(argv.e) env = argv.e;
@@ -25,7 +30,12 @@ events.subscribe('PROMISEME', function(){
     tools.promiseme();
 });
 
-tools.setConfigFile(configFile);
+tools.createGorillaEnvironment(
+    projectPath, 
+    templatesPath,
+    gorillaFile,
+    projectPath + '/' + gorillaFolder
+); // If not exist.
 
 if(argv._[0] === 'configure' || argv._[0] === 'pack' || argv._[0] === 'start'){
     eval(argv._[0])();
@@ -40,10 +50,11 @@ function configure(){
     if (argv.d) {
 
         tools.promises().push(
-            [tools.setEnvVariables, ['templates/**/*']], 
+            [tools.moveFiles, [templatesPath + '/' + tools.param('docker', 'template'), projectPath + '/' + gorillaFolder]],
+            [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/**/*']
             [docker.check, tools.param('docker', 'machinename')],
-            [docker.start, [tools.param('docker', 'machinename'), tools.param('docker', 'composefile')]],
-            [host.add, [tools.param('system', 'hostsfile'), tools.param('apache', 'vhosturl'), docker.ip(tools.param('docker', 'machinename'))]],
+            [docker.start, [tools.param('docker', 'machinename'), projectPath + '/' + gorillaFolder + '/' + composeFile]],
+            [host.add, [tools.param('system', 'hostsfile'), tools.param('apache', 'vhosturl'), docker.ip(tools.param('docker', 'machinename'))]]
             [tools.resetEnvVariables, ['templates/**/*']]
         );
     }
