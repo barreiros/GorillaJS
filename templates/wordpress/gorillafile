@@ -1,23 +1,26 @@
 {
     "local": {
         "project": {
-            "serverfolder": ""
+            "serverfolder": "",
+            "datafolder": ""
         },
         "apache": {
-            "vhosturl": ""
+            "vhosturl": "",
+            "port": "",
+            "adminemail": ""
         },
         "system": {
             "hostsfile": ""
         },
         "docker": {
             "machinename": "",
-            "template": ""
+            "template": "",
+            "gorillafolder": ".gorilla"
         },
         "db": {
             "username": "",
             "password": "",
-            "dbname": "",
-            "populatefrom": ""
+            "dbname": ""
         }
     }
 }

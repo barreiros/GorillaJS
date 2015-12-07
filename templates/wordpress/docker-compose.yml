@@ -1,7 +1,17 @@
 web:
   image: gorillajs/apache-base
   ports:  
-    - "80:80"
+    - "${apache.port}:80"
   volumes:
-    - ../../templates/wordpress:/root/templates
-    - ../../${project.serverfolder}:/var/www/${apache.vhosturl}/${project.serverfolder}
+    - ../${docker.gorillafolder}:/root/templates
+    - ../${project.serverfolder}:/var/www/${apache.vhosturl}/${project.serverfolder}
+  links:
+    - mysql
+mysql:
+  image: gorillajs/mysql
+  expose: 
+    - 3306
+  volumes:
+    - ../${docker.gorillafolder}:/root/templates
+    - ../${project.datafolder}:/var/lib/mysql
+

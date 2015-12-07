@@ -51,11 +51,10 @@ function configure(){
 
         tools.promises().push(
             [tools.moveFiles, [templatesPath + '/' + tools.param('docker', 'template'), projectPath + '/' + gorillaFolder]],
-            [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/**/*']
+            [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/**/*'],
             [docker.check, tools.param('docker', 'machinename')],
-            [docker.start, [tools.param('docker', 'machinename'), projectPath + '/' + gorillaFolder + '/' + composeFile]],
-            [host.add, [tools.param('system', 'hostsfile'), tools.param('apache', 'vhosturl'), docker.ip(tools.param('docker', 'machinename'))]]
-            [tools.resetEnvVariables, ['templates/**/*']]
+            [docker.start, [tools.param('docker', 'machinename'), projectPath + '/' + gorillaFolder + '/' + composeFile, tools.param('apache', 'vhosturl')]],
+            [host.open, 'http://' + tools.param('apache', 'vhosturl') + ':' + tools.param('apache', 'port')]
         );
     }
 
