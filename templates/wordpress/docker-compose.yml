@@ -6,7 +6,7 @@ web:
     - ../${docker.gorillafolder}:/root/templates
     - ../${project.serverfolder}:/var/www/${apache.vhosturl}/${project.serverfolder}
   links:
-    - mysql
+    - mysql:database
 mysql:
   image: gorillajs/mysql
   expose: 

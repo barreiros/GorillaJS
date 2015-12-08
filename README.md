@@ -81,7 +81,7 @@ Comprobar si Docker está activo y si tiene instalado docker-compose.
 Iniciar los contenedores y configurarlos con docker compose.
 Añadir la redirección del dominio a la ip del contenedor en /etc/hosts.
 
-reconfigure: Métodos para volver a configurar algunas partes del proyecto. Por ejemplo: el archivo de configuración.
+reconfigure: Métodos para volver a configurar algunas partes del proyecto. Por ejemplo: el archivo de configuración, el archivo de wp-config en wordpress...
 ====
 
 pack: Preparar la rama master para el despliegue.
