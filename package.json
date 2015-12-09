@@ -23,6 +23,7 @@
     "path": "^0.12.7",
     "readline-sync": "^1.2.21",
     "run-sequence": "^1.1.4",
+    "sleep": "^3.0.0",
     "split": "^1.0.0"
   }
 }

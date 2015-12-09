@@ -54,7 +54,7 @@ function configure(){
             [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/**/*'],
             [docker.check, tools.param('docker', 'machinename')],
             [docker.start, [tools.param('docker', 'machinename'), projectPath + '/' + gorillaFolder + '/' + composeFile, tools.param('apache', 'vhosturl')]],
-            [host.open, 'http://' + tools.param('apache', 'vhosturl') + ':' + tools.param('apache', 'port')]
+            [host.open, ['http://' + tools.param('apache', 'vhosturl') + ':' + tools.param('apache', 'port'), 7]]
         );
     }
 
