@@ -30,9 +30,9 @@ git = require(__dirname + '/lib/git.js');
 events.subscribe('PROMISEME', function(){
     tools.promiseme();
 });
-events.subscribe('VERBOSE', function(systemMessage){
-    if(verbose){
-        console.log(systemMessage);
+events.subscribe('VERBOSE', function(systemMessage, force){
+    if(verbose || force){
+        tools.showVerbose(systemMessage);
     }
 });
 events.subscribe('ERROR', function(error){
@@ -55,8 +55,8 @@ function init(){
     if (argv.f) tools.setConfigFile(argv.f);
 
     if (argv.grc) tools.promises().push(
-            [git.createRemote, [tools.param('git', 'platform', ['github', 'bitbucket', 'gitlab']), (tools.param('git', 'platform') !== 'gitlab' ? tools.param('git', 'username') : tools.param('git', 'token')), (tools.param('git', 'platform') !== 'gitlab' ? tools.param('git', 'password') : true), tools.param('git', 'private', ['true', 'false']), tools.param('project', 'slug')]],
-            [git.initRepo, [tools.param('git', 'mainrepo'), projectPath]],
+            [git.createRemote, [tools.param('git', 'platform', ['github', 'bitbucket', 'gitlab']), tools.param('git', 'username'), (tools.param('git', 'platform') !== 'gitlab' ? tools.param('git', 'password') : tools.param('git', 'token')), tools.param('git', 'private', ['true', 'false']), tools.param('project', 'slug')]],
+            [git.initRepo, [tools.param('git', 'platform'), tools.param('git', 'username'), tools.param('project', 'slug')]],
             [git.createBranch, 'gorilla-devel'], 
             [git.clone, tools.param('git', 'clonefrom')],
             [tools.moveFiles, [__dirname + '/temp_repo/', __dirname + '/', ['.git']]],
@@ -66,8 +66,8 @@ function init(){
             [git.push, 'gorilla-devel']
         );
     else if (argv.gr) tools.promises().push(
-            [git.createRemote, [tools.param('git', 'platform', ['github', 'bitbucket', 'gitlab']), (tools.param('git', 'platform') !== 'gitlab' ? tools.param('git', 'username') : tools.param('git', 'token')), (tools.param('git', 'platform') !== 'gitlab' ? tools.param('git', 'password') : true), tools.param('git', 'private', ['true', 'false']), tools.param('project', 'slug')]],
-            [git.initRepo, [tools.param('git', 'mainrepo'), projectPath]],
+            [git.createRemote, [tools.param('git', 'platform', ['github', 'bitbucket', 'gitlab']), tools.param('git', 'username'), (tools.param('git', 'platform') !== 'gitlab' ? tools.param('git', 'password') : tools.param('git', 'token')), tools.param('git', 'private', ['true', 'false']), tools.param('project', 'slug')]],
+            [git.initRepo, [tools.param('git', 'platform'), tools.param('git', 'username'), tools.param('project', 'slug')]],
             [git.createBranch, 'gorilla-devel'],
             [git.add, '.'],
             [git.commit, 'Initial commit'], 
