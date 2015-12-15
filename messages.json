@@ -21,5 +21,8 @@
         "git-clone" : "Cloning from repo...",
         "git-remote" : "Creating new remote repo",
         "tools-createbase" : "Creating GorillaJS scaffolding"
+    },
+    "questions": {
+        
     }
 }

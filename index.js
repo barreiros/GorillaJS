@@ -58,9 +58,9 @@ function init(){
             [git.createRemote, [tools.param('git', 'platform', ['github', 'bitbucket', 'gitlab']), tools.param('git', 'username'), (tools.param('git', 'platform') !== 'gitlab' ? tools.param('git', 'password') : tools.param('git', 'token')), tools.param('git', 'private', ['true', 'false']), tools.param('project', 'slug')]],
             [git.initRepo, [tools.param('git', 'platform'), tools.param('git', 'username'), tools.param('project', 'slug')]],
             [git.createBranch, 'gorilla-devel'], 
-            [git.clone, tools.param('git', 'clonefrom')],
-            [tools.moveFiles, [__dirname + '/temp_repo/', __dirname + '/', ['.git']]],
-            [tools.removeDir, __dirname + '/temp_repo/'],
+            [git.clone, [tools.param('git', 'clonefromurl'), tools.param('git', 'clonefrombranch'), projectPath + '/temp_repo/']],
+            [tools.moveFiles, [projectPath + '/temp_repo/', projectPath + '/', ['.git']]],
+            [tools.removeDir, projectPath + '/temp_repo/'],
             [git.add, '.'],
             [git.commit, 'Initial commit'], 
             [git.push, 'gorilla-devel']
