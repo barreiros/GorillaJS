@@ -1,26 +1,26 @@
 {
-    "local": {
+    "default": {
         "project": {
-            "serverfolder": "",
-            "datafolder": ""
+            "serverfolder": "application",
+            "datafolder": "application-db"
         },
         "apache": {
-            "vhosturl": "",
+            "vhosturl": "gorilla.local",
             "port": "",
             "adminemail": ""
         },
         "system": {
-            "hostsfile": ""
+            "hostsfile": "/etc/hosts"
         },
         "docker": {
-            "machinename": "",
-            "template": "",
+            "machinename": "default",
+            "template": "wordpress",
             "gorillafolder": ".gorilla"
         },
-        "db": {
-            "username": "",
+        "database": {
+            "username": "gorilla",
             "password": "",
-            "dbname": ""
+            "dbname": "gorilla-db"
         }
     }
 }

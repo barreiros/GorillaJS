@@ -1,0 +1,25 @@
+{
+    "errors": {
+        "001" : "Unable to init repo.",
+        "002" : "Unable to push your commit. Please, check your repo. GorillaJS is not a Git handler and expected a clean remote repo or a remote and local repo synchronized. GorillaJS try to push your files in a gorilla-devel branch to your remote. If this branch exists, GorillaJS will work with it.",
+        "003" : "Unable to change to branch",
+        "004" : "Unable to clone the repo. Please check your repo and try again.",
+        "005" : "Unable to create remote repo"
+    },
+    "warnings": {
+        "001" : "Local repo already exists.",
+        "002" : "Branch gorilla-devel already exists.",
+        "004" : "Unable to reset branch.",
+        "005" : "Apparently nothing to staging.",
+        "006" : "Apparently nothing to commit."
+    },
+    "steps" : {
+        "git-init" : "Creating local repo...",
+        "git-branch-gorilla-devel" : "Creating gorilla-devel branch...",
+        "git-branch-gorilla-master" : "Creating gorilla-master branch...",
+        "git-push" : "Pushing to remote...",
+        "git-clone" : "Cloning from repo...",
+        "git-remote" : "Creating new remote repo",
+        "tools-createbase" : "Creating GorillaJS scaffolding"
+    }
+}
