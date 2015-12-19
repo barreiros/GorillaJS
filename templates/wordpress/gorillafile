@@ -2,12 +2,8 @@
     "default": {
         "project": {
             "serverfolder": "application",
-            "datafolder": "application-db"
-        },
-        "apache": {
-            "vhosturl": "gorilla.local",
-            "port": "",
-            "adminemail": ""
+            "datafolder": "application-db",
+            "domain": "gorilla.local"
         },
         "system": {
             "hostsfile": "/etc/hosts"

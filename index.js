@@ -14,6 +14,7 @@ var env = 'local';
 var gorillaPath = __dirname;
 var gorillaFolder = '.gorilla';
 var gorillaFile = 'gorillafile';
+var messagesFile = 'messages';
 var projectPath = process.cwd();
 var templatesPath = gorillaPath + '/templates';
 var composeFile = 'docker-compose.yml';
@@ -44,9 +45,12 @@ events.subscribe('WARNING', function(error){
 events.subscribe('STEP', function(step){
     tools.showStep(step);
 });
+events.subscribe('MESSAGE', function(message){
+    tools.showMessage(message);
+});
 
 if(argv._[0] === 'init' || argv._[0] === 'pack' || argv._[0] === 'start'){
-    tools.createBaseEnvironment(projectPath, gorillaFile, gorillaFolder);
+    tools.createBaseEnvironment(projectPath, gorillaFile, gorillaFolder, gorillaPath, messagesFile);
     eval(argv._[0])();
 }
 
@@ -81,14 +85,16 @@ function init(){
             [git.push, 'gorilla-devel']
         );
 
-    if (argv.d) tools.promises().push(
-            [tools.createDockerEnvironment, [projectPath, templatesPath, gorillaFile, projectPath + '/' + gorillaFolder]], // If not exist.
+    if (argv.d) {
+        tools.createTemplateEnvironment(templatesPath, tools.param('docker', 'template'), gorillaFile, messagesFile); //If not exists.
+        tools.promises().push(
             [tools.moveFiles, [templatesPath + '/' + tools.param('docker', 'template'), projectPath + '/' + gorillaFolder]],
             [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/**/*'],
             [docker.check, tools.param('docker', 'machinename')],
-            [docker.start, [tools.param('docker', 'machinename'), projectPath + '/' + gorillaFolder + '/' + composeFile, tools.param('apache', 'vhosturl')]],
-            [host.open, ['http://' + tools.param('apache', 'vhosturl') + ':' + tools.param('apache', 'port'), 15, 'Waiting for opening your web:']]
+            [docker.start, [tools.param('docker', 'machinename'), projectPath + '/' + gorillaFolder + '/' + composeFile, tools.param('project', 'domain')]],
+            [host.open, ['http://' + tools.param('project', 'domain') + ':' + tools.param('docker', 'port'), 15, 'Waiting for opening your web']]
         );
+    }
 
     if (tools.promises().length) tools.promiseme();
 }

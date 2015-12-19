@@ -1,0 +1,7 @@
+{
+    "questions": {
+        "project": {
+            "serverfolder": "The root application folder"
+        }
+    }
+}
