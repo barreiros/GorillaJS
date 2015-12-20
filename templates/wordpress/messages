@@ -2,6 +2,9 @@
     "questions": {
         "project": {
             "serverfolder": "The root application folder"
+        },
+        "docker": {
+            "gorillafolder": "The Gorilla folder"
         }
     }
 }

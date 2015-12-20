@@ -1,10 +1,10 @@
 web:
   image: gorillajs/apache-base
   ports:  
-    - "${apache.port}:80"
+    - "${docker.port}:80"
   volumes:
     - ../${docker.gorillafolder}:/root/templates
-    - ../${project.serverfolder}:/var/www/${apache.vhosturl}/${project.serverfolder}
+    - ../${project.serverfolder}:/var/www/${project.domain}/${project.serverfolder}
   links:
     - mysql:database
 mysql:
