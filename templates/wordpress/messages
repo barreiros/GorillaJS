@@ -5,6 +5,9 @@
         },
         "docker": {
             "gorillafolder": "The Gorilla folder"
+        },
+        "git": {
+            "test": "Test text"
         }
     }
 }

@@ -86,12 +86,12 @@ function init(){
         );
 
     if (argv.d) {
-        tools.createTemplateEnvironment(templatesPath, tools.param('docker', 'template'), gorillaFile, messagesFile); //If not exists.
+        tools.createTemplateEnvironment(projectPath, templatesPath, tools.param('docker', 'template'), gorillaFolder, gorillaFile, messagesFile); //If not exists.
         tools.promises().push(
-            [tools.moveFiles, [templatesPath + '/' + tools.param('docker', 'template'), projectPath + '/' + gorillaFolder]],
             [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/**/*'],
             [docker.check, tools.param('docker', 'machinename')],
             [docker.start, [tools.param('docker', 'machinename'), projectPath + '/' + gorillaFolder + '/' + composeFile, tools.param('project', 'domain')]],
+            [host.add, [tools.param('system', 'hostsfile'), tools.param('project', 'domain'), docker.ip(tools.param('docker', 'machinename'))]],
             [host.open, ['http://' + tools.param('project', 'domain') + ':' + tools.param('docker', 'port'), 15, 'Waiting for opening your web']]
         );
     }

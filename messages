@@ -17,7 +17,8 @@
         "006" : "Apparently nothing to commit.",
         "007" : "Problem setting Docker environment variables.",
         "008" : "Problem starting Docker machine.",
-        "009" : "Unable to open your browser."
+        "009" : "Unable to open your browser.",
+        "010" : "The machine ip is not valid"
     },
 
     "steps" : {
@@ -32,6 +33,7 @@
         "tools-setvariables" : "Setting Docker variables...",
         "docker-checkplatform" : "Checking your platform...",
         "docker-start" : "Starting Docker...",
-        "tools-createtemplate" : "Checking for gorillafile template..."
+        "tools-createtemplate" : "Checking for gorillafile template...",
+        "hosts-adddomain": "Adding your new domain to hosts file (maybe you must enter your root password)"
     }
 }
