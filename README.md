@@ -100,6 +100,15 @@ Subirlo al remoto.
 PRODUCCIÓN
 ===
 
+*provisioning: Aprovisionar la máquina*
+-g
+Instalar git.
+
+-d
+Instalar Docker.
+Configurar las máquinas usando una template.
+
+
 *deploy: Actualizar los archivos en producción.*
 Crear un repositorio, si no existe. El árbol de carpetas del servidor tiene que ser como el de desarrollo, es decir, el repositorio va en el raíz y la parte pública va en la carpeta de la aplicación.
 Conectarme al servidor por ssh.

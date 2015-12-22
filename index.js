@@ -49,9 +49,13 @@ events.subscribe('MESSAGE', function(message){
     tools.showMessage(message);
 });
 
-if(argv._[0] === 'init' || argv._[0] === 'pack' || argv._[0] === 'start'){
+if(argv._[0] === 'init' || argv._[0] === 'pack' || argv._[0] === 'start' || argv._[0] === 'server'){
     tools.createBaseEnvironment(projectPath, gorillaFile, gorillaFolder, gorillaPath, messagesFile);
     eval(argv._[0])();
+}
+
+function server(){
+
 }
 
 function init(){
@@ -86,7 +90,7 @@ function init(){
         );
 
     if (argv.d) {
-        tools.createTemplateEnvironment(projectPath, templatesPath, tools.param('docker', 'template'), gorillaFolder, gorillaFile, messagesFile); //If not exists.
+        tools.createTemplateEnvironment(projectPath, templatesPath, tools.param('docker', 'template'), gorillaFolder, gorillaFile, messagesFile);
         tools.promises().push(
             [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/**/*'],
             [docker.check, tools.param('docker', 'machinename')],
