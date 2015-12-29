@@ -8,9 +8,13 @@ var prompt = require('readline-sync');
 var color = require('colors');
 var datef = require('dateformat');
 
-var tools, host, events, docker, git;
-var verbose = false;
-var env = 'local';
+var tools = require(__dirname + '/lib/tools.js');
+var events = require(__dirname + '/lib/pubsub.js');
+var ssh = require(__dirname + '/lib/ssh.js');
+var docker = require(__dirname + '/lib/docker.js');
+var git = require(__dirname + '/lib/git.js');
+var host = require(__dirname + '/lib/host.js');
+
 var gorillaPath = __dirname;
 var gorillaFolder = '.gorilla';
 var gorillaFile = 'gorillafile';
@@ -18,15 +22,9 @@ var messagesFile = 'messages';
 var projectPath = process.cwd();
 var templatesPath = gorillaPath + '/templates';
 var composeFile = 'docker-compose.yml';
+var env = argv.e ? argv.e : 'local';
+var verbose = argv.v ? argv.v : false;
 
-if(argv.e) env = argv.e;
-if(argv.v) verbose = true;
-
-tools = require(__dirname + '/lib/tools.js')(env);
-host = require(__dirname + '/lib/host.js');
-events = require(__dirname + '/lib/pubsub.js');
-docker = require(__dirname + '/lib/docker.js');
-git = require(__dirname + '/lib/git.js');
 
 events.subscribe('PROMISEME', function(){
     tools.promiseme();
@@ -49,18 +47,44 @@ events.subscribe('MESSAGE', function(message){
     tools.showMessage(message);
 });
 
-if(argv._[0] === 'init' || argv._[0] === 'pack' || argv._[0] === 'start' || argv._[0] === 'server'){
-    tools.createBaseEnvironment(projectPath, gorillaFile, gorillaFolder, gorillaPath, messagesFile);
-    eval(argv._[0])();
+
+if(argv._[0] === 'init' || argv._[0] === 'pack' || argv._[0] === 'start' || argv._[0] === 'provision'){
+
+    console.log('Hola, Bar ', env);
+    tools.config(env);
+    tools.createBaseEnvironment(projectPath, templatesPath, gorillaPath, gorillaFile, gorillaFolder, messagesFile);
+
+    if(env === 'local') {
+        tools.promises().push([ssh.connect, [
+            tools.param('ssh', 'identifytype', ['key', 'password']), 
+            tools.param('ssh', 'host'), 
+            tools.param('ssh', 'port'), 
+            tools.param('ssh', 'username'), 
+            tools.param('ssh', 'identifytype') === 'key' ? tools.param('ssh', 'key') : tools.param('ssh', 'password'),
+            tools.param('ssh', 'identifytype') === 'key' ? tools.param('ssh', 'passphrase') : null
+        ]]);
+    }
+
+    tools.promises().push(
+        tools.getPlatform,
+        eval(argv._[0])
+    );
+
+    tools.promiseme();
 }
 
-function server(){
+function provision(){
+    
+    tools.promises().push(
+        [tools.provision, [templatesPath]],
+        // ssh.interactive,
+        [ssh.close]
+    );
 
+    if (tools.promises().length) tools.promiseme();
 }
 
 function init(){
-
-    if (argv.f) tools.setConfigFile(argv.f);
 
     if (argv.grc) tools.promises().push(
             [git.createRemote, [tools.param('git', 'platform', ['github', 'bitbucket', 'gitlab']), tools.param('git', 'username'), (tools.param('git', 'platform') !== 'gitlab' ? tools.param('git', 'password') : tools.param('git', 'token')), tools.param('git', 'private', ['true', 'false']), tools.param('project', 'slug')]],
@@ -92,6 +116,7 @@ function init(){
     if (argv.d) {
         tools.createTemplateEnvironment(projectPath, templatesPath, tools.param('docker', 'template'), gorillaFolder, gorillaFile, messagesFile);
         tools.promises().push(
+            [docker.config, tools.getPlatform()],
             [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/**/*'],
             [docker.check, tools.param('docker', 'machinename')],
             [docker.start, [tools.param('docker', 'machinename'), projectPath + '/' + gorillaFolder + '/' + composeFile, tools.param('project', 'domain')]],

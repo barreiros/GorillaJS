@@ -100,7 +100,7 @@ Subirlo al remoto.
 PRODUCCIÓN
 ===
 
-*provisioning: Aprovisionar la máquina*
+*provision: Aprovisionar la máquina*
 -g
 Instalar git.
 
