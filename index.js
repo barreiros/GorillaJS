@@ -24,6 +24,7 @@ var templatesPath = gorillaPath + '/templates';
 var composeFile = 'docker-compose.yml';
 var env = argv.e ? argv.e : 'local';
 var verbose = argv.v ? argv.v : false;
+var workingPath;
 
 
 events.subscribe('PROMISEME', function(){
@@ -50,11 +51,10 @@ events.subscribe('MESSAGE', function(message){
 
 if(argv._[0] === 'init' || argv._[0] === 'pack' || argv._[0] === 'start' || argv._[0] === 'provision'){
 
-    console.log('Hola, Bar ', env);
     tools.config(env);
     tools.createBaseEnvironment(projectPath, templatesPath, gorillaPath, gorillaFile, gorillaFolder, messagesFile);
 
-    if(env === 'local') {
+    if(env !== 'local') {
         tools.promises().push([ssh.connect, [
             tools.param('ssh', 'identifytype', ['key', 'password']), 
             tools.param('ssh', 'host'), 
@@ -63,6 +63,9 @@ if(argv._[0] === 'init' || argv._[0] === 'pack' || argv._[0] === 'start' || argv
             tools.param('ssh', 'identifytype') === 'key' ? tools.param('ssh', 'key') : tools.param('ssh', 'password'),
             tools.param('ssh', 'identifytype') === 'key' ? tools.param('ssh', 'passphrase') : null
         ]]);
+        workingPath = tools.param('ssh', 'workingpath');
+    }else{
+        workingPath = projectPath;
     }
 
     tools.promises().push(
@@ -106,7 +109,7 @@ function init(){
             [git.push, 'gorilla-devel']
         );
     else if (argv.g) tools.promises().push(
-            [git.initRepo, [tools.param('git', 'mainrepo'), projectPath]],
+            [git.initRepo, [tools.param('git', 'platform'), tools.param('git', 'username'), tools.param('project', 'slug')]],
             [git.createBranch, 'gorilla-devel'],
             [git.add, '.'],
             [git.commit, 'Initial commit'], 
@@ -115,11 +118,16 @@ function init(){
 
     if (argv.d) {
         tools.createTemplateEnvironment(projectPath, templatesPath, tools.param('docker', 'template'), gorillaFolder, gorillaFile, messagesFile);
+        tools.promises().push([tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/**/*']);
+        
+        // if (env === 'local') tools.promises().push([
+
         tools.promises().push(
             [docker.config, tools.getPlatform()],
-            [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/**/*'],
             [docker.check, tools.param('docker', 'machinename')],
-            [docker.start, [tools.param('docker', 'machinename'), projectPath + '/' + gorillaFolder + '/' + composeFile, tools.param('project', 'domain')]],
+            [docker.start, [tools.param('docker', 'machinename'), workingPath + '/' + gorillaFolder + '/' + composeFile, tools.param('project', 'domain')]]
+        );
+        tools.promises().push(
             [host.add, [tools.param('system', 'hostsfile'), tools.param('project', 'domain'), docker.ip(tools.param('docker', 'machinename'))]],
             [host.open, ['http://' + tools.param('project', 'domain') + ':' + tools.param('docker', 'port'), 15, 'Waiting for opening your web']]
         );

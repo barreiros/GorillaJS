@@ -44,6 +44,7 @@
         "tools-createtemplate" : "Checking for gorillafile template...",
         "hosts-adddomain": "Adding your new domain to hosts file (maybe you must enter your root password)",
         "ssh-connect": "Connecting with your server...",
-        "ssh-interactive": "Innitiating interactive shell session"
+        "ssh-interactive": "Innitiating interactive shell session...",
+        "ssh-sftp": "Uploading files to remote host..."
     }
 }

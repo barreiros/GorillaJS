@@ -1,3 +1,14 @@
+Recordatorio para desplegar Docker en remoto:
+    - Subir los archivos de la template al servidor remoto.
+    - Los archivos tienen que estar compilados (variables asignadas) antes de subir.
+    - Los archivos estarán en una carpeta ".gorilla/${project.domain}" en el raíz del usuario remoto.
+    - Las rutas de los volúmenes del archivo docker-compose tienen que ser absolutas. Hasta ahora solo necesitaba el nombre de la carpeta, tanto de application como de aplicaton-db (ejemplo de la template de wordpress).
+
+
+
+
+
+
 Dependencies:
 ===
 Docker-machine (mac-OSX)

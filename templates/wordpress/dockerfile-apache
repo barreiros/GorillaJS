@@ -1,7 +1,7 @@
 FROM ubuntu
 
 RUN echo "deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -cs) main restricted multiverse\ndeb-src http://archive.ubuntu.com/ubuntu $(lsb_release -cs) main restricted multiverse" | sudo tee -a /etc/apt/sources.list > /dev/null
-RUN apt-get update && apt-get -y --fix-missing install apache2-mpm-prefork apache2-mpm-worker libapache2-mod-fastcgi php5-fpm php5-memcached memcached php-apc php5-mysql supervisor
+RUN apt-get update && apt-get -y --fix-missing install apache2-mpm-prefork apache2-mpm-worker libapache2-mod-fastcgi php5-fpm php5-memcached memcached php-apc php5-mysqli supervisor
 
 COPY templates/wordpress/apache-supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 

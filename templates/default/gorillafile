@@ -1,6 +1,7 @@
 {
     "default": {
         "ssh": {
+            "workingpath": "/var/gorilla",
             "port": 22
         }
     }
