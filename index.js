@@ -14,6 +14,8 @@ var ssh = require(__dirname + '/lib/ssh.js');
 var docker = require(__dirname + '/lib/docker.js');
 var git = require(__dirname + '/lib/git.js');
 var host = require(__dirname + '/lib/host.js');
+var cross = require(__dirname + '/lib/crossExec.js');
+
 
 var gorillaPath = __dirname;
 var gorillaFolder = '.gorilla';
@@ -55,15 +57,17 @@ if(argv._[0] === 'init' || argv._[0] === 'pack' || argv._[0] === 'start' || argv
     tools.createBaseEnvironment(projectPath, templatesPath, gorillaPath, gorillaFile, gorillaFolder, messagesFile);
 
     if(env !== 'local') {
-        tools.promises().push([ssh.connect, [
-            tools.param('ssh', 'identifytype', ['key', 'password']), 
-            tools.param('ssh', 'host'), 
-            tools.param('ssh', 'port'), 
-            tools.param('ssh', 'username'), 
-            tools.param('ssh', 'identifytype') === 'key' ? tools.param('ssh', 'key') : tools.param('ssh', 'password'),
-            tools.param('ssh', 'identifytype') === 'key' ? tools.param('ssh', 'passphrase') : null
-        ]]);
-        workingPath = tools.param('ssh', 'workingpath');
+        if(tools.param('ssh', 'enable', ['yes', 'no']) === 'yes'){
+            tools.promises().push([ssh.connect, [
+                tools.param('ssh', 'identifytype', ['key', 'password']), 
+                tools.param('ssh', 'host'), 
+                tools.param('ssh', 'port'), 
+                tools.param('ssh', 'username'), 
+                tools.param('ssh', 'identifytype') === 'key' ? tools.param('ssh', 'key') : tools.param('ssh', 'password'),
+                tools.param('ssh', 'identifytype') === 'key' ? tools.param('ssh', 'passphrase') : null
+            ]]);
+            workingPath = tools.param('ssh', 'workingpath') + '/' + tools.param('project', 'slug');
+        }
     }else{
         workingPath = projectPath;
     }
@@ -119,18 +123,21 @@ function init(){
     if (argv.d) {
         tools.createTemplateEnvironment(projectPath, templatesPath, tools.param('docker', 'template'), gorillaFolder, gorillaFile, messagesFile);
         tools.promises().push([tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/**/*']);
-        
-        // if (env === 'local') tools.promises().push([
+
+        if (ssh.get()) {
+            tools.promises().push([cross.moveFiles, [projectPath + '/' + gorillaFolder, workingPath + '/' + gorillaFolder, true, ['.DS_Store']]]);
+        }else{
+            tools.promises().push([host.add, [tools.param('system', 'hostsfile'), tools.param('project', 'domain'), docker.ip(tools.param('docker', 'machinename'))]]);
+        }
 
         tools.promises().push(
             [docker.config, tools.getPlatform()],
             [docker.check, tools.param('docker', 'machinename')],
-            [docker.start, [tools.param('docker', 'machinename'), workingPath + '/' + gorillaFolder + '/' + composeFile, tools.param('project', 'domain')]]
-        );
-        tools.promises().push(
-            [host.add, [tools.param('system', 'hostsfile'), tools.param('project', 'domain'), docker.ip(tools.param('docker', 'machinename'))]],
+            [docker.start, [tools.param('docker', 'machinename'), workingPath + '/' + gorillaFolder + '/' + composeFile, tools.param('project', 'domain')]],
             [host.open, ['http://' + tools.param('project', 'domain') + ':' + tools.param('docker', 'port'), 15, 'Waiting for opening your web']]
         );
+
+        if (ssh.get()) tools.promises().push(ssh.close);
     }
 
     if (tools.promises().length) tools.promiseme();

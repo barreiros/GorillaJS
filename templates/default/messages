@@ -8,12 +8,14 @@
         "005" : "Unable to create remote repo.",
         "007" : "Unable to start Docker.",
         "008" : "Unable to stop Docker.",
-        "009" : "Unable to install git in remote hosts",
-        "010" : "Unable to connect with remote hosts",
-        "011" : "Unable to start intercative shell session",
-        "012" : "Unable to provisioning the machine",
-        "013" : "Unable to get the current Docker public ip",
-        "014" : "Unable to detect the platform"
+        "009" : "Unable to install git in remote hosts.",
+        "010" : "Unable to connect with remote hosts.",
+        "011" : "Unable to start intercative shell session.",
+        "012" : "Unable to provisioning the machine.",
+        "013" : "Unable to get the current Docker public ip.",
+        "014" : "Unable to detect the platform.",
+        "015" : "Unable to start a sftp session.",
+        "016" : "Unable to upload the file."
     },
 
     "warnings": {
@@ -25,7 +27,7 @@
         "007" : "Problem setting Docker environment variables.",
         "008" : "Problem starting Docker machine.",
         "009" : "Unable to open your browser.",
-        "010" : "The machine ip is not valid"
+        "010" : "The machine ip is not valid."
     },
 
     "steps" : {
@@ -46,5 +48,11 @@
         "ssh-connect": "Connecting with your server...",
         "ssh-interactive": "Innitiating interactive shell session...",
         "ssh-sftp": "Uploading files to remote host..."
+    },
+
+    "questions": {
+        "ssh": {
+            "enable": "The actual environment is not 'local'. Do you want to initiate a ssh session with a remote server?"
+        }
     }
 }
