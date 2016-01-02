@@ -8,6 +8,9 @@
         "system": {
             "hostsfile": "/etc/hosts"
         },
+        "apache": {
+            "adminemail": "test@yourdomain.com"
+        },
         "docker": {
             "machinename": "default",
             "template": "wordpress",

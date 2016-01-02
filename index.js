@@ -135,6 +135,7 @@ function init(){
             [docker.check, tools.param('docker', 'machinename')],
             [docker.start, [tools.param('docker', 'machinename'), workingPath + '/' + gorillaFolder + '/' + composeFile, tools.param('project', 'domain')]],
             [host.open, ['http://' + tools.param('project', 'domain') + ':' + tools.param('docker', 'port'), 15, 'Waiting for opening your web']]
+            // [tools.resetEnvVariables, projectPath + '/' + gorillaFolder + '/**/*']
         );
 
         if (ssh.get()) tools.promises().push(ssh.close);
