@@ -83,7 +83,7 @@ if(argv._[0] === 'init' || argv._[0] === 'pack' || argv._[0] === 'start' || argv
 function provision(){
     
     tools.promises().push(
-        [tools.provision, [templatesPath]],
+        [tools.provision, [projectPath + '/' + gorillaFolder + '/remote-provision.sh']],
         // ssh.interactive,
         [ssh.close]
     );
@@ -126,18 +126,36 @@ function init(){
 
         if (ssh.get()) {
             tools.promises().push([cross.moveFiles, [projectPath + '/' + gorillaFolder, workingPath + '/' + gorillaFolder, true, ['.DS_Store']]]);
-        }else{
-            tools.promises().push([host.add, [tools.param('system', 'hostsfile'), tools.param('project', 'domain'), docker.ip(tools.param('docker', 'machinename'))]]);
         }
 
         tools.promises().push(
             [docker.config, tools.getPlatform()],
             [docker.check, tools.param('docker', 'machinename')],
-            [docker.start, [tools.param('docker', 'machinename'), workingPath + '/' + gorillaFolder + '/' + composeFile, tools.param('project', 'domain')]],
-            [host.open, ['http://' + tools.param('project', 'domain') + ':' + tools.param('docker', 'port'), 15, 'Waiting for opening your web']]
+            [docker.start, [tools.param('docker', 'machinename'), workingPath + '/' + gorillaFolder + '/' + composeFile, tools.param('project', 'domain')]]
             // [tools.resetEnvVariables, projectPath + '/' + gorillaFolder + '/**/*']
         );
 
+        if (ssh.get()){
+            if(tools.param('system', 'platform', ['apache', 'nginx', 'cancel']) !== 'cancel'){
+                tools.promises().push(
+                    [host.create, [tools.param('system', 'platform'), projectPath + '/' + gorillaFolder + '/' + tools.param('system', 'platform') + '-proxy.conf', workingPath + '/' + gorillaFolder + '/' + tools.param('system', 'platform') + '-proxy.conf', tools.param('project', 'domain')]],
+                    [host.open, ['http://' + tools.param('project', 'domain'), 15, 'Waiting for opening your web']]
+                );
+            }else{
+                tools.promises().push(
+                    [host.open, ['http://' + tools.param('project', 'domain') + ':' + tools.param('docker', 'port'), 15, 'Waiting for opening your web']]
+                );
+            }
+        }else{
+            if(tools.param('hosts', 'enabled', ['yes', 'no']) === 'yes'){
+                tools.promises().push(
+                    [host.add, [tools.param('system', 'hostsfile'), tools.param('project', 'domain'), docker.ip(tools.param('docker', 'machinename'))]],
+                    [host.open, ['http://' + tools.param('project', 'domain') + ':' + tools.param('docker', 'port'), 15, 'Waiting for opening your web']]
+                );
+            }else{
+                tools.promises().push([host.open, ['http://' + docker.ip(tools.param('docker', 'machinename')) + ':' + tools.param('docker', 'port'), 15, 'Waiting for opening your web']]);
+            }
+        }
         if (ssh.get()) tools.promises().push(ssh.close);
     }
 

@@ -15,7 +15,9 @@
         "013" : "Unable to get the current Docker public ip.",
         "014" : "Unable to detect the platform.",
         "015" : "Unable to start a sftp session.",
-        "016" : "Unable to upload the file."
+        "016" : "Unable to upload the file.",
+        "017" : "Unable to create nginx proxy",
+        "018" : "Unable to create apache proxy"
     },
 
     "warnings": {
@@ -45,6 +47,7 @@
         "docker-start" : "Starting Docker...",
         "tools-createtemplate" : "Checking for gorillafile template...",
         "hosts-adddomain": "Adding your new domain to hosts file (maybe you must enter your root password)",
+        "hosts-createproxy": "Configuring proxy in your remote server",
         "ssh-connect": "Connecting with your server...",
         "ssh-interactive": "Innitiating interactive shell session...",
         "ssh-sftp": "Uploading files to remote host..."

@@ -23,3 +23,7 @@ sudo chown $USER:root /var/gorilla
 sudo groupadd docker
 sudo gpasswd -a ${USER} docker
 sudo service docker restart
+
+# Install and configure nginx
+sudo apt-get -y install nginx
+

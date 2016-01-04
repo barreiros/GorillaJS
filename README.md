@@ -1,7 +1,9 @@
-Recordatorio para desplegar Docker en remoto:
-    - Los archivos tienen que estar compilados (variables asignadas) antes de subir. Revisar esto porque algunos archivos no se están compilando.
-    - Las rutas de los volúmenes del archivo docker-compose tienen que ser absolutas. Hasta ahora solo necesitaba el nombre de la carpeta, tanto de application como de aplicaton-db (ejemplo de la template de wordpress).
-
+Recordatorio para configurar el API remote de Docker:
+===
+Para iniciar el API remote de Docker uso la librería socat porque me facilita redireccionar el puerto al socket de Docker sin que eso interfiera en el funcionamiento de los contenedores.
+socat -d -d TCP-LISTEN:4242,fork UNIX:/var/run/docker.sock 
+¡Tengo que ver cómo volver a crear el enlace, porque ahora cuando termino el proceso y lo vuelvo a arrancar, me dice que está ocupado. 
+sudo netstat -nlp | grep ${PORT}
 
 
 To create Docker images
