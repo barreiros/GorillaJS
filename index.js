@@ -119,7 +119,7 @@ function init(){
         tools.promises().push(
             [docker.config, tools.getPlatform()],
             [docker.check, tools.param('docker', 'machinename')],
-            [docker.start, [tools.param('docker', 'machinename'), workingPath + '/' + gorillaFolder + '/' + composeFile, tools.param('project', 'domain')]]
+            [docker.start, [tools.param('docker', 'machinename'), workingPath + '/' + gorillaFolder + '/' + composeFile, tools.param('project', 'slug', null, tools.sanitize)]]
             // [tools.resetEnvVariables, projectPath + '/' + gorillaFolder + '/**/*']
         );
 
@@ -135,12 +135,13 @@ function init(){
                 );
             }
         }else{
-            if(tools.param('hosts', 'enabled', ['yes', 'no']) === 'yes'){
+            if(tools.param('hosts', 'enabled', ['ip', 'domain']) === 'domain'){
                 tools.promises().push(
                     [host.add, [tools.param('system', 'hostsfile'), tools.param('project', 'domain'), docker.ip(tools.param('docker', 'machinename'))]],
                     [host.open, ['http://' + tools.param('project', 'domain') + ':' + tools.param('docker', 'port'), 15, 'Waiting for opening your web']]
                 );
             }else{
+                tools.paramForced('project', 'domain', docker.ip(tools.param('docker', 'machinename')));
                 tools.promises().push([host.open, ['http://' + docker.ip(tools.param('docker', 'machinename')) + ':' + tools.param('docker', 'port'), 15, 'Waiting for opening your web']]);
             }
         }

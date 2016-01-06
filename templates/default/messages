@@ -55,6 +55,9 @@
     },
 
     "questions": {
+        "hosts": {
+            "enabled": "Do you want to access to your local web project either through ip or domain name?"
+        },
         "project": {
             "slug": "Your project ID ()"
         },
@@ -64,11 +67,12 @@
         "git": {
             "branchdevel": "Whath is your development branch?",
             "branchdeploy": "What is your deploy branch?",
-            "platform": "What git platform do you want to use for your project?",
+            "platform": "What git platform do you want to use for store your project?",
             "username": "Git username",
             "password": "Git password",
             "clonefromurl": "What is the git project url (https) to clone?",
-            "clonefrombranch": "Wich branch?"
+            "clonefrombranch": "Wich branch?",
+            "private": "Do you want a private repository?"
         }
     }
 }
