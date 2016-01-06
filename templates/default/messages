@@ -17,7 +17,8 @@
         "015" : "Unable to start a sftp session.",
         "016" : "Unable to upload the file.",
         "017" : "Unable to create nginx proxy",
-        "018" : "Unable to create apache proxy"
+        "018" : "Unable to create apache proxy",
+        "019" : "Unable to remove directory"
     },
 
     "warnings": {
@@ -54,8 +55,20 @@
     },
 
     "questions": {
+        "project": {
+            "slug": "Your project ID ()"
+        },
         "ssh": {
             "enable": "The actual environment is not 'local'. Do you want to initiate a ssh session with a remote server?"
+        },
+        "git": {
+            "branchdevel": "Whath is your development branch?",
+            "branchdeploy": "What is your deploy branch?",
+            "platform": "What git platform do you want to use for your project?",
+            "username": "Git username",
+            "password": "Git password",
+            "clonefromurl": "What is the git project url (https) to clone?",
+            "clonefrombranch": "Wich branch?"
         }
     }
 }

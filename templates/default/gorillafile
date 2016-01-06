@@ -3,6 +3,10 @@
         "ssh": {
             "workingpath": "/var/gorilla",
             "port": 22
+        },
+        "git": {
+            "branchdevel": "gorilla-devel",
+            "branchdeploy": "master"
         }
     }
 }

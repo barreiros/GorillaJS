@@ -5,6 +5,11 @@ socat -d -d TCP-LISTEN:4242,fork UNIX:/var/run/docker.sock
 ¡Tengo que ver cómo volver a crear el enlace, porque ahora cuando termino el proceso y lo vuelvo a arrancar, me dice que está ocupado. 
 sudo netstat -nlp | grep ${PORT}
 
+Advertencias en el uso de GorillaJS
+===
+*Git*
+Cuando se clona un repositorio solo se clonan los contenidos, no el histórico de commits. Los usuarios que no quieran un repositorio limpio solo tienen que usar la clonación de git, sin la ayuda de GorillaJS :-).
+
 
 To create Docker images
 ===

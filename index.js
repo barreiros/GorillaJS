@@ -16,7 +16,6 @@ var git = require(__dirname + '/lib/git.js');
 var host = require(__dirname + '/lib/host.js');
 var cross = require(__dirname + '/lib/crossExec.js');
 
-
 var gorillaPath = __dirname;
 var gorillaFolder = '.gorilla';
 var gorillaFile = 'gorillafile';
@@ -66,7 +65,7 @@ if(argv._[0] === 'init' || argv._[0] === 'pack' || argv._[0] === 'start' || argv
                 tools.param('ssh', 'identifytype') === 'key' ? tools.param('ssh', 'key') : tools.param('ssh', 'password'),
                 tools.param('ssh', 'identifytype') === 'key' ? tools.param('ssh', 'passphrase') : null
             ]]);
-            workingPath = tools.param('ssh', 'workingpath') + '/' + tools.param('project', 'slug');
+            workingPath = tools.param('ssh', 'workingpath') + '/' + tools.param('project', 'slug', null, tools.sanitize);
         }
     }else{
         workingPath = projectPath;
@@ -80,45 +79,34 @@ if(argv._[0] === 'init' || argv._[0] === 'pack' || argv._[0] === 'start' || argv
     tools.promiseme();
 }
 
-function provision(){
-    
-    tools.promises().push(
-        [tools.provision, [projectPath + '/' + gorillaFolder + '/remote-provision.sh']],
-        // ssh.interactive,
-        [ssh.close]
-    );
-
-    if (tools.promises().length) tools.promiseme();
-}
-
 function init(){
 
-    if (argv.grc) tools.promises().push(
-            [git.createRemote, [tools.param('git', 'platform', ['github', 'bitbucket', 'gitlab']), tools.param('git', 'username'), (tools.param('git', 'platform') !== 'gitlab' ? tools.param('git', 'password') : tools.param('git', 'token')), tools.param('git', 'private', ['true', 'false']), tools.param('project', 'slug')]],
-            [git.initRepo, [tools.param('git', 'platform'), tools.param('git', 'username'), tools.param('project', 'slug')]],
-            [git.createBranch, 'gorilla-devel'], 
+    if (argv.c || argv.r) {
+        tools.promises().push(
+            [git.config, workingPath]
+        );
+    }
+
+    if (argv.c) {
+        tools.promises().push(
+            git.initRepo,
             [git.clone, [tools.param('git', 'clonefromurl'), tools.param('git', 'clonefrombranch'), projectPath + '/temp_repo/']],
-            [tools.moveFiles, [projectPath + '/temp_repo/', projectPath + '/', ['.git']]],
-            [tools.removeDir, projectPath + '/temp_repo/'],
-            [git.add, '.'],
-            [git.commit, 'Initial commit'], 
-            [git.push, 'gorilla-devel']
+            [cross.moveFiles, [projectPath + '/temp_repo/', projectPath + '/', false, ['.git']]],
+            [tools.removeDir, projectPath + '/temp_repo/']
         );
-    else if (argv.gr) tools.promises().push(
-            [git.createRemote, [tools.param('git', 'platform', ['github', 'bitbucket', 'gitlab']), tools.param('git', 'username'), (tools.param('git', 'platform') !== 'gitlab' ? tools.param('git', 'password') : tools.param('git', 'token')), tools.param('git', 'private', ['true', 'false']), tools.param('project', 'slug')]],
-            [git.initRepo, [tools.param('git', 'platform'), tools.param('git', 'username'), tools.param('project', 'slug')]],
-            [git.createBranch, 'gorilla-devel'],
+    }
+
+    if (argv.r) {
+        tools.promises().push(
+            git.initRepo,
+            [git.createRemote, [tools.param('git', 'platform', ['github', 'bitbucket', 'gitlab']), tools.param('git', 'username'), (tools.param('git', 'platform') !== 'gitlab' ? tools.param('git', 'password') : tools.param('git', 'token')), tools.param('git', 'private', ['true', 'false']), tools.param('project', 'slug', null, tools.sanitize)]],
+            [git.addOrigin, [tools.param('git', 'platform', ['github', 'bitbucket', 'gitlab']), tools.param('git', 'username'), tools.param('project', 'slug'), workingPath]],
+            [git.createBranch, tools.param('git', 'branchdevel')],
             [git.add, '.'],
-            [git.commit, 'Initial commit'], 
-            [git.push, 'gorilla-devel']
+            [git.commit, 'GorillaJS ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss')], 
+            [git.push, tools.param('git', 'branchdevel')]
         );
-    else if (argv.g) tools.promises().push(
-            [git.initRepo, [tools.param('git', 'platform'), tools.param('git', 'username'), tools.param('project', 'slug')]],
-            [git.createBranch, 'gorilla-devel'],
-            [git.add, '.'],
-            [git.commit, 'Initial commit'], 
-            [git.push, 'gorilla-devel']
-        );
+    }
 
     if (argv.d) {
         tools.createTemplateEnvironment(projectPath, templatesPath, tools.param('docker', 'template'), gorillaFolder, gorillaFile, messagesFile);
@@ -177,6 +165,17 @@ function pack(){
         [git.commit, 'deploy ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss')], 
         [git.push, 'master'], 
         [git.checkout, 'gorilla-devel']
+    );
+
+    if (tools.promises().length) tools.promiseme();
+}
+
+function provision(){
+    
+    tools.promises().push(
+        [tools.provision, [projectPath + '/' + gorillaFolder + '/remote-provision.sh']],
+        // ssh.interactive,
+        [ssh.close]
     );
 
     if (tools.promises().length) tools.promiseme();
