@@ -35,8 +35,7 @@
 
     "steps" : {
         "git-init" : "Creating local repo...",
-        "git-branch-gorilla-devel" : "Creating gorilla-devel branch...",
-        "git-branch-gorilla-master" : "Creating gorilla-master branch...",
+        "git-branch" : "Creating branch...",
         "git-push" : "Pushing to remote...",
         "git-clone" : "Cloning from repo...",
         "git-remote" : "Creating new remote repo...",
@@ -59,10 +58,13 @@
             "enabled": "Do you want to access to your local web project either through ip or domain name?"
         },
         "project": {
-            "slug": "Your project ID ()"
+            "slug": "Your project ID ()",
+            "srcin": "What is your src (www, html, application...) local project folder? (Please, relative to the project folder).",
+            "srcout": "What is your src (www, html, application...) server folder? (Please, relative to the server project folder)."
         },
         "ssh": {
-            "enable": "The actual environment is not 'local'. Do you want to initiate a ssh session with a remote server?"
+            "enable": "The actual environment is not 'local'. Do you want to initiate a ssh session with a remote server?",
+            "passphrase": "Your ssh key passphrase (leave blank if not)"
         },
         "git": {
             "branchdevel": "Whath is your development branch?",

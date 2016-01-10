@@ -6,7 +6,7 @@
         },
         "git": {
             "branchdevel": "gorilla-devel",
-            "branchdeploy": "master"
+            "branchdeploy": "gorilla-master"
         }
     }
 }

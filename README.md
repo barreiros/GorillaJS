@@ -10,6 +10,15 @@ Advertencias en el uso de GorillaJS
 *Git*
 Cuando se clona un repositorio solo se clonan los contenidos, no el histórico de commits. Los usuarios que no quieran un repositorio limpio solo tienen que usar la clonación de git, sin la ayuda de GorillaJS :-).
 
+*ssh*
+Solo se admiten keys para conectarse con los servidores remotos. ¿passwordless?
+
+*Deploy*
+Los archivos que no queramos incluir en el proceso tendrán que estar en el archivo .gitignore. 
+
+*Pack*
+La rama que usará el método pack será la que le hayamos indicado en la variable branchdevel. Esta rama la ha podido crear el usuario por otras vías distintas a GorillaJS. Por eso, si la rama no existe, la creará GorillaJS. La idea de esto es dar flexibilidad al usuario y que pueda ir eligiendo ramas que quiera desplegar para cada uno de los entornos.
+
 
 To create Docker images
 ===
