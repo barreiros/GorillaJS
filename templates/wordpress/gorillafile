@@ -1,7 +1,7 @@
 {
     "default": {
         "project": {
-            "serverfolder": "application",
+            "srcin": "src",
             "datafolder": "application-db",
             "domain": "gorilla.local"
         },

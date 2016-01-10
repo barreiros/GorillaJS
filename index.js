@@ -82,6 +82,9 @@ function deploy(){
     // git show --name-only --oneline --no-commit-id --pretty="format:"
     // Falta aplicar el filtro git-diff (https://git-scm.com/docs/git-diff) para saber si son modificados, eliminados, añadidos... Esto lo voy a necesitar, sobre todo, en el método de rollback.
 
+    // Crear un array con los archivos que se han modificado de alguna manera y otro con los que se han eliminado.
+    // Subir al servidor los archivos que se han modificado, a través de sftp.
+    // Borrar en el servidor los archivos que se han eliminado, a través de línea de comando.
 }
 
 function rollback(){
@@ -112,16 +115,21 @@ function pack(){
 
 function init(){
 
+    if (argv.d) {
+        // Hago esta llamada primero para evitar el error Segmentation fail 11.
+        tools.paramForced('docker', 'gorillafolder', gorillaFolder);
+        tools.createTemplateEnvironment(projectPath, templatesPath, tools.param('docker', 'template'), gorillaFolder, gorillaFile, messagesFile);
+    }
+
     if (argv.c || argv.r) {
         tools.promises().push(
-            [git.config, workingPath]
+            [git.config, workingPath],
+            [git.initRepo, gorillaFolder]
         );
     }
 
     if (argv.c) {
         tools.promises().push(
-            [git.config, workingPath],
-            [git.initRepo, gorillaFolder],
             [git.clone, [tools.param('git', 'clonefromurl'), tools.param('git', 'clonefrombranch'), projectPath + '/temp_repo/']],
             [cross.moveFiles, [projectPath + '/temp_repo/', projectPath + '/', false, ['.git']]],
             [tools.removeDir, projectPath + '/temp_repo/'],
@@ -132,15 +140,12 @@ function init(){
 
     if (argv.r) {
         tools.promises().push(
-            [git.config, workingPath],
-            [git.initRepo, gorillaFolder],
             [git.createRemote, [tools.param('git', 'platform', ['github', 'bitbucket', 'gitlab']), tools.param('git', 'username'), (tools.param('git', 'platform') !== 'gitlab' ? tools.param('git', 'password') : tools.param('git', 'token')), tools.param('git', 'private', ['true', 'false']), tools.param('project', 'slug', null, tools.sanitize)]],
             [git.addOrigin, [tools.param('git', 'platform', ['github', 'bitbucket', 'gitlab']), tools.param('git', 'username'), tools.param('project', 'slug'), workingPath]]
         );
     }
 
     if (argv.d) {
-        tools.createTemplateEnvironment(projectPath, templatesPath, tools.param('docker', 'template'), gorillaFolder, gorillaFile, messagesFile);
         tools.promises().push([tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/**/*']);
 
         if (ssh.get()) {
