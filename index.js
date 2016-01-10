@@ -79,6 +79,8 @@ if(argv._[0] === 'init' || argv._[0] === 'pack' || argv._[0] === 'deploy' || arg
 }
 
 function deploy(){
+    // git show --name-only --oneline --no-commit-id --pretty="format:"
+    // Falta aplicar el filtro git-diff (https://git-scm.com/docs/git-diff) para saber si son modificados, eliminados, añadidos... Esto lo voy a necesitar, sobre todo, en el método de rollback.
 
 }
 
@@ -97,7 +99,6 @@ function pack(){
         [git.add, '.'],
         [git.commit, ['GorillaJS control point ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
         [git.createBranch, [tools.param('git', 'branchdeploy'), true]],
-        [git.commit, ['GorillaJS control point ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
         [git.clone, ['file://' + projectPath, tools.param('git', 'branchdevel'), projectPath + '/temp_repo/']],
         [cross.moveFiles, [projectPath + '/temp_repo/' + tools.param('project', 'src'), projectPath + '/', false, ['.git']]],
         [tools.removeDir, projectPath + '/temp_repo/'],
