@@ -18,7 +18,10 @@
         "016" : "Unable to upload the file.",
         "017" : "Unable to create nginx proxy",
         "018" : "Unable to create apache proxy",
-        "019" : "Unable to remove directory"
+        "019" : "Unable to remove directory",
+        "020" : "Unable to list modified files from your repository",
+        "021" : "Unable to list deleted files from your repository",
+        "022" : "Unable to create server directory tree"
     },
 
     "warnings": {
@@ -30,7 +33,9 @@
         "007" : "Problem setting Docker environment variables.",
         "008" : "Problem starting Docker machine.",
         "009" : "Unable to open your browser.",
-        "010" : "The machine ip is not valid."
+        "010" : "The machine ip is not valid.",
+        "011" : "Unable to remove empty directory",
+        "012" : "Unable to remove server files"
     },
 
     "steps" : {
@@ -50,7 +55,9 @@
         "hosts-createproxy": "Configuring proxy in your remote server",
         "ssh-connect": "Connecting with your server...",
         "ssh-interactive": "Innitiating interactive shell session...",
-        "ssh-sftp": "Uploading files to remote host..."
+        "ssh-sftp": "Uploading files to remote host...",
+        "git-fileschanged": "Listing changed files...",
+        "git-filesdeleted": "Listing deleted files..."
     },
 
     "questions": {

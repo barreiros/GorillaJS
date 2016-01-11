@@ -84,7 +84,18 @@ function deploy(){
 
     // Crear un array con los archivos que se han modificado de alguna manera y otro con los que se han eliminado.
     // Subir al servidor los archivos que se han modificado, a través de sftp.
-    // Borrar en el servidor los archivos que se han eliminado, a través de línea de comando.
+    // Borrar en el servidor los archivos que se han eliminado, a través de sftp.
+    if (argv.f) tools.setConfigFile(f);
+
+    tools.promises().push(
+        [git.config, projectPath],
+        [git.createBranch, [tools.param('git', 'branchdeploy')]],
+        [cross.moveFiles, [git.listFilesChanged(), workingPath + '/' + tools.param('project', 'srcout'), true]],
+        [cross.removeFiles, [git.listFilesRemoved(), true]],
+        ssh.close
+    );
+
+    if (tools.promises().length) tools.promiseme();
 }
 
 function rollback(){
@@ -103,7 +114,7 @@ function pack(){
         [git.commit, ['GorillaJS control point ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
         [git.createBranch, [tools.param('git', 'branchdeploy'), true]],
         [git.clone, ['file://' + projectPath, tools.param('git', 'branchdevel'), projectPath + '/temp_repo/']],
-        [cross.moveFiles, [projectPath + '/temp_repo/' + tools.param('project', 'src'), projectPath + '/', false, ['.git']]],
+        [cross.moveFiles, [projectPath + '/temp_repo/' + tools.param('project', 'srcin'), projectPath + '/', false, ['.git']]],
         [tools.removeDir, projectPath + '/temp_repo/'],
         [git.add, '.'],
         [git.commit, 'GorillaJS deploy point ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss')],
@@ -116,7 +127,7 @@ function pack(){
 function init(){
 
     if (argv.d) {
-        // Hago esta llamada primero para evitar el error Segmentation fail 11.
+        // Hago esta llamada primero para evitar el error "Segmentation fault 11". Las llamadas a funciones que no estén en promises se deberían ir primero.
         tools.paramForced('docker', 'gorillafolder', gorillaFolder);
         tools.createTemplateEnvironment(projectPath, templatesPath, tools.param('docker', 'template'), gorillaFolder, gorillaFile, messagesFile);
     }

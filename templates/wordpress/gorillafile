@@ -2,6 +2,7 @@
     "default": {
         "project": {
             "srcin": "src",
+            "srcout": "application",
             "datafolder": "application-db",
             "domain": "gorilla.local"
         },
