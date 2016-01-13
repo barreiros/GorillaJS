@@ -112,9 +112,21 @@ function deploy(){
             workingPath + '/' + tools.param('project', 'srcout'), 
             true
         ]],
-        [cross.removeFiles, [git.listFiles().deleted, true]],
+        [cross.removeFiles, [
+            tools.filterPaths(
+                git.listFiles(
+                    // git.lastCommitDate(tools.param('git', 'branchdeploy')), 
+                    'Tue Jan 12 20:09:31 2016 +0100',
+                    tools.param('git', 'branchdevel')
+                ).deleted, 
+                tools.param('project', 'srcin')
+            ),
+            workingPath + '/' + tools.param('project', 'srcout'), 
+            true
+        ]],
         [git.add, '.'],
         [git.commit, ['GorillaJS deploy point ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
+        [git.createBranch, [tools.param('git', 'branchdevel')]],
         ssh.close
     );
 
