@@ -79,19 +79,42 @@ if(argv._[0] === 'init' || argv._[0] === 'pack' || argv._[0] === 'deploy' || arg
 }
 
 function deploy(){
-    // git show --name-only --oneline --no-commit-id --pretty="format:"
-    // Falta aplicar el filtro git-diff (https://git-scm.com/docs/git-diff) para saber si son modificados, eliminados, añadidos... Esto lo voy a necesitar, sobre todo, en el método de rollback.
-
     // Crear un array con los archivos que se han modificado de alguna manera y otro con los que se han eliminado.
     // Subir al servidor los archivos que se han modificado, a través de sftp.
     // Borrar en el servidor los archivos que se han eliminado, a través de sftp.
     if (argv.f) tools.setConfigFile(f);
 
+    // console.log('La fecha del último commit es', git.listFiles(git.lastCommitDate(tools.param('git', 'branchdeploy'))));
+
     tools.promises().push(
         [git.config, projectPath],
+        [git.createBranch, [tools.param('git', 'branchdevel')]],
+        [git.add, '.'],
+        [git.commit, ['GorillaJS deploy point ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
         [git.createBranch, [tools.param('git', 'branchdeploy')]],
-        [cross.moveFiles, [git.listFilesChanged(), workingPath + '/' + tools.param('project', 'srcout'), true]],
-        [cross.removeFiles, [git.listFilesRemoved(), true]],
+        [git.clone, ['file://' + projectPath, tools.param('git', 'branchdevel'), projectPath + '/temp_repo/']],
+        [cross.moveFiles, [projectPath + '/temp_repo/' + tools.param('project', 'srcin'), projectPath + '/', false, ['.git']]],
+        [tools.removeDir, projectPath + '/temp_repo/'],
+
+        [cross.moveFiles, [
+            tools.filterPaths(
+                tools.fusionObjectNodes(
+                    git.listFiles(
+                        // git.lastCommitDate(tools.param('git', 'branchdeploy')), 
+                        'Tue Jan 12 20:09:31 2016 +0100',
+                        tools.param('git', 'branchdevel')
+                    ), 
+                    'added', 
+                    'modified'
+                ),
+                tools.param('project', 'srcin')
+            ),
+            workingPath + '/' + tools.param('project', 'srcout'), 
+            true
+        ]],
+        [cross.removeFiles, [git.listFiles().deleted, true]],
+        [git.add, '.'],
+        [git.commit, ['GorillaJS deploy point ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
         ssh.close
     );
 

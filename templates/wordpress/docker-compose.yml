@@ -4,7 +4,7 @@ web:
     - "${docker.port}:80"
   volumes:
     - ../${docker.gorillafolder}:/root/templates
-    - ../${project.srcin}:/var/www/${project.domain}/${project.srcin}
+    - ../${project.srcout}:/var/www/${project.domain}/${project.srcout}
   links:
     - mysql:database
 mysql:

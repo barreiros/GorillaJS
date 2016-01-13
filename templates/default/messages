@@ -56,8 +56,7 @@
         "ssh-connect": "Connecting with your server...",
         "ssh-interactive": "Innitiating interactive shell session...",
         "ssh-sftp": "Uploading files to remote host...",
-        "git-fileschanged": "Listing changed files...",
-        "git-filesdeleted": "Listing deleted files..."
+        "git-listfiles": "Listing files..."
     },
 
     "questions": {
