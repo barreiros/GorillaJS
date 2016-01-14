@@ -86,44 +86,42 @@ function deploy(){
 
     // console.log('La fecha del último commit es', git.listFiles(git.lastCommitDate(tools.param('git', 'branchdeploy'))));
 
+    // console.log(
+    //     tools.filterPaths(
+    //         tools.fusionObjectNodes(
+    //             git.listFiles(
+    //                 // git.lastCommitDate(tools.param('git', 'branchdeploy')), 
+    //                 'Tue Jan 12 20:09:31 2016 +0100',
+    //                 tools.param('git', 'branchdevel')
+    //             ), 
+    //             'added', 
+    //             'modified'
+    //         ),
+    //         tools.param('project', 'srcin')
+    //     )
+    // );
+    // return;
+
     tools.promises().push(
         [git.config, projectPath],
-        [git.createBranch, [tools.param('git', 'branchdevel')]],
+        [git.createBranch, [tools.param('git', 'branchdevel'), true]],
         [git.add, '.'],
         [git.commit, ['GorillaJS deploy point ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
-        [git.createBranch, [tools.param('git', 'branchdeploy')]],
+        [git.createBranch, [tools.param('git', 'branchdeploy'), true]],
         [git.clone, ['file://' + projectPath, tools.param('git', 'branchdevel'), projectPath + '/temp_repo/']],
-        [cross.moveFiles, [projectPath + '/temp_repo/' + tools.param('project', 'srcin'), projectPath + '/', false, ['.git']]],
+        [cross.moveFiles, [projectPath + '/', false, ['.git'], projectPath + '/temp_repo/' + tools.param('project', 'srcin')]],
         [tools.removeDir, projectPath + '/temp_repo/'],
 
-        [cross.moveFiles, [
-            tools.filterPaths(
-                tools.fusionObjectNodes(
-                    git.listFiles(
-                        // git.lastCommitDate(tools.param('git', 'branchdeploy')), 
-                        'Tue Jan 12 20:09:31 2016 +0100',
-                        tools.param('git', 'branchdevel')
-                    ), 
-                    'added', 
-                    'modified'
-                ),
-                tools.param('project', 'srcin')
-            ),
-            workingPath + '/' + tools.param('project', 'srcout'), 
-            true
-        ]],
-        [cross.removeFiles, [
-            tools.filterPaths(
-                git.listFiles(
-                    // git.lastCommitDate(tools.param('git', 'branchdeploy')), 
-                    'Tue Jan 12 20:09:31 2016 +0100',
-                    tools.param('git', 'branchdevel')
-                ).deleted, 
-                tools.param('project', 'srcin')
-            ),
-            workingPath + '/' + tools.param('project', 'srcout'), 
-            true
-        ]],
+        [git.listFiles, ['Tue Jan 12 20:09:31 2016 +0100', tools.param('git', 'branchdevel')]],
+        [tools.fusionObjectNodes, ['added', 'modified']], // last param autofilled
+        [tools.filterPaths, tools.param('project', 'srcin')], // last param autofilled
+        [cross.moveFiles, [workingPath + '/' + tools.param('project', 'srcout'), true]],
+
+        [git.listFiles, ['Tue Jan 12 20:09:31 2016 +0100', tools.param('git', 'branchdevel')]],
+        [tools.fusionObjectNodes, ['deleted']], // last param autofilled
+        [tools.filterPaths, tools.param('project', 'srcin')], // last param autofilled
+        [cross.removeFiles, [workingPath + '/' + tools.param('project', 'srcout'), true]],
+
         [git.add, '.'],
         [git.commit, ['GorillaJS deploy point ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
         [git.createBranch, [tools.param('git', 'branchdevel')]],
@@ -180,7 +178,7 @@ function init(){
             [cross.moveFiles, [projectPath + '/temp_repo/', projectPath + '/', false, ['.git']]],
             [tools.removeDir, projectPath + '/temp_repo/'],
             [git.createBranch, tools.param('git', 'branchdevel')],
-            [git.commit, ['GorillaJS has cloned the repo ' + tools.param('git', 'clonefromurl') + ' on ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]]
+            [git.commit, ['GorillaJS has cloned the repo ' + tools.param('git', 'clonefromurl'), true]]
         );
     }
 
