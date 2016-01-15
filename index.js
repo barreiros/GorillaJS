@@ -50,6 +50,8 @@ events.subscribe('MESSAGE', function(message){
 });
 
 
+if (argv.f) tools.setConfigFile(f);
+
 if(argv._[0] === 'init' || argv._[0] === 'pack' || argv._[0] === 'deploy' || argv._[0] === 'rollback' || argv._[0] === 'provision'){
 
     tools.config(env);
@@ -79,28 +81,6 @@ if(argv._[0] === 'init' || argv._[0] === 'pack' || argv._[0] === 'deploy' || arg
 }
 
 function deploy(){
-    // Crear un array con los archivos que se han modificado de alguna manera y otro con los que se han eliminado.
-    // Subir al servidor los archivos que se han modificado, a través de sftp.
-    // Borrar en el servidor los archivos que se han eliminado, a través de sftp.
-    if (argv.f) tools.setConfigFile(f);
-
-    // console.log('La fecha del último commit es', git.listFiles(git.lastCommitDate(tools.param('git', 'branchdeploy'))));
-
-    // console.log(
-    //     tools.filterPaths(
-    //         tools.fusionObjectNodes(
-    //             git.listFiles(
-    //                 // git.lastCommitDate(tools.param('git', 'branchdeploy')), 
-    //                 'Tue Jan 12 20:09:31 2016 +0100',
-    //                 tools.param('git', 'branchdevel')
-    //             ), 
-    //             'added', 
-    //             'modified'
-    //         ),
-    //         tools.param('project', 'srcin')
-    //     )
-    // );
-    // return;
 
     tools.promises().push(
         [git.config, projectPath],
@@ -135,34 +115,18 @@ function rollback(){
 
 }
 
-function pack(){
-
-    if (argv.f) tools.setConfigFile(f);
-
-    tools.promises().push(
-        [git.config, workingPath],
-        [git.initRepo, gorillaFolder],
-        [git.createBranch, tools.param('git', 'branchdevel')],
-        [git.add, '.'],
-        [git.commit, ['GorillaJS control point ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
-        [git.createBranch, [tools.param('git', 'branchdeploy'), true]],
-        [git.clone, ['file://' + projectPath, tools.param('git', 'branchdevel'), projectPath + '/temp_repo/']],
-        [cross.moveFiles, [projectPath + '/temp_repo/' + tools.param('project', 'srcin'), projectPath + '/', false, ['.git']]],
-        [tools.removeDir, projectPath + '/temp_repo/'],
-        [git.add, '.'],
-        [git.commit, 'GorillaJS deploy point ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss')],
-        [git.checkout, tools.param('git', 'branchdevel')]
-    );
-
-    if (tools.promises().length) tools.promiseme();
-}
-
 function init(){
+
+    var remote;
+
+    if (ssh.get()){
+        remote = true;
+    }
 
     if (argv.d) {
         // Hago esta llamada primero para evitar el error "Segmentation fault 11". Las llamadas a funciones que no estén en promises se deberían ir primero.
-        tools.paramForced('docker', 'gorillafolder', gorillaFolder);
         tools.createTemplateEnvironment(projectPath, templatesPath, tools.param('docker', 'template'), gorillaFolder, gorillaFile, messagesFile);
+        tools.paramForced('docker', 'gorillafolder', gorillaFolder);
     }
 
     if (argv.c || argv.r) {
@@ -175,7 +139,7 @@ function init(){
     if (argv.c) {
         tools.promises().push(
             [git.clone, [tools.param('git', 'clonefromurl'), tools.param('git', 'clonefrombranch'), projectPath + '/temp_repo/']],
-            [cross.moveFiles, [projectPath + '/temp_repo/', projectPath + '/', false, ['.git']]],
+            [cross.moveFiles, [projectPath + '/', false, ['.git'], projectPath + '/temp_repo/']],
             [tools.removeDir, projectPath + '/temp_repo/'],
             [git.createBranch, tools.param('git', 'branchdevel')],
             [git.commit, ['GorillaJS has cloned the repo ' + tools.param('git', 'clonefromurl'), true]]
@@ -192,18 +156,18 @@ function init(){
     if (argv.d) {
         tools.promises().push([tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/**/*']);
 
-        if (ssh.get()) {
-            tools.promises().push([cross.moveFiles, [projectPath + '/' + gorillaFolder, workingPath + '/' + gorillaFolder, true, ['.DS_Store']]]);
+        if (remote) {
+            tools.promises().push([cross.moveFiles, [workingPath + '/' + gorillaFolder, true, ['.DS_Store'], projectPath + '/' + gorillaFolder]]);
         }
 
         tools.promises().push(
             [docker.config, tools.getPlatform()],
-            [docker.check, tools.param('docker', 'machinename')],
-            [docker.start, [tools.param('docker', 'machinename'), workingPath + '/' + gorillaFolder + '/' + composeFile, tools.param('project', 'slug', null, tools.sanitize)]]
+            [docker.check, tools.param('docker', 'machinename'), remote],
+            [docker.start, [tools.param('docker', 'machinename'), workingPath + '/' + gorillaFolder + '/' + composeFile, tools.param('project', 'slug', null, tools.sanitize), remote]]
             // [tools.resetEnvVariables, projectPath + '/' + gorillaFolder + '/**/*']
         );
 
-        if (ssh.get()){
+        if (remote){
             if(tools.param('system', 'platform', ['apache', 'nginx', 'cancel']) !== 'cancel'){
                 tools.promises().push(
                     [host.create, [tools.param('system', 'platform'), projectPath + '/' + gorillaFolder + '/' + tools.param('system', 'platform') + '-proxy.conf', workingPath + '/' + gorillaFolder + '/' + tools.param('system', 'platform') + '-proxy.conf', tools.param('project', 'domain')]],
@@ -225,7 +189,7 @@ function init(){
                 tools.promises().push([host.open, ['http://' + docker.ip(tools.param('docker', 'machinename')) + ':' + tools.param('docker', 'port'), 15, 'Waiting for opening your web']]);
             }
         }
-        if (ssh.get()) tools.promises().push(ssh.close);
+        if (remote) tools.promises().push(ssh.close);
     }
 
     if (tools.promises().length) tools.promiseme();
