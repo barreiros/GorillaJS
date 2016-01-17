@@ -92,12 +92,12 @@ function deploy(){
         [cross.moveFiles, [projectPath + '/', false, ['.git'], projectPath + '/temp_repo/' + tools.param('project', 'srcin')]],
         [tools.removeDir, projectPath + '/temp_repo/'],
 
-        [git.listFiles, ['Tue Jan 12 20:09:31 2016 +0100', tools.param('git', 'branchdevel')]],
+        [git.listFiles, ['Tue Jan 12 20:09:31 2016 +0100', null, tools.param('git', 'branchdevel')]],
         [tools.fusionObjectNodes, ['added', 'modified']], // last param autofilled
         [tools.filterPaths, tools.param('project', 'srcin')], // last param autofilled
         [cross.moveFiles, [workingPath + '/' + tools.param('project', 'srcout'), true]],
 
-        [git.listFiles, ['Tue Jan 12 20:09:31 2016 +0100', tools.param('git', 'branchdevel')]],
+        [git.listFiles, ['Tue Jan 12 20:09:31 2016 +0100', null, tools.param('git', 'branchdevel')]],
         [tools.fusionObjectNodes, ['deleted']], // last param autofilled
         [tools.filterPaths, tools.param('project', 'srcin')], // last param autofilled
         [cross.removeFiles, [workingPath + '/' + tools.param('project', 'srcout'), true]],
@@ -108,11 +108,33 @@ function deploy(){
         ssh.close
     );
 
-    if (tools.promises().length) tools.promiseme();
+    tools.promiseme();
 }
 
 function rollback(){
 
+    // Creo una ista con los archivos que han cambiado hasta el último commit de la rama deploy.
+    // Cambio los valores de la lista. Ahora los archivos añadidos serán los eliminados y al revés.
+    // Hago un reset --hard al commit inicial.
+    // Creo un lista con los archivos que han cambiado en el commit inicial de la rama deploy.
+    // Comparo las dos listas y le doy preferencia a la segunda. Los archivos eliminados de la segunda lista, si en la primera aparecen como modificados o válidos, no serán eliminados.
+
+    var listA, listB;
+
+    var commitDate = git.commitDate(tools.param('git', 'branchdeploy'), tools.param('git', 'rollbackdate', git.listCommits(tools.param('git', 'branchdeploy')), null, false));
+    var listA = git.listFiles(commitDate, datef(new Date(), 'yyyy-mm-dd HH:MM:ss o'), tools.param('git', 'branchdeploy'), true);
+    var listB = git.listFiles(commitDate, commitDate, tools.param('git', 'branchdeploy'), true);
+    console.log(commitDate);
+    console.log(listA);
+    console.log(listB);
+    // listA = git.listFiles(tools.param('git', 'rollbackdate', git.listCommits(tools.param('git', 'branchdeploy')), null, false), tools.param('git', 'branchdeploy'));
+    // console.log(listA);
+    // tools.promises.push(
+    //     [git.listFiles, ['Tue Jan 12 20:09:31 2016 +0100', tools.param('git', 'branchdevel')]],
+    //
+    // );
+    //
+    // tools.promiseme();
 }
 
 function init(){

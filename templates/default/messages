@@ -21,7 +21,8 @@
         "019" : "Unable to remove directory",
         "020" : "Unable to list modified files from your repository",
         "021" : "Unable to list deleted files from your repository",
-        "022" : "Unable to create server directory tree"
+        "022" : "Unable to create server directory tree",
+        "023" : "Unable to list commits"
     },
 
     "warnings": {
