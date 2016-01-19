@@ -47,6 +47,7 @@
         "git-remote" : "Creating new remote repo...",
         "tools-createbase" : "Creating GorillaJS scaffolding...",
         "tools-movefiles" : "Moving files...",
+        "tools-removefiles" : "Removing files...",
         "tools-setvariables" : "Setting Docker variables...",
         "tools-provision": "Provisioning the machine...",
         "docker-checkplatform" : "Checking your platform...",
@@ -56,7 +57,7 @@
         "hosts-createproxy": "Configuring proxy in your remote server",
         "ssh-connect": "Connecting with your server...",
         "ssh-interactive": "Innitiating interactive shell session...",
-        "ssh-sftp": "Uploading files to remote host...",
+        "ssh-sftp": "Worging with remote server...",
         "git-listfiles": "Listing files..."
     },
 

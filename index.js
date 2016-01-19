@@ -29,9 +29,6 @@ var verbose = argv.v ? argv.v : false;
 var workingPath = projectPath;
 
 
-events.subscribe('PROMISEME', function(){
-    promises.start();
-});
 events.subscribe('VERBOSE', function(systemMessage, force){
     if(verbose || force){
         tools.showVerbose(systemMessage);
@@ -72,7 +69,7 @@ function deploy(){
 
     var promisesPack = [
         [git.config, projectPath],
-        [git.initRepo, gorillaFolder],
+        [git.initRepo, gorillaFolder, 'test'],
         [git.createBranch, [tools.param('git', 'branchdevel'), true]],
         [git.add, '.'],
         [git.commit, ['GorillaJS deploy point ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
@@ -86,13 +83,11 @@ function deploy(){
         [tools.filterPaths, tools.param('project', 'srcin')], // last param autofilled
         [cross.moveFiles, [workingPath + '/' + tools.param('project', 'srcout'), true]],
 
-        [promises.cache, 'list'],
-        [tools.fusionObjectNodes, ['deleted']], // last param autofilled
+        [tools.fusionObjectNodes, ['deleted', null, 'promises::list']],
         [tools.filterPaths, tools.param('project', 'srcin'), 'list_deleted'], // last param autofilled
         [cross.removeFiles, [workingPath + '/' + tools.param('project', 'srcout'), true]],
         [git.createBranch, [tools.param('git', 'branchdeploy')]],
-        // [promises.cache, 'list_deleted'],
-        // [cross.removeFiles, [projectPath + '/', false]],
+        [cross.removeFiles, [projectPath + '/', false, null, 'promises::list_deleted']],
 
         [git.add, '.'],
         [git.commit, ['GorillaJS deploy point ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
@@ -116,7 +111,6 @@ function rollback(){
     var commitDate = git.commitDate(tools.param('git', 'branchdeploy'), tools.param('git', 'rollbackdate', git.listCommits(tools.param('git', 'branchdeploy')), null, false));
     var listA = git.listFiles(commitDate, datef(new Date(), 'yyyy-mm-dd HH:MM:ss o'), tools.param('git', 'branchdeploy'), true);
     var listB = git.listFiles(commitDate, commitDate, tools.param('git', 'branchdeploy'), true);
-    console.log(commitDate);
     console.log(listA);
     console.log(listB);
     // listA = git.listFiles(tools.param('git', 'rollbackdate', git.listCommits(tools.param('git', 'branchdeploy')), null, false), tools.param('git', 'branchdeploy'));
