@@ -15,6 +15,7 @@ var docker = require(__dirname + '/lib/docker.js');
 var git = require(__dirname + '/lib/git.js');
 var host = require(__dirname + '/lib/host.js');
 var cross = require(__dirname + '/lib/crossExec.js');
+var promises = require(__dirname + '/lib/promises.js');
 
 var gorillaPath = __dirname;
 var gorillaFolder = '.gorilla';
@@ -25,11 +26,11 @@ var templatesPath = gorillaPath + '/templates';
 var composeFile = 'docker-compose.yml';
 var env = argv.e ? argv.e : 'local';
 var verbose = argv.v ? argv.v : false;
-var workingPath;
+var workingPath = projectPath;
 
 
 events.subscribe('PROMISEME', function(){
-    tools.promiseme();
+    promises.start();
 });
 events.subscribe('VERBOSE', function(systemMessage, force){
     if(verbose || force){
@@ -59,31 +60,19 @@ if(argv._[0] === 'init' || argv._[0] === 'pack' || argv._[0] === 'deploy' || arg
 
     if(env !== 'local') {
         if(tools.param('ssh', 'enable', ['yes', 'no']) === 'yes'){
-            tools.promises().push([ssh.connect, [
-                tools.param('ssh', 'host'), 
-                tools.param('ssh', 'port'), 
-                tools.param('ssh', 'username'), 
-                tools.param('ssh', 'key'),
-                tools.param('ssh', 'passphrase')
-            ]]);
             workingPath = tools.param('ssh', 'workingpath') + '/' + tools.param('project', 'slug', null, tools.sanitize);
+            promises.add([ssh.connect, [tools.param('ssh', 'host'), tools.param('ssh', 'port'), tools.param('ssh', 'username'), tools.param('ssh', 'key'), tools.param('ssh', 'passphrase')]]);
         }
-    }else{
-        workingPath = projectPath;
     }
-
-    tools.promises().push(
-        tools.getPlatform,
-        eval(argv._[0])
-    );
-
-    tools.promiseme();
+    promises.add(eval(argv._[0]));
+    promises.start();
 }
 
 function deploy(){
 
-    tools.promises().push(
+    var promisesPack = [
         [git.config, projectPath],
+        [git.initRepo, gorillaFolder],
         [git.createBranch, [tools.param('git', 'branchdevel'), true]],
         [git.add, '.'],
         [git.commit, ['GorillaJS deploy point ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
@@ -92,23 +81,26 @@ function deploy(){
         [cross.moveFiles, [projectPath + '/', false, ['.git'], projectPath + '/temp_repo/' + tools.param('project', 'srcin')]],
         [tools.removeDir, projectPath + '/temp_repo/'],
 
-        [git.listFiles, ['Tue Jan 12 20:09:31 2016 +0100', null, tools.param('git', 'branchdevel')]],
+        [git.listFiles, [git.commitDate(tools.param('git', 'branchdevel')), null, tools.param('git', 'branchdevel')], 'list'],
         [tools.fusionObjectNodes, ['added', 'modified']], // last param autofilled
         [tools.filterPaths, tools.param('project', 'srcin')], // last param autofilled
         [cross.moveFiles, [workingPath + '/' + tools.param('project', 'srcout'), true]],
 
-        [git.listFiles, ['Tue Jan 12 20:09:31 2016 +0100', null, tools.param('git', 'branchdevel')]],
+        [promises.cache, 'list'],
         [tools.fusionObjectNodes, ['deleted']], // last param autofilled
-        [tools.filterPaths, tools.param('project', 'srcin')], // last param autofilled
+        [tools.filterPaths, tools.param('project', 'srcin'), 'list_deleted'], // last param autofilled
         [cross.removeFiles, [workingPath + '/' + tools.param('project', 'srcout'), true]],
+        [git.createBranch, [tools.param('git', 'branchdeploy')]],
+        // [promises.cache, 'list_deleted'],
+        // [cross.removeFiles, [projectPath + '/', false]],
 
         [git.add, '.'],
         [git.commit, ['GorillaJS deploy point ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
         [git.createBranch, [tools.param('git', 'branchdevel')]],
         ssh.close
-    );
-
-    tools.promiseme();
+    ];
+    promises.add(promisesPack);
+    promises.start();
 }
 
 function rollback(){
@@ -134,12 +126,14 @@ function rollback(){
     //
     // );
     //
-    // tools.promiseme();
+    // promises.start();
 }
 
 function init(){
 
-    var remote;
+    var remote, promisesPack;
+
+    promisesPack = [];
 
     if (ssh.get()){
         remote = true;
@@ -152,14 +146,14 @@ function init(){
     }
 
     if (argv.c || argv.r) {
-        tools.promises().push(
+        promisesPack.push(
             [git.config, workingPath],
             [git.initRepo, gorillaFolder]
         );
     }
 
     if (argv.c) {
-        tools.promises().push(
+        promisesPack.add(
             [git.clone, [tools.param('git', 'clonefromurl'), tools.param('git', 'clonefrombranch'), projectPath + '/temp_repo/']],
             [cross.moveFiles, [projectPath + '/', false, ['.git'], projectPath + '/temp_repo/']],
             [tools.removeDir, projectPath + '/temp_repo/'],
@@ -169,21 +163,22 @@ function init(){
     }
 
     if (argv.r) {
-        tools.promises().push(
+        promisesPack.add(
             [git.createRemote, [tools.param('git', 'platform', ['github', 'bitbucket', 'gitlab']), tools.param('git', 'username'), (tools.param('git', 'platform') !== 'gitlab' ? tools.param('git', 'password') : tools.param('git', 'token')), tools.param('git', 'private', ['true', 'false']), tools.param('project', 'slug', null, tools.sanitize)]],
             [git.addOrigin, [tools.param('git', 'platform', ['github', 'bitbucket', 'gitlab']), tools.param('git', 'username'), tools.param('project', 'slug'), workingPath]]
         );
     }
 
     if (argv.d) {
-        tools.promises().push([tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/**/*']);
+        promisesPack.add([tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/**/*']);
 
         if (remote) {
-            tools.promises().push([cross.moveFiles, [workingPath + '/' + gorillaFolder, true, ['.DS_Store'], projectPath + '/' + gorillaFolder]]);
+            promisesPack.add([cross.moveFiles, [workingPath + '/' + gorillaFolder, true, ['.DS_Store'], projectPath + '/' + gorillaFolder]]);
         }
 
-        tools.promises().push(
-            [docker.config, tools.getPlatform()],
+        promisesPack.add(
+            [tools.getPlatform],
+            [docker.config],
             [docker.check, tools.param('docker', 'machinename'), remote],
             [docker.start, [tools.param('docker', 'machinename'), workingPath + '/' + gorillaFolder + '/' + composeFile, tools.param('project', 'slug', null, tools.sanitize), remote]]
             // [tools.resetEnvVariables, projectPath + '/' + gorillaFolder + '/**/*']
@@ -191,39 +186,41 @@ function init(){
 
         if (remote){
             if(tools.param('system', 'platform', ['apache', 'nginx', 'cancel']) !== 'cancel'){
-                tools.promises().push(
+                promisesPack.add(
                     [host.create, [tools.param('system', 'platform'), projectPath + '/' + gorillaFolder + '/' + tools.param('system', 'platform') + '-proxy.conf', workingPath + '/' + gorillaFolder + '/' + tools.param('system', 'platform') + '-proxy.conf', tools.param('project', 'domain')]],
                     [host.open, ['http://' + tools.param('project', 'domain'), 15, 'Waiting for opening your web']]
                 );
             }else{
-                tools.promises().push(
+                promisesPack.add(
                     [host.open, ['http://' + tools.param('project', 'domain') + ':' + tools.param('docker', 'port'), 15, 'Waiting for opening your web']]
                 );
             }
         }else{
             if(tools.param('hosts', 'enabled', ['ip', 'domain']) === 'domain'){
-                tools.promises().push(
+                promisesPack.add(
                     [host.add, [tools.param('system', 'hostsfile'), tools.param('project', 'domain'), docker.ip(tools.param('docker', 'machinename'))]],
                     [host.open, ['http://' + tools.param('project', 'domain') + ':' + tools.param('docker', 'port'), 15, 'Waiting for opening your web']]
                 );
             }else{
                 tools.paramForced('project', 'domain', docker.ip(tools.param('docker', 'machinename')));
-                tools.promises().push([host.open, ['http://' + docker.ip(tools.param('docker', 'machinename')) + ':' + tools.param('docker', 'port'), 15, 'Waiting for opening your web']]);
+                promisesPack.add([host.open, ['http://' + docker.ip(tools.param('docker', 'machinename')) + ':' + tools.param('docker', 'port'), 15, 'Waiting for opening your web']]);
             }
         }
-        if (remote) tools.promises().push(ssh.close);
+        if (remote) promisesPack.add(ssh.close);
     }
-
-    if (tools.promises().length) tools.promiseme();
+    promises.add(promisesPack);
+    promises.start();
 }
 
 function provision(){
     
-    tools.promises().push(
+    var promisesPack;
+
+    promisesPack.push(
         [tools.provision, [projectPath + '/' + gorillaFolder + '/remote-provision.sh']],
         // ssh.interactive,
         [ssh.close]
     );
-
-    if (tools.promises().length) tools.promiseme();
+    promises.add(promisesPack);
+    promises.start();
 }
