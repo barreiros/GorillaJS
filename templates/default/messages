@@ -57,7 +57,7 @@
         "hosts-createproxy": "Configuring proxy in your remote server",
         "ssh-connect": "Connecting with your server...",
         "ssh-interactive": "Innitiating interactive shell session...",
-        "ssh-sftp": "Worging with remote server...",
+        "ssh-sftp": "Working with remote server...",
         "git-listfiles": "Listing files..."
     },
 
