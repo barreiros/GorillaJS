@@ -82,9 +82,9 @@ function deploy(){
         // Los archivos eliminados los tengo que recuperar de la rama de desarrollo y contar desde la fecha del último commit de la rama deploy.
         [git.listFiles, [git.commitDate(tools.param('git', 'branchdeploy')), null, tools.param('git', 'branchdevel')], 'list-devel'],
         [tools.fusionObjectNodes, ['deleted', null]], // last param autofilled
-        [tools.filterPaths, tools.param('project', 'srcin')], // last param autofilled
-        [cross.removeFiles, [workingPath + '/' + tools.param('project', 'srcout'), true]],
-        [cross.removeFiles, [projectPath + '/', false, null]],
+        [tools.filterPaths, [tools.param('project', 'srcin')], 'list-devel-filtered'], // last param autofilled
+        [cross.removeFiles, [workingPath + '/' + tools.param('project', 'srcout'), true, null, 'promises::list-devel-filtered']],
+        [cross.removeFiles, [projectPath + '/', false, null, 'promises::list-devel-filtered']],
 
         // Los archivos añadidos, o modificados los recupero de la rama deploy.
         [git.add, '.'],

@@ -94,25 +94,17 @@ module.exports = {
 
                                     sftp.readdir(path.dirname(toPath), function(err, list){
                                         events.publish('VERBOSE', [err]);
-                                        console.log('Esta es la lista', list);
 
-                                        if(list){
-                                            if(list.length === 0){
-                                                sftp.rmdir(path.dirname(toPath), function(err){
-                                                    if (err) events.publish('WARNING', ['011']);
-                                                    events.publish('VERBOSE', [err]);
+                                        if(!list){
+                                            sftp.rmdir(path.dirname(toPath), function(err){
+                                                if (err) events.publish('WARNING', ['011']);
+                                                events.publish('VERBOSE', [err]);
 
-                                                    count += 1;
-                                                    if(count === source.length){
-                                                        events.publish('PROMISEME');
-                                                    }
-                                                });
-                                            }else{
                                                 count += 1;
                                                 if(count === source.length){
                                                     events.publish('PROMISEME');
                                                 }
-                                            }
+                                            });
                                         }else{
                                             count += 1;
                                             if(count === source.length){
@@ -125,8 +117,6 @@ module.exports = {
                         }else{
                             events.publish('PROMISEME');
                         }
-                    }else{
-                        events.publish('PROMISEME');
                     }
                 });
             }else{
@@ -135,47 +125,43 @@ module.exports = {
         }else{
             if(typeof source === 'object'){
                 count = 0;
-                if(source.length > 0){
-                    source.forEach(function(file, index){
-                        toPath = path.join(to, file);
-                        if(fs.existsSync(toPath)){
-                            if(!fs.lstatSync(toPath).isDirectory()){
-                                events.publish('VERBOSE', ['Removing file ' + toPath]);
-                                fs.unlink(toPath);
-                                module.exports.exec('ls ' + path.dirname(toPath), function(err, stdout, stderr){
-                                    if (err) events.publish('WARNING', ['012']);
-                                    events.publish('VERBOSE', [err]);
-                                    events.publish('VERBOSE', [stdout]);
+                source.forEach(function(file, index){
+                    toPath = path.join(to, file);
+                    if(fs.existsSync(toPath)){
+                        if(!fs.lstatSync(toPath).isDirectory()){
+                            events.publish('VERBOSE', ['Removing file ' + toPath]);
+                            fs.unlink(toPath);
+                            module.exports.exec('ls ' + path.dirname(toPath), function(err, stdout, stderr){
+                                if (err) events.publish('WARNING', ['012']);
+                                events.publish('VERBOSE', [err]);
+                                events.publish('VERBOSE', [stdout]);
 
-                                    if(stdout === ''){
-                                        module.exports.exec('rm -rf ' + path.dirname(toPath), function(err, stdout, stderr){
-                                            count += 1;
-                                            if(count === source.length){
-                                                events.publish('PROMISEME');
-                                            }
-                                        });
-                                    }else{
-                                        count += 1;
-                                        if(count === source.length){
-                                            events.publish('PROMISEME');
-                                        }
-                                    }
-                                });
-                            }else{
-                                module.exports.exec('rm -rf ' + file, function(err, stdout, stderr){
-                                    count += 1;
-                                    if(count === source.length){
-                                        events.publish('PROMISEME');
-                                    }
-                                });
-                            }
+                                // if(stdout !== ''){
+                                //     module.exports.exec('rm -rf ' + path.dirname(toPath), function(err, stdout, stderr){
+                                //         count += 1;
+                                //         if(count === source.length){
+                                //             events.publish('PROMISEME');
+                                //         }
+                                //     });
+                                // }else{
+                                //     count += 1;
+                                //     if(count === source.length){
+                                //         events.publish('PROMISEME');
+                                //     }
+                                // }
+                            });
                         }else{
-                            events.publish('PROMISEME');
+                            module.exports.exec('rm -rf ' + file, function(err, stdout, stderr){
+                                count += 1;
+                                if(count === source.length){
+                                    events.publish('PROMISEME');
+                                }
+                            });
                         }
-                    });
-                }else{
-                    events.publish('PROMISEME');
-                }
+                    }else{
+                        events.publish('PROMISEME');
+                    }
+                });
             }else{
                 if(fs.existsSync(source)){
                     fs.unlink(source);
