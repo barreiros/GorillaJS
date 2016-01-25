@@ -22,7 +22,8 @@
         "020" : "Unable to list modified files from your repository",
         "021" : "Unable to list deleted files from your repository",
         "022" : "Unable to create server directory tree",
-        "023" : "Unable to list commits"
+        "023" : "Unable to list commits",
+        "024" : "Unable to reset your branch to the desired point"
     },
 
     "warnings": {
@@ -58,7 +59,8 @@
         "ssh-connect": "Connecting with your server...",
         "ssh-interactive": "Innitiating interactive shell session...",
         "ssh-sftp": "Working with remote server...",
-        "git-listfiles": "Listing files..."
+        "git-listfiles": "Listing files...",
+        "git-reset": "Getting back..."
     },
 
     "questions": {
@@ -67,8 +69,8 @@
         },
         "project": {
             "slug": "Your project ID ()",
-            "srcin": "What is your src (www, html, application...) local project folder? (Please, relative to the project folder).",
-            "srcout": "What is your src (www, html, application...) server folder? (Please, relative to the server project folder)."
+            "srcin": "What is your src (www, html, application...) local project folder path? (Please, relative to the project folder).",
+            "srcout": "What is your src (www, html, application...) server folder path? (Please, relative to the server project folder)."
         },
         "ssh": {
             "enable": "The actual environment is not 'local'. Do you want to initiate a ssh session with a remote server?",
@@ -82,7 +84,8 @@
             "password": "Git password",
             "clonefromurl": "What is the git project url (https) to clone?",
             "clonefrombranch": "Wich branch?",
-            "private": "Do you want a private repository?"
+            "private": "Do you want a private repository?",
+            "rollbackdate": "Select a rollback point from the list above:"
         }
     }
 }

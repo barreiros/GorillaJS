@@ -75,6 +75,7 @@ function deploy(){
         [git.add, '.'],
         [git.commit, ['GorillaJS checkpoint ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
         [git.createBranch, [tools.param('git', 'branchdeploy'), true]],
+        [git.commit, ['GorillaJS rollback ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
         [git.clone, ['file://' + projectPath, tools.param('git', 'branchdevel'), projectPath + '/temp_repo/']],
         [cross.moveFiles, [projectPath + '/', false, ['.git'], projectPath + '/temp_repo/' + tools.param('project', 'srcin')]],
         [tools.removeDir, projectPath + '/temp_repo/'],
@@ -102,27 +103,31 @@ function deploy(){
 
 function rollback(){
 
-    // Creo una ista con los archivos que han cambiado hasta el último commit de la rama deploy.
-    // Cambio los valores de la lista. Ahora los archivos añadidos serán los eliminados y al revés.
-    // Hago un reset --hard al commit inicial.
-    // Creo un lista con los archivos que han cambiado en el commit inicial de la rama deploy.
-    // Comparo las dos listas y le doy preferencia a la segunda. Los archivos eliminados de la segunda lista, si en la primera aparecen como modificados o válidos, no serán eliminados.
+    var promisesPack = [
+        [git.config, projectPath],
+        [git.initRepo, gorillaFolder],
 
-    var listA, listB;
+        [git.createBranch, [tools.param('git', 'branchdeploy')]],
+        [git.listCommits, [tools.param('git', 'branchdeploy'), 'rollback'], 'commits'],
+        [tools.param, ['git', 'rollbackdate', 'promises::commits', null, false], 'rollback-point'],
+        [git.commitDate, [tools.param('git', 'branchdeploy')], 'commit-date'], // last param autofilled
+        [git.listFiles, ['promises::commit-date', datef(new Date(), 'yyyy-mm-dd HH:MM:ss o'), tools.param('git', 'branchdeploy'), true], 'list'],
 
-    var commitDate = git.commitDate(tools.param('git', 'branchdeploy'), tools.param('git', 'rollbackdate', git.listCommits(tools.param('git', 'branchdeploy')), null, false));
-    var listA = git.listFiles(commitDate, datef(new Date(), 'yyyy-mm-dd HH:MM:ss o'), tools.param('git', 'branchdeploy'), true);
-    var listB = git.listFiles(commitDate, commitDate, tools.param('git', 'branchdeploy'), true);
-    console.log(listA);
-    console.log(listB);
-    // listA = git.listFiles(tools.param('git', 'rollbackdate', git.listCommits(tools.param('git', 'branchdeploy')), null, false), tools.param('git', 'branchdeploy'));
-    // console.log(listA);
-    // tools.promises.push(
-    //     [git.listFiles, ['Tue Jan 12 20:09:31 2016 +0100', tools.param('git', 'branchdevel')]],
-    //
-    // );
-    //
-    // promises.start();
+        // [Aquí hago un reset --hard al commit inicial para recuperar todos los archivos],
+        [git.reset, [tools.param('git', 'branchdeploy'), 'promises::rollback-point']],
+        [tools.fusionObjectNodes, ['deleted', 'modified', 'promises::list']],
+        [cross.moveFiles, [workingPath + '/' + tools.param('project', 'srcout'), true]], // last param autofilled
+
+        // Como voy hacia atrás en el tiempo, los archivos eliminados ahora son añadidos y a la inversa.
+        [tools.fusionObjectNodes, ['added', null, 'promises::list'], 'list-deleted'],
+        [cross.removeFiles, [workingPath + '/' + tools.param('project', 'srcout'), true, null, 'promises::list-deleted']],
+        [cross.removeFiles, [projectPath + '/', false, null, 'promises:list-deleted']],
+
+        [git.createBranch, [tools.param('git', 'branchdevel')]],
+        ssh.close
+    ];
+    promises.add(promisesPack);
+    promises.start();
 }
 
 function docker(){
