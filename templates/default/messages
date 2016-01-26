@@ -23,7 +23,8 @@
         "021" : "Unable to list deleted files from your repository",
         "022" : "Unable to create server directory tree",
         "023" : "Unable to list commits",
-        "024" : "Unable to reset your branch to the desired point"
+        "024" : "Unable to reset your branch to the desired point",
+        "025" : "Last rollback point. Is not possible rollback again."
     },
 
     "warnings": {
@@ -41,6 +42,7 @@
     },
 
     "steps" : {
+        "gorilla-cleaner" : "Closing GorillaJS...",
         "git-init" : "Creating local repo...",
         "git-branch" : "Creating branch...",
         "git-push" : "Pushing to remote...",

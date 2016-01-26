@@ -28,25 +28,27 @@ var env = argv.e ? argv.e : 'local';
 var verbose = argv.v ? argv.v : false;
 var workingPath = projectPath;
 
+events.subscribe('ERROR', showError);
+events.subscribe('VERBOSE', showVerbose);
+events.subscribe('WARNING', tools.showWarning);
+events.subscribe('STEP', tools.showStep);
+events.subscribe('MESSAGE', tools.showMessage);
 
-events.subscribe('VERBOSE', function(systemMessage, force){
+function showVerbose(systemMessage, force){
     if(verbose || force){
         tools.showVerbose(systemMessage);
     }
-});
-events.subscribe('ERROR', function(error){
-    tools.showError(error);
-});
-events.subscribe('WARNING', function(error){
-    tools.showWarning(error);
-});
-events.subscribe('STEP', function(step){
-    tools.showStep(step);
-});
-events.subscribe('MESSAGE', function(message){
-    tools.showMessage(message);
-});
+}
 
+function showError(number){
+    tools.showError(number);
+    tools.showStep('gorilla-cleaner');
+    events.unsubscribe('VERBOSE', showVerbose);
+    events.unsubscribe('WARNING', tools.showWarning);
+    events.unsubscribe('STEP', tools.showStep);
+    events.unsubscribe('MESSAGE', tools.showMessage);
+    cleanBeforeForceExit();
+}
 
 if (argv.f) tools.setConfigFile(f);
 
@@ -62,6 +64,22 @@ if(argv._[0] === 'init' || argv._[0] === 'docker' || argv._[0] === 'pack' || arg
         }
     }
     promises.add(eval(argv._[0]));
+    promises.start();
+}
+
+function cleanBeforeForceExit(){
+
+    var promisesPack = [];
+
+    if(argv._[0] === 'rollback'){
+        promisesPack.push(
+            [git.initRepo, gorillaFolder],
+            [git.createBranch, [tools.param('git', 'branchdevel')]]
+        );
+    }
+
+    promises.add(promisesPack);
+    promises.add(process.exit);
     promises.start();
 }
 
@@ -123,6 +141,9 @@ function rollback(){
         [cross.removeFiles, [workingPath + '/' + tools.param('project', 'srcout'), true, null, 'promises::list-deleted']],
         [cross.removeFiles, [projectPath + '/', false, null, 'promises:list-deleted']],
 
+        [git.listCommits, [tools.param('git', 'branchdeploy'), 'deploy']],
+        [tools.selectArrayValue, 0], // last param autofilled
+        [git.reset, [tools.param('git', 'branchdeploy')]], // last param autofilled
         [git.createBranch, [tools.param('git', 'branchdevel')]],
         ssh.close
     ];
