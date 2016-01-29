@@ -59,14 +59,14 @@ function deploy(){
 
     promisesPack.push(
         [git.config, projectPath],
-        [git.initRepo, gorillaFolder]
+        [git.initRepo, gorillaFolder],
+        [git.currentBranch, null, 'current-branch'],
+        [git.add, '.'],
+        git.stash
     );
 
     if (argv.n) {
         promisesPack.push(
-            [git.createBranch, [tools.param('git', 'branchdevel')]],
-            [git.add, '.'],
-            [git.commit, ['GorillaJS checkpoint ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
             [git.createBranch, [tools.param('git', 'branchdeploy'), true]],
             [git.commit, ['GorillaJS rollback ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
             [git.clone, ['file://' + projectPath, tools.param('git', 'branchdevel'), projectPath + '/temp_repo/']],
@@ -89,6 +89,7 @@ function deploy(){
         );
     }else{
         promisesPack.push(
+            // Los archivos eliminados, añadido y modificados los recupero del último commit de la rama deploy.
             [git.createBranch, [tools.param('git', 'branchdeploy'), true]],
             [git.listFiles, [git.commitDate(tools.param('git', 'branchdeploy')), null, tools.param('git', 'branchdeploy')], 'list'],
             [tools.fusionObjectNodes, ['deleted', null]], // last param autofilled
@@ -99,7 +100,8 @@ function deploy(){
     }
 
     promisesPack.push(
-        [git.createBranch, [tools.param('git', 'branchdevel')]],
+        [git.createBranch, 'promises::current-branch'],
+        [git.stash, 'pop'],
         ssh.close
     );
 

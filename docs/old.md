@@ -37,6 +37,7 @@ Arguments list:
 --gr : Create local and remote repository.
 --grc : Create local, remote and clone contents from other repository.
 --d : Configure Docker environment.
+-n : En el método deploy genera uno nuevo.
 
 
 Project configuration file settings:

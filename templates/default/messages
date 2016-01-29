@@ -24,7 +24,8 @@
         "022" : "Unable to create server directory tree",
         "023" : "Unable to list commits",
         "024" : "Unable to reset your branch to the desired point",
-        "025" : "Last rollback point. Is not possible rollback again."
+        "025" : "Last rollback point. Is not possible rollback again.",
+        "026" : "Unable to check current branch."
     },
 
     "warnings": {
@@ -38,7 +39,8 @@
         "009" : "Unable to open your browser.",
         "010" : "The machine ip is not valid.",
         "011" : "Unable to remove empty directory",
-        "012" : "Unable to remove server files"
+        "012" : "Unable to remove server files",
+        "013" : "Unable to save your current branch work"
     },
 
     "steps" : {
@@ -48,6 +50,10 @@
         "git-push" : "Pushing to remote...",
         "git-clone" : "Cloning from repo...",
         "git-remote" : "Creating new remote repo...",
+        "git-listfiles": "Listing files...",
+        "git-reset": "Getting back...",
+        "git-currentbranch": "Checking for current branch...",
+        "git-stash": "Saving your current branch work...",
         "tools-createbase" : "Creating GorillaJS scaffolding...",
         "tools-movefiles" : "Moving files...",
         "tools-removefiles" : "Removing files...",
@@ -60,9 +66,7 @@
         "hosts-createproxy": "Configuring proxy in your remote server",
         "ssh-connect": "Connecting with your server...",
         "ssh-interactive": "Innitiating interactive shell session...",
-        "ssh-sftp": "Working with remote server...",
-        "git-listfiles": "Listing files...",
-        "git-reset": "Getting back..."
+        "ssh-sftp": "Working with remote server..."
     },
 
     "questions": {
