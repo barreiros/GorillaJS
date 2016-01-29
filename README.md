@@ -1,5 +1,5 @@
 # GorillaJS
-### GorillaJS es una herramienta que ayuda a automatizar de manera sencilla tareas complejas del desarrollo web.
+#### GorillaJS es una herramienta que ayuda a automatizar de manera sencilla tareas complejas del desarrollo web.
 
 ## Con GorillaJS se puede:
 * **Crear y configurar Docker container's en servidores remotos desde tu máquina local.**
@@ -12,11 +12,11 @@
 
 
 
-# Deploy
+## Deploy
 Los archivos que no se haya guardado se recuperarán al finalizar el proceso con git stash pop.
 Por defecto el deploy se hace sobre el último que haya hecho el usuario.
 
-Parámetros
-* -e eliges el entorno en el que deplegar tus cambios [local]
-* -n crea un nuevo deploy [false]
-* --all despliega todos los archivos que hay en la rama deploy [false]
+*Parámetros*
+* *-e* eliges el entorno en el que deplegar tus cambios [local]
+* *-n* crea un nuevo deploy [false]
+* *--all* despliega todos los archivos que hay en la rama deploy [false]
