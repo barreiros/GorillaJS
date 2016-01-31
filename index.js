@@ -34,30 +34,56 @@ events.subscribe('WARNING', tools.showWarning);
 events.subscribe('STEP', tools.showStep);
 events.subscribe('MESSAGE', tools.showMessage);
 
+checkUserInput();
 
-if (argv.f) tools.setConfigFile(f);
 
-if(argv._[0] === 'init' || argv._[0] === 'docker' || argv._[0] === 'pack' || argv._[0] === 'deploy' || argv._[0] === 'rollback' || argv._[0] === 'provision'){
+function checkUserInput(){
 
-    tools.config(env);
-    tools.createBaseEnvironment(projectPath, templatesPath, gorillaPath, gorillaFile, gorillaFolder, messagesFile);
+    var promisesPack = [];
 
-    if(env !== 'local') {
-        if(tools.param('ssh', 'enable', ['yes', 'no']) === 'yes'){
-            workingPath = tools.param('ssh', 'workingpath') + '/' + tools.param('project', 'slug', null, tools.sanitize);
-            promises.add([ssh.connect, [tools.param('ssh', 'host'), tools.param('ssh', 'port'), tools.param('ssh', 'username'), tools.param('ssh', 'key'), tools.param('ssh', 'passphrase')]]);
+    if (argv.f) tools.setConfigFile(f);
+
+    if(argv._[0] === 'init' || argv._[0] === 'docker' || argv._[0] === 'pack' || argv._[0] === 'deploy' || argv._[0] === 'rollback' || argv._[0] === 'provision'){
+
+        promisesPack.push(
+            [tools.config, env],
+            [tools.createBaseEnvironment, [projectPath, templatesPath, gorillaPath, gorillaFile, gorillaFolder, messagesFile]]
+        );
+
+        if(env !== 'local') {
+            // if(tools.param('ssh', 'enable', ['yes', 'no']) === 'yes'){
+                promisesPack.push(
+                    [tools.param, ['ssh', 'workingpath'], 'working-path'],
+                    [tools.param, ['project', 'slug', null, tools.sanitize], 'slug'],
+                    [tools.param, ['ssh', 'host'], 'host'],
+                    [tools.param, ['ssh', 'port'], 'port'],
+                    [tools.param, ['ssh', 'username'], 'user-name'],
+                    [tools.param, ['ssh', 'key'], 'key'],
+                    [tools.param, ['ssh', 'passphrase'], 'passphrase'],
+
+                    [setWorkingPath, '::working-path::' + '/' + '::slug::'],
+                    [ssh.connect, ['::host::', '::port::', '::user-name::', '::key::', '::passphrase::']]
+                );
+            // }
         }
-    }
-    promises.add(eval(argv._[0]));
-    promises.start();
-}
+        promisesPack.push(eval(argv._[0]));
 
+        promises.add(promisesPack);
+        promises.start();
+    }
+}
 
 function deploy(){
 
     var promisesPack = [];
 
     promisesPack.push(
+        [tools.param, ['git', 'branchdevel'], 'branch-devel'],
+        [tools.param, ['git', 'branchdeploy'], 'branch-deploy'],
+        [tools.param, ['project', 'srcin'], 'srcin'],
+        [tools.param, ['project', 'srcout'], 'srcout'],
+
+        [cross.config, projectPath],
         [git.config, projectPath],
         [git.initRepo, gorillaFolder],
         [git.currentBranch, null, 'current-branch'],
@@ -67,52 +93,54 @@ function deploy(){
 
     if (argv.all) {
         promisesPack.push(
-            [git.createBranch, [tools.param('git', 'branchdeploy'), true]],
-            [git.listCommits, [tools.param('git', 'branchdeploy'), '']],
+            [git.createBranch, ['::branch-deploy::', true]],
+            [git.listCommits, ['::branch-deploy::', '']],
             [tools.selectArrayValue, 'last'], // last param autofilled
-            [git.commitDate, tools.param('git', 'branchdeploy'), 'last-commit-date'], // last param autofilled
-            [git.listFiles, ['promises::last-commit-date', null, tools.param('git', 'branchdeploy')], 'list'],
+            [git.commitDate, '::branch-deploy::', 'last-commit-date'], // last param autofilled
+            [git.listFiles, ['::last-commit-date::', null, '::branch-deploy::'], 'list'],
             [tools.fusionObjectNodes, ['deleted', null]], // last param autofilled
-            [cross.removeFiles, [workingPath + '/' + tools.param('project', 'srcout'), true, null]], // last param autofilled
-            [tools.fusionObjectNodes, ['added', 'modified', 'promises::list']],
-            [cross.moveFiles, [workingPath + '/' + tools.param('project', 'srcout'), true]] // last param autofilled
+            [cross.removeFiles, [workingPath + '/' + '::srcout::', true, null]], // last param autofilled
+            [tools.fusionObjectNodes, ['added', 'modified', '::list::']],
+            [cross.moveFiles, [workingPath + '/' + '::srcout::', true]] // last param autofilled
         );
     }else if (argv.n) {
         promisesPack.push(
-            [git.createBranch, [tools.param('git', 'branchdeploy'), true]],
+            // Los archivos eliminados los tengo que recuperar de la rama de desarrollo y contar desde la fecha del último commit de la rama deploy.
+            [git.createBranch, ['::branch-deploy::', true]],
+            [git.commitDate, ['::branch-deploy::'], 'last-commit-date'],
+            [git.listFiles, ['::last-commit-date::', null, '::branch-devel::']],
+            [tools.fusionObjectNodes, ['deleted', null]], // last param autofilled
+            [tools.filterPaths, '::srcin::', 'list-devel-filtered'], // last param autofilled
+            [cross.removeFiles, [workingPath + '/' + '::srcout::', true, null, '::list-devel-filtered::']],
+            [cross.removeFiles, [projectPath + '/', false, null, '::list-devel-filtered::']],
+
             [git.commit, ['GorillaJS rollback ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
-            [git.clone, ['file://' + projectPath, tools.param('git', 'branchdevel'), projectPath + '/temp_repo/']],
-            [cross.moveFiles, [projectPath + '/', false, ['.git'], projectPath + '/temp_repo/' + tools.param('project', 'srcin')]],
+            [git.clone, ['file://' + projectPath, '::branch-devel::', projectPath + '/temp_repo/']],
+            [cross.moveFiles, [projectPath + '/', false, ['.git'], projectPath + '/temp_repo/' + '::srcin::']],
             [tools.removeDir, projectPath + '/temp_repo/'],
 
-            // Los archivos eliminados los tengo que recuperar de la rama de desarrollo y contar desde la fecha del último commit de la rama deploy.
-            [git.listFiles, [git.commitDate(tools.param('git', 'branchdeploy')), null, tools.param('git', 'branchdevel')]],
-            [tools.fusionObjectNodes, ['deleted', null]], // last param autofilled
-            [tools.filterPaths, [tools.param('project', 'srcin')], 'list-devel-filtered'], // last param autofilled
-            [cross.removeFiles, [workingPath + '/' + tools.param('project', 'srcout'), true, null, 'promises::list-devel-filtered']],
-            [cross.removeFiles, [projectPath + '/', false, null, 'promises::list-devel-filtered']],
-
-            // Los archivos añadidos o modificados los recupero de la rama deploy.
+            //Los archivos añadidos o modificados los recupero de la rama deploy.
             [git.add, '.'],
             [git.commit, ['GorillaJS deploy ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
-            [git.listFiles, [git.commitDate(tools.param('git', 'branchdeploy')), null, tools.param('git', 'branchdeploy')]],
+            [git.listFiles, ['::last-commit-date::', null, '::branch-deploy::']],
             [tools.fusionObjectNodes, ['added', 'modified']], // last param autofilled
-            [cross.moveFiles, [workingPath + '/' + tools.param('project', 'srcout'), true]] // last param autofilled
+            [cross.moveFiles, [workingPath + '/' + '::srcout::', true]] // last param autofilled
         );
     }else{
         promisesPack.push(
             // Los archivos eliminados, añadido y modificados los recupero del último commit de la rama deploy.
-            [git.createBranch, [tools.param('git', 'branchdeploy'), true]],
-            [git.listFiles, [git.commitDate(tools.param('git', 'branchdeploy')), null, tools.param('git', 'branchdeploy')], 'list'],
+            [git.createBranch, ['::branch-deploy::', true]],
+            [git.commitDate, ['::branch-deploy::', null], 'last-commit-date'],
+            [git.listFiles, ['::last-commit-date::', null, '::branch-deploy::'], 'list'],
             [tools.fusionObjectNodes, ['deleted', null]], // last param autofilled
-            [cross.removeFiles, [workingPath + '/' + tools.param('project', 'srcout'), true, null]], // last param autofilled
-            [tools.fusionObjectNodes, ['added', 'modified', 'promises::list']],
-            [cross.moveFiles, [workingPath + '/' + tools.param('project', 'srcout'), true]] // last param autofilled
+            [cross.removeFiles, [workingPath + '/' + '::srcout::', true, null]], // last param autofilled
+            [tools.fusionObjectNodes, ['added', 'modified', '::list::']],
+            [cross.moveFiles, [workingPath + '/' + '::srcout::', true]] // last param autofilled
         );
     }
 
     promisesPack.push(
-        [git.createBranch, 'promises::current-branch'],
+        [git.createBranch, '::current-branch::'],
         [git.stash, 'pop'],
         ssh.close
     );
@@ -132,25 +160,25 @@ function rollback(){
 
         [git.createBranch, [tools.param('git', 'branchdeploy')]],
         [git.listCommits, [tools.param('git', 'branchdeploy'), 'rollback'], 'commits'],
-        [tools.param, ['git', 'rollbackdate', 'promises::commits', null, false], 'rollback-point'],
+        [tools.param, ['git', 'rollbackdate', '::commits', null, false], 'rollback-point'],
         [git.commitDate, [tools.param('git', 'branchdeploy')], 'commit-date'], // last param autofilled
-        [git.listFiles, ['promises::commit-date', datef(new Date(), 'yyyy-mm-dd HH:MM:ss o'), tools.param('git', 'branchdeploy'), true], 'list'],
+        [git.listFiles, ['::commit-date', datef(new Date(), 'yyyy-mm-dd HH:MM:ss o'), tools.param('git', 'branchdeploy'), true], 'list'],
 
         // [Aquí hago un reset --hard al commit inicial para recuperar todos los archivos],
-        [git.reset, [tools.param('git', 'branchdeploy'), 'promises::rollback-point']],
-        [tools.fusionObjectNodes, ['deleted', 'modified', 'promises::list']],
+        [git.reset, [tools.param('git', 'branchdeploy'), '::rollback-point']],
+        [tools.fusionObjectNodes, ['deleted', 'modified', '::list']],
         [cross.moveFiles, [workingPath + '/' + tools.param('project', 'srcout'), true]], // last param autofilled
 
         // Como voy hacia atrás en el tiempo, los archivos eliminados ahora son añadidos y a la inversa.
-        [tools.fusionObjectNodes, ['added', null, 'promises::list'], 'list-deleted'],
-        [cross.removeFiles, [workingPath + '/' + tools.param('project', 'srcout'), true, null, 'promises::list-deleted']],
+        [tools.fusionObjectNodes, ['added', null, '::list'], 'list-deleted'],
+        [cross.removeFiles, [workingPath + '/' + tools.param('project', 'srcout'), true, null, '::list-deleted']],
         [cross.removeFiles, [projectPath + '/', false, null, 'promises:list-deleted']],
 
         [git.listCommits, [tools.param('git', 'branchdeploy'), 'deploy']],
         [tools.selectArrayValue, 0], // last param autofilled
         [git.reset, [tools.param('git', 'branchdeploy')]], // last param autofilled
 
-        [git.createBranch, 'promises::current-branch'],
+        [git.createBranch, '::current-branch'],
         [git.stash, 'pop'],
         ssh.close
     ];
@@ -288,7 +316,7 @@ function cleanBeforeForceExit(){
         promisesPack.push(
             [git.config, projectPath],
             [git.initRepo, gorillaFolder],
-            [git.createBranch, 'promises::current-branch'],
+            [git.createBranch, '::current-branch'],
             [git.stash, 'pop']
         );
     }
@@ -296,4 +324,10 @@ function cleanBeforeForceExit(){
     promises.add(promisesPack);
     promises.add(process.exit);
     promises.start();
+}
+
+function setWorkingPath(path){
+    workingPath = path;
+       
+    return path;
 }
