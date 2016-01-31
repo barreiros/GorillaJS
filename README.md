@@ -12,7 +12,7 @@
 
 
 
-## Deploy
+### Deploy
 GorillaJS solo desplegará los archivos que se hayan commiteado; con el resto se hará un stash al inicio y un stash pop al final del proceso.
 Por defecto el deploy se hace sobre el último que haya hecho el usuario.
 
@@ -20,3 +20,6 @@ Por defecto el deploy se hace sobre el último que haya hecho el usuario.
 * **-e** eliges el entorno en el que deplegar tus cambios [local]
 * **-n** crea un nuevo deploy [false]
 * **--all** despliega todos los archivos que hay en la rama deploy [false]
+
+**Valores**
+* 
