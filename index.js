@@ -51,8 +51,9 @@ function checkUserInput(){
         );
 
         if(env !== 'local') {
-            // if(tools.param('ssh', 'enable', ['yes', 'no']) === 'yes'){
-                promisesPack.push(
+            promisesPack.push(
+                [tools.param, ['ssh', 'enable', true], 'test'],
+                [promises.cond, [
                     [tools.param, ['ssh', 'workingpath'], 'working-path'],
                     [tools.param, ['project', 'slug', null, tools.sanitize], 'slug'],
                     [tools.param, ['ssh', 'host'], 'host'],
@@ -60,13 +61,15 @@ function checkUserInput(){
                     [tools.param, ['ssh', 'username'], 'user-name'],
                     [tools.param, ['ssh', 'key'], 'key'],
                     [tools.param, ['ssh', 'passphrase'], 'passphrase'],
-
                     [setWorkingPath, '::working-path::' + '/' + '::slug::'],
                     [ssh.connect, ['::host::', '::port::', '::user-name::', '::key::', '::passphrase::']]
-                );
-            // }
+                ]] // last param autofilled
+            );
         }
-        promisesPack.push(eval(argv._[0]));
+
+        promisesPack.push(
+            eval(argv._[0])
+        );
 
         promises.add(promisesPack);
         promises.start();
