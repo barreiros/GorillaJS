@@ -1,0 +1,76 @@
+<meta charset="UTF-8"><h1>
+<a id="user-content-gorillajs" class="anchor" href="#gorillajs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>GorillaJS</h1>
+
+<p><strong>GorillaJS es una herramienta que ayuda a automatizar de manera sencilla tareas complejas del desarrollo web.</strong></p>
+
+<h3>
+<a id="user-content-objetivo-y-filosofía" class="anchor" href="#objetivo-y-filosof%C3%ADa" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Objetivo y filosofía</h3>
+
+<p>GorillaJS pretende servir como apoyo en el flujo de trabajo habitual del desarrollador, ayudándole a realizar algunas de las tareas más comunes y repetitivas de ese flujo.
+Para hacer esto, GorillaJS utiliza una interfaz sencilla (CLI) basada en preguntas simples relacionadas con la tarea que se va a realizar y guarda las respuestas para poder automatizarla la próxima vez.</p>
+
+<p>Está pensado para adaptarse a todo tipo de desarrolladores y quiere alejarse de complejas herramientas de desarrollo y exigentes arquitecturas. Cada desarrollador puede elegir en cada momento qué necesita usar de GorillaJS, y qué no: GorillaJS no es un framework y tampoco una herramienta de integración continua.</p>
+
+<p>Con GorillaJS se puede:</p>
+
+<ul>
+<li>Levantar máquinas de desarrollo independientes para cada proyecto. En tu máquina <strong>local</strong> y en servidores <strong>remotos</strong>.</li>
+<li>Clonar repositorios Git sin heredar el histórico. Tanto <strong>locales</strong> como <strong>remotos</strong>.</li>
+<li>Crear repositorios públicos y privados en <strong>Gitlab</strong>, <strong>Github</strong> y <strong>Bitbucket</strong>.</li>
+<li>Desplegar versiones en servidores remotos (<strong>deploy</strong>).</li>
+<li>Revertir los cambios en cualquier momento (<strong>rollback</strong>).</li>
+</ul>
+
+<p><strong>Su mayor potencial está en iniciar, mantener y automatizar estas tareas</strong>, usando herramientas como <strong>Git</strong>, <strong>Docker</strong> o <strong>SSH</strong> y comunicándose con los servidores remotos (cuando lo necesita) a través de comandos simples que reciben la infomación lo más procesada posible para cada tarea.</p>
+
+<h3>
+<a id="user-content-instalación" class="anchor" href="#instalaci%C3%B3n" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Instalación</h3>
+
+<pre><code>npm install -g gorillajs
+</code></pre>
+
+<h3>
+<a id="user-content-listado-de-tareas" class="anchor" href="#listado-de-tareas" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Listado de tareas</h3>
+
+<ul>
+<li><a href="#user-content-deploy">deploy</a></li>
+<li>rollback</li>
+<li>docker</li>
+<li>git[clone|remote]</li>
+<li>provision</li>
+</ul>
+
+<hr>
+
+<h2>
+<a id="user-content-deploy" class="anchor" href="#deploy" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Deploy</h2>
+
+<p>GorillaJS solo desplegará los archivos que se hayan commiteado; con el resto se hará un stash al inicio y un stash pop al final del proceso.
+Por defecto el deploy se hace sobre el último que haya hecho el usuario.</p>
+
+<p><strong>Requerimientos</strong></p>
+
+<ul>
+<li>Tener instalado Git en la máquina local.</li>
+<li>Acceso sftp con clave pública al servidor remoto.</li>
+</ul>
+
+<p><strong>Parámetros</strong></p>
+
+<ul>
+<li>
+<strong>-e</strong> elegir el entorno en el que desplegar los cambios [local]</li>
+<li>
+<strong>-n</strong> crea un nuevo punto de deploy. Es decir, comprueba los cambios que ha habido en el proyecto. [false]</li>
+<li>
+<strong>--all</strong> despliega todos los archivos que hay en la rama deploy [false]</li>
+<li>
+<strong>-f</strong> GorillaJS vuelve a hacer las preguntas para poder cambiar la configuración en ese entorno. [false]</li>
+</ul>
+
+<p><strong>Valores de configuración</strong></p>
+
+<ul>
+<li>
+</li>
+</ul>
