@@ -17,8 +17,8 @@ var PATHS = {
     },
     videos: {
         source: [
-            // BASE_PATH + '/docs/videos/*.mp4'
-            BASE_PATH + '/docs/videos/*.mov'
+            BASE_PATH + '/docs/videos/*.mp4'
+            // BASE_PATH + '/docs/videos/*.mov'
         ]
     },
     docs: {
@@ -54,8 +54,8 @@ function compileDocs(file){
 function compileVideo(file){
     var output;
 
-    // output = path.dirname(file.path) + '/' + path.basename(file.path, '.mp4') + '.gif';
-    output = path.dirname(file.path) + '/' + path.basename(file.path, '.mov') + '.gif';
+    output = path.dirname(file.path) + '/' + path.basename(file.path, '.mp4') + '.gif';
+    // output = path.dirname(file.path) + '/' + path.basename(file.path, '.mov') + '.gif';
 
     exec('ffmpeg -i ' + file.path + ' -vf scale=-1:-1 ' + output, function(err, stdout, stderr){
         console.log(err);
