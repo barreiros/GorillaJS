@@ -40,7 +40,7 @@ gorilla deploy -e [environment]
 Despliega la última versión de los archivos de la rama deploy [gorilla-deploy] en el servidor remoto. Si se añade el parámetro **-n** la última versión de los archivos de la rama devel [gorilla-devel] se copian en la rama deploy [gorilla-deploy] para crear un nuevo despliegue y subir esa versión al servidor.
 GorillaJS solo tiene en cuenta los archivos de la rama devel [gorilla-devel] que se hayan incluído en el último commit. Esto también significa que los archivos que estén en .gitignore tampoco se incluirán en el deploy.
 
-![alt text](https://github.com/barreiros/GorillaJS/tree/devel/docs "GorillaJS deploy example")
+![GorillaJS deploy example](https://github.com/barreiros/GorillaJS/tree/devel/docs/videos/deploy_edited.gif "GorillaJS deploy example")
 
 **Requerimientos**
 * Tener instalado Git en la máquina local.
