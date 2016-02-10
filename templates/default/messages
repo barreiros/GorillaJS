@@ -71,27 +71,13 @@
 
     "questions": {
         "hosts": {
-            "enabled": "Do you want to access to your local web project either through ip or domain name?"
         },
         "project": {
-            "slug": "Your project ID ()",
-            "srcin": "What is your src (www, html, application...) local project folder path? (Please, relative to the project folder).",
-            "srcout": "What is your src (www, html, application...) server folder path? (Please, relative to the server project folder)."
         },
         "ssh": {
-            "enable": "The actual environment is not 'local'. Do you want to initiate a ssh session with a remote server?",
-            "passphrase": "Your ssh key passphrase (leave blank if not)"
+            "enable": "The actual environment is not 'local'. Do you want to initiate a ssh session with a remote server?"
         },
         "git": {
-            "branchdevel": "Whath is your development branch?",
-            "branchdeploy": "What is your deploy branch?",
-            "platform": "What git platform do you want to use for store your project?",
-            "username": "Git username",
-            "password": "Git password",
-            "clonefromurl": "What is the git project url (https) to clone?",
-            "clonefrombranch": "Wich branch?",
-            "private": "Do you want a private repository?",
-            "rollbackdate": "Select a rollback point from the list above:"
         }
     }
 }

@@ -37,8 +37,10 @@ Deploy
 gorilla deploy -e [environment]
 ```
 
-GorillaJS solo desplegará los archivos que se hayan commiteado; con el resto se hará un stash al inicio y un stash pop al final del proceso.
-Por defecto el deploy se hace sobre el último que haya hecho el usuario.
+Despliega la última versión de los archivos de la rama deploy [gorilla-deploy] en el servidor remoto. Si se añade el parámetro **-n** la última versión de los archivos de la rama devel [gorilla-devel] se copian en la rama deploy [gorilla-deploy] para crear un nuevo despliegue y subir esa versión al servidor.
+GorillaJS solo tiene en cuenta los archivos de la rama devel [gorilla-devel] que se hayan incluído en el último commit. Esto también significa que los archivos que estén en .gitignore tampoco se incluirán en el deploy.
+
+![alt text](https://github.com/barreiros/GorillaJS/tree/devel/docs "GorillaJS deploy example")
 
 **Requerimientos**
 * Tener instalado Git en la máquina local.
@@ -52,4 +54,38 @@ Por defecto el deploy se hace sobre el último que haya hecho el usuario.
 * **--all** despliega todos los archivos que hay en la rama deploy. [false]
 
 **Valores de configuración**
-* 
+* **ssh/workingpath** [/var/gorilla]
+
+    Ruta de la carpeta remota en la que GorillaJS tiene que desplegar los archivos. 
+
+* **ssh/host** [ ]
+
+   Nombre del servidor o ip del servidor remoto. 
+
+* **ssh/port** [22]
+
+    Puerto de conexión ssh del servidor remoto. 
+
+* **ssh/username** [ ]
+
+    Nombre de usuario ssh del servidor remoto.
+
+* **ssh/key** [ ]
+
+    Ruta local de la clave privada ssh.
+
+* **ssh/passphrase** [ ] 
+
+    Contraseña de la clave privada. Si no tiene contraseña, se tiene que dejar vacío.
+
+* **git/branchdevel** [gorilla-devel]
+
+    Nombre de la rama en la que están los archivos que GorillaJS va a usar en el despliegue. Normalmente es la rama de desarrollo del proyecto. Si no existe, GorillaJS la crea automáticamente.
+
+* **git/branchdeploy** [gorilla-deploy]
+
+    Nombre de la rama que GorillaJS va a usar para llevar el histórico de despligues. Lo ideal es que esta rama se use solamente para este cometido. Si no existe, GorillaJS la crea automáticamente.
+
+* **project/srcin** [ ]
+
+    Nombre de la carpeta del directorio de desarrollo que contiene los archivos que GorillaJS va a usar en el despliegue. Si la carpeta es la raíz del proyecto, se tiene que dejar vacío.

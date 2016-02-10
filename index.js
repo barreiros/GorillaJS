@@ -52,16 +52,15 @@ function checkUserInput(){
 
         if(env !== 'local') {
             promisesPack.push(
-                [tools.param, ['ssh', 'enable', true], 'test'],
+                [tools.param, ['ssh', 'enable', true]],
                 [promises.cond, [
                     [tools.param, ['ssh', 'workingpath'], 'working-path'],
-                    [tools.param, ['project', 'slug', null, tools.sanitize], 'slug'],
                     [tools.param, ['ssh', 'host'], 'host'],
                     [tools.param, ['ssh', 'port'], 'port'],
                     [tools.param, ['ssh', 'username'], 'user-name'],
                     [tools.param, ['ssh', 'key'], 'key'],
                     [tools.param, ['ssh', 'passphrase'], 'passphrase'],
-                    [setWorkingPath, '::working-path::' + '/' + '::slug::'],
+                    [setWorkingPath, '::working-path::'],
                     [ssh.connect, ['::host::', '::port::', '::user-name::', '::key::', '::passphrase::']]
                 ]] // last param autofilled
             );
@@ -84,7 +83,6 @@ function deploy(){
         [tools.param, ['git', 'branchdevel'], 'branch-devel'],
         [tools.param, ['git', 'branchdeploy'], 'branch-deploy'],
         [tools.param, ['project', 'srcin'], 'srcin'],
-        [tools.param, ['project', 'srcout'], 'srcout'],
 
         [cross.config, projectPath],
         [git.config, projectPath],
@@ -102,9 +100,9 @@ function deploy(){
             [git.commitDate, '::branch-deploy::', 'last-commit-date'], // last param autofilled
             [git.listFiles, ['::last-commit-date::', null, '::branch-deploy::'], 'list'],
             [tools.fusionObjectNodes, ['deleted', null]], // last param autofilled
-            [cross.removeFiles, [workingPath + '/' + '::srcout::', true, null]], // last param autofilled
+            [cross.removeFiles, [workingPath, true, null]], // last param autofilled
             [tools.fusionObjectNodes, ['added', 'modified', '::list::']],
-            [cross.moveFiles, [workingPath + '/' + '::srcout::', true]] // last param autofilled
+            [cross.moveFiles, [workingPath, true]] // last param autofilled
         );
     }else if (argv.n) {
         promisesPack.push(
@@ -114,7 +112,7 @@ function deploy(){
             [git.listFiles, ['::last-commit-date::', null, '::branch-devel::']],
             [tools.fusionObjectNodes, ['deleted', null]], // last param autofilled
             [tools.filterPaths, '::srcin::', 'list-devel-filtered'], // last param autofilled
-            [cross.removeFiles, [workingPath + '/' + '::srcout::', true, null, '::list-devel-filtered::']],
+            [cross.removeFiles, [workingPath, true, null, '::list-devel-filtered::']],
             [cross.removeFiles, [projectPath + '/', false, null, '::list-devel-filtered::']],
 
             [git.commit, ['GorillaJS rollback ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
@@ -127,7 +125,7 @@ function deploy(){
             [git.commit, ['GorillaJS deploy ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
             [git.listFiles, ['::last-commit-date::', null, '::branch-deploy::']],
             [tools.fusionObjectNodes, ['added', 'modified']], // last param autofilled
-            [cross.moveFiles, [workingPath + '/' + '::srcout::', true]] // last param autofilled
+            [cross.moveFiles, [workingPath, true]] // last param autofilled
         );
     }else{
         promisesPack.push(
@@ -136,9 +134,9 @@ function deploy(){
             [git.commitDate, ['::branch-deploy::', null], 'last-commit-date'],
             [git.listFiles, ['::last-commit-date::', null, '::branch-deploy::'], 'list'],
             [tools.fusionObjectNodes, ['deleted', null]], // last param autofilled
-            [cross.removeFiles, [workingPath + '/' + '::srcout::', true, null]], // last param autofilled
+            [cross.removeFiles, [workingPath, true, null]], // last param autofilled
             [tools.fusionObjectNodes, ['added', 'modified', '::list::']],
-            [cross.moveFiles, [workingPath + '/' + '::srcout::', true]] // last param autofilled
+            [cross.moveFiles, [workingPath, true]] // last param autofilled
         );
     }
 
