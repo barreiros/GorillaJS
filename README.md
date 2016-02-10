@@ -18,23 +18,25 @@ Con GorillaJS se puede:
 **Su mayor potencial está en iniciar, mantener y automatizar estas tareas**, usando herramientas como **Git**, **Docker** o **SSH** y comunicándose con los servidores remotos (cuando lo necesita) a través de comandos simples que reciben la infomación lo más procesada posible para cada tarea.
 
 ### Instalación
-```
+```shell
 npm install -g gorillajs
 ```
 
 ### Listado de tareas
 * [deploy](#user-content-deploy)
-* rollback
-* docker
-* git[clone|remote]
-* provision
+* [rollback](#user-content-rollback)
+* [docker](#user-content-docker)
+* [clonerepo](#user-content-clonerepo)
+* [createrepo](#user-content-createrepo)
 
-
-***
-
+******
 
 Deploy
 ---
+```shell
+gorilla deploy -e [environment]
+```
+
 GorillaJS solo desplegará los archivos que se hayan commiteado; con el resto se hará un stash al inicio y un stash pop al final del proceso.
 Por defecto el deploy se hace sobre el último que haya hecho el usuario.
 
@@ -45,8 +47,9 @@ Por defecto el deploy se hace sobre el último que haya hecho el usuario.
 **Parámetros**
 * **-e** elegir el entorno en el que desplegar los cambios [local]
 * **-n** crea un nuevo punto de deploy. Es decir, comprueba los cambios que ha habido en el proyecto. [false]
-* **--all** despliega todos los archivos que hay en la rama deploy [false]
 * **-f** GorillaJS vuelve a hacer las preguntas para poder cambiar la configuración en ese entorno. [false]
+* **-v** Enable verbose mode. [false]
+* **--all** despliega todos los archivos que hay en la rama deploy. [false]
 
 **Valores de configuración**
 * 

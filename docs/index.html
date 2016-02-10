@@ -26,24 +26,25 @@ Para hacer esto, GorillaJS utiliza una interfaz sencilla (CLI) basada en pregunt
 <h3>
 <a id="user-content-instalación" class="anchor" href="#instalaci%C3%B3n" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Instalación</h3>
 
-<pre><code>npm install -g gorillajs
-</code></pre>
+<div class="highlight highlight-source-shell"><pre>npm install -g gorillajs</pre></div>
 
 <h3>
 <a id="user-content-listado-de-tareas" class="anchor" href="#listado-de-tareas" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Listado de tareas</h3>
 
 <ul>
 <li><a href="#user-content-deploy">deploy</a></li>
-<li>rollback</li>
-<li>docker</li>
-<li>git[clone|remote]</li>
-<li>provision</li>
+<li><a href="#user-content-rollback">rollback</a></li>
+<li><a href="#user-content-docker">docker</a></li>
+<li><a href="#user-content-clonerepo">clonerepo</a></li>
+<li><a href="#user-content-createrepo">createrepo</a></li>
 </ul>
 
 <hr>
 
 <h2>
 <a id="user-content-deploy" class="anchor" href="#deploy" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Deploy</h2>
+
+<div class="highlight highlight-source-shell"><pre>gorilla deploy -e [environment]</pre></div>
 
 <p>GorillaJS solo desplegará los archivos que se hayan commiteado; con el resto se hará un stash al inicio y un stash pop al final del proceso.
 Por defecto el deploy se hace sobre el último que haya hecho el usuario.</p>
@@ -63,13 +64,19 @@ Por defecto el deploy se hace sobre el último que haya hecho el usuario.</p>
 <li>
 <strong>-n</strong> crea un nuevo punto de deploy. Es decir, comprueba los cambios que ha habido en el proyecto. [false]</li>
 <li>
-<strong>--all</strong> despliega todos los archivos que hay en la rama deploy [false]</li>
-<li>
 <strong>-f</strong> GorillaJS vuelve a hacer las preguntas para poder cambiar la configuración en ese entorno. [false]</li>
+<li>
+<strong>-v</strong> Enable verbose mode. [false]</li>
+<li>
+<strong>--all</strong> despliega todos los archivos que hay en la rama deploy. [false]</li>
 </ul>
 
 <p><strong>Valores de configuración</strong></p>
 
+<ul>
+<li>
+</li>
+</ul>
 <ul>
 <li>
 </li>
