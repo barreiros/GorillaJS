@@ -1,4 +1,4 @@
-![GorillaJS logo](http://s2.postimg.org/yq6fanqbt/logo.jpg =320)
+![GorillaJS logo](http://s23.postimg.org/ka5fnkw23/logo_mini.jpg)
 
 **GorillaJS es una herramienta que ayuda a automatizar de manera sencilla tareas complejas del desarrollo web.**
 
