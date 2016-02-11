@@ -1,5 +1,5 @@
-GorillaJS
-===
+![GorillaJS logo](http://s2.postimg.org/yq6fanqbt/logo.jpg =320 "GorillaJS logo")
+
 **GorillaJS es una herramienta que ayuda a automatizar de manera sencilla tareas complejas del desarrollo web.**
 
 ### Objetivo y filosofía
