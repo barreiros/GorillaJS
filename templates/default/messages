@@ -25,7 +25,8 @@
         "023" : "Unable to list commits",
         "024" : "Unable to reset your branch to the desired point",
         "025" : "Last rollback point. Is not possible rollback again.",
-        "026" : "Unable to check current branch."
+        "026" : "Unable to check current branch.",
+        "027" : "Problems to complete your file commands"
     },
 
     "warnings": {
@@ -59,6 +60,7 @@
         "tools-removefiles" : "Removing files...",
         "tools-setvariables" : "Setting Docker variables...",
         "tools-provision": "Provisioning the machine...",
+        "tools-filecommands": "Running your file commands...",
         "docker-checkplatform" : "Checking your platform...",
         "docker-start" : "Starting Docker...",
         "tools-createtemplate" : "Checking for gorillafile template...",

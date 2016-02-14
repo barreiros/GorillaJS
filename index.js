@@ -23,6 +23,7 @@ var gorillaFile = 'gorillafile';
 var messagesFile = 'messages';
 var projectPath = process.cwd();
 var templatesPath = gorillaPath + '/templates';
+var commonPath = projectPath + '/' + gorillaFolder + '/common';
 var composeFile = 'docker-compose.yml';
 var env = argv.e ? argv.e : 'local';
 var verbose = argv.v ? argv.v : false;
@@ -84,6 +85,7 @@ function deploy(){
         [tools.param, ['git', 'branchdeploy'], 'branch-deploy'],
         [tools.param, ['project', 'srcin'], 'srcin'],
 
+        [tools.runFileCommands, commonPath + '/' + env + '-before.sh'],
         [cross.config, projectPath],
         [git.config, projectPath],
         [git.initRepo, gorillaFolder],
@@ -143,6 +145,7 @@ function deploy(){
     promisesPack.push(
         [git.createBranch, '::current-branch::'],
         [git.stash, 'pop'],
+        [tools.runFileCommands, commonPath + '/' + env + '-after.sh'],
         ssh.close
     );
 

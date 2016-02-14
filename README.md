@@ -38,9 +38,25 @@ Deploy
 ```shell
 gorilla deploy -e [environment]
 ```
+Despliega en el servidor remoto los archivos que estén en el último commit de la rama deploy.
 
-Despliega la última versión de los archivos de la rama deploy [gorilla-deploy] en el servidor remoto. Si se añade el parámetro **-n** la última versión de los archivos de la rama devel [gorilla-devel] se copian en la rama deploy [gorilla-deploy] para crear un nuevo despliegue y subir esa versión al servidor.
-GorillaJS solo tiene en cuenta los archivos de la rama devel [gorilla-devel] que se hayan incluído en el último commit. Esto también significa que los archivos que estén en .gitignore tampoco se incluirán en el deploy.
+GorillaJS necesita dos ramas del repositorio git para poder crear los despliegues: la rama deploy [gorilla-deploy] y la rama devel [gorilla-devel].<br />
+La rama deploy la crea y la gestiona GorillaJS y es la que sirve para llevar el histórico de despliegues, y la rama devel es la que se usa normalmente para desarrollo y desde la que GorillaJS coge las últimas versiones de los archivos.<br />
+Por defecto GorillaJS no pasa los archivos de la rama devel a deploy cada vez que se ejecuta esta tarea. Para eso se tiene que usar el parámetro **-n**; esto pasará los nuevos cambios en los archivos de la rama devel a un nuevo commit de la rama deploy (generado automáticamente por GorillaJS).
+
+Además de desplegar los archivos, GorillaJS puede ejecutar comandos de bash antes y después del despliegue. Para ejecutar comandos antes se añaden al archivo .gorilla/common/[environment]-before.sh, y para ejecutarlso después se añaden al archivo .gorilla/common/[environent]-after.sh.
+Por ejemplo, se puede imprimir el mensaje "Hola" en el servidor justo antes de iniciar el despliegue de los archivos añadiendo esta línea en el archivo [environment]-before.sh
+```
+echo "Hola"
+```
+
+y el mensaje "Adiós" justo después del despliegue añadiendo esta línea en el archivo [environment]-after.sh
+```
+echo "Adiós"
+```
+
+
+
 
 <p align="center">
   <img src="http://s7.postimg.org/yom3jzwxn/deploy_edited.gif" alt="GorillaJS deploy example"/>
