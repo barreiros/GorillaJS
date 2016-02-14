@@ -42,12 +42,10 @@ function checkUserInput(){
 
     var promisesPack = [];
 
-    if (argv.f) tools.setConfigFile(f);
-
     if(argv._[0] === 'init' || argv._[0] === 'docker' || argv._[0] === 'pack' || argv._[0] === 'deploy' || argv._[0] === 'rollback' || argv._[0] === 'provision'){
 
         promisesPack.push(
-            [tools.config, env],
+            [tools.config, [env, argv.f]],
             [tools.createBaseEnvironment, [projectPath, templatesPath, gorillaPath, gorillaFile, gorillaFolder, messagesFile]]
         );
 
