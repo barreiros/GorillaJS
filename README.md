@@ -33,7 +33,7 @@ npm install -g gorillajs
 
 ******
 
-Deploy
+deploy
 ---
 ```shell
 gorilla deploy -e [environment]
@@ -54,9 +54,6 @@ y el mensaje "Adiós" justo después del despliegue añadiendo esta línea en el
 ```
 echo "Adiós"
 ```
-
-
-
 
 <p align="center">
   <img src="http://s7.postimg.org/yom3jzwxn/deploy_edited.gif" alt="GorillaJS deploy example"/>
@@ -109,3 +106,99 @@ echo "Adiós"
 * **project/srcin** [ ]
 
     Nombre de la carpeta del directorio de desarrollo que contiene los archivos que GorillaJS va a usar en el despliegue. Si la carpeta es la raíz del proyecto, se tiene que dejar vacío.
+
+******
+
+rollback
+---
+```shell
+gorilla rollback -e [environment]
+```
+
+Descripción de la tarea en una línea.
+
+Explicación más extensa del método.
+
+Ejemplos de código, si es necesario.
+
+<p align="center">
+  <img src="http://s30.postimg.org/n3rq2r31d/rollback_edited.gif" alt="GorillaJS rollback example"/>
+</p>
+
+**Requerimientos**
+
+**Parámetros**
+
+**Valores de configuración**
+
+******
+
+docker
+---
+```shell
+gorilla rollback -e [environment]
+```
+
+Descripción de la tarea en una línea.
+
+Explicación más extensa del método.
+
+Ejemplos de código, si es necesario.
+
+<p align="center">
+  <img src="http://s30.postimg.org/n3rq2r31d/rollback_edited.gif" alt="GorillaJS rollback example"/>
+</p>
+
+**Requerimientos**
+
+**Parámetros**
+
+**Valores de configuración**
+
+******
+
+clonerepo
+---
+```shell
+gorilla rollback -e [environment]
+```
+
+Descripción de la tarea en una línea.
+
+Explicación más extensa del método.
+
+Ejemplos de código, si es necesario.
+
+<p align="center">
+  <img src="http://s30.postimg.org/n3rq2r31d/rollback_edited.gif" alt="GorillaJS rollback example"/>
+</p>
+
+**Requerimientos**
+
+**Parámetros**
+
+**Valores de configuración**
+
+******
+
+createrepo
+---
+```shell
+gorilla createrepo -e [environment]
+```
+
+Descripción de la tarea en una línea.
+
+Explicación más extensa del método.
+
+Ejemplos de código, si es necesario.
+
+<p align="center">
+  <img src="http://s30.postimg.org/n3rq2r31d/rollback_edited.gif" alt="GorillaJS rollback example"/>
+</p>
+
+**Requerimientos**
+
+**Parámetros**
+
+**Valores de configuración**

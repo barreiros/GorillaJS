@@ -43,12 +43,26 @@ Para hacer esto, GorillaJS utiliza una interfaz sencilla (CLI) basada en pregunt
 <hr>
 
 <h2>
-<a id="user-content-deploy" class="anchor" href="#deploy" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Deploy</h2>
+<a id="user-content-deploy" class="anchor" href="#deploy" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>deploy</h2>
 
 <div class="highlight highlight-source-shell"><pre>gorilla deploy -e [environment]</pre></div>
 
-<p>Despliega la última versión de los archivos de la rama deploy [gorilla-deploy] en el servidor remoto. Si se añade el parámetro <strong>-n</strong> la última versión de los archivos de la rama devel [gorilla-devel] se copian en la rama deploy [gorilla-deploy] para crear un nuevo despliegue y subir esa versión al servidor.
-GorillaJS solo tiene en cuenta los archivos de la rama devel [gorilla-devel] que se hayan incluído en el último commit. Esto también significa que los archivos que estén en .gitignore tampoco se incluirán en el deploy.</p>
+<p>Despliega en el servidor remoto los archivos que estén en el último commit de la rama deploy.</p>
+
+<p>GorillaJS necesita dos ramas del repositorio git para poder crear los despliegues: la rama deploy [gorilla-deploy] y la rama devel [gorilla-devel].<br>
+La rama deploy la crea y la gestiona GorillaJS y es la que sirve para llevar el histórico de despliegues, y la rama devel es la que se usa normalmente para desarrollo y desde la que GorillaJS coge las últimas versiones de los archivos.<br>
+Por defecto GorillaJS no pasa los archivos de la rama devel a deploy cada vez que se ejecuta esta tarea. Para eso se tiene que usar el parámetro <strong>-n</strong>; esto pasará los nuevos cambios en los archivos de la rama devel a un nuevo commit de la rama deploy (generado automáticamente por GorillaJS).</p>
+
+<p>Además de desplegar los archivos, GorillaJS puede ejecutar comandos de bash antes y después del despliegue. Para ejecutar comandos antes se añaden al archivo .gorilla/common/[environment]-before.sh, y para ejecutarlso después se añaden al archivo .gorilla/common/[environent]-after.sh.
+Por ejemplo, se puede imprimir el mensaje "Hola" en el servidor justo antes de iniciar el despliegue de los archivos añadiendo esta línea en el archivo [environment]-before.sh</p>
+
+<pre><code>echo "Hola"
+</code></pre>
+
+<p>y el mensaje "Adiós" justo después del despliegue añadiendo esta línea en el archivo [environment]-after.sh</p>
+
+<pre><code>echo "Adiós"
+</code></pre>
 
 <p align="center">
   <a href="https://camo.githubusercontent.com/820f2d5ae6bb97166228417efd032bca7e5c0415/687474703a2f2f73372e706f7374696d672e6f72672f796f6d336a7a77786e2f6465706c6f795f6564697465642e676966" target="_blank"><img src="https://camo.githubusercontent.com/820f2d5ae6bb97166228417efd032bca7e5c0415/687474703a2f2f73372e706f7374696d672e6f72672f796f6d336a7a77786e2f6465706c6f795f6564697465642e676966" alt="GorillaJS deploy example" data-canonical-src="http://s7.postimg.org/yom3jzwxn/deploy_edited.gif" style="max-width:100%;"></a>
@@ -125,3 +139,95 @@ GorillaJS solo tiene en cuenta los archivos de la rama devel [gorilla-devel] que
 <p>Nombre de la carpeta del directorio de desarrollo que contiene los archivos que GorillaJS va a usar en el despliegue. Si la carpeta es la raíz del proyecto, se tiene que dejar vacío.</p>
 </li>
 </ul>
+
+<hr>
+
+<h2>
+<a id="user-content-rollback" class="anchor" href="#rollback" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>rollback</h2>
+
+<div class="highlight highlight-source-shell"><pre>gorilla rollback -e [environment]</pre></div>
+
+<p>Descripción de la tarea en una línea.</p>
+
+<p>Explicación más extensa del método.</p>
+
+<p>Ejemplos de código, si es necesario.</p>
+
+<p align="center">
+  <a href="https://camo.githubusercontent.com/8e9fb50b1eb2333f0172e825bc9e83a9330ba757/687474703a2f2f7333302e706f7374696d672e6f72672f6e33727132723331642f726f6c6c6261636b5f6564697465642e676966" target="_blank"><img src="https://camo.githubusercontent.com/8e9fb50b1eb2333f0172e825bc9e83a9330ba757/687474703a2f2f7333302e706f7374696d672e6f72672f6e33727132723331642f726f6c6c6261636b5f6564697465642e676966" alt="GorillaJS rollback example" data-canonical-src="http://s30.postimg.org/n3rq2r31d/rollback_edited.gif" style="max-width:100%;"></a>
+</p>
+
+<p><strong>Requerimientos</strong></p>
+
+<p><strong>Parámetros</strong></p>
+
+<p><strong>Valores de configuración</strong></p>
+
+<hr>
+
+<h2>
+<a id="user-content-docker" class="anchor" href="#docker" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>docker</h2>
+
+<div class="highlight highlight-source-shell"><pre>gorilla rollback -e [environment]</pre></div>
+
+<p>Descripción de la tarea en una línea.</p>
+
+<p>Explicación más extensa del método.</p>
+
+<p>Ejemplos de código, si es necesario.</p>
+
+<p align="center">
+  <a href="https://camo.githubusercontent.com/8e9fb50b1eb2333f0172e825bc9e83a9330ba757/687474703a2f2f7333302e706f7374696d672e6f72672f6e33727132723331642f726f6c6c6261636b5f6564697465642e676966" target="_blank"><img src="https://camo.githubusercontent.com/8e9fb50b1eb2333f0172e825bc9e83a9330ba757/687474703a2f2f7333302e706f7374696d672e6f72672f6e33727132723331642f726f6c6c6261636b5f6564697465642e676966" alt="GorillaJS rollback example" data-canonical-src="http://s30.postimg.org/n3rq2r31d/rollback_edited.gif" style="max-width:100%;"></a>
+</p>
+
+<p><strong>Requerimientos</strong></p>
+
+<p><strong>Parámetros</strong></p>
+
+<p><strong>Valores de configuración</strong></p>
+
+<hr>
+
+<h2>
+<a id="user-content-clonerepo" class="anchor" href="#clonerepo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>clonerepo</h2>
+
+<div class="highlight highlight-source-shell"><pre>gorilla rollback -e [environment]</pre></div>
+
+<p>Descripción de la tarea en una línea.</p>
+
+<p>Explicación más extensa del método.</p>
+
+<p>Ejemplos de código, si es necesario.</p>
+
+<p align="center">
+  <a href="https://camo.githubusercontent.com/8e9fb50b1eb2333f0172e825bc9e83a9330ba757/687474703a2f2f7333302e706f7374696d672e6f72672f6e33727132723331642f726f6c6c6261636b5f6564697465642e676966" target="_blank"><img src="https://camo.githubusercontent.com/8e9fb50b1eb2333f0172e825bc9e83a9330ba757/687474703a2f2f7333302e706f7374696d672e6f72672f6e33727132723331642f726f6c6c6261636b5f6564697465642e676966" alt="GorillaJS rollback example" data-canonical-src="http://s30.postimg.org/n3rq2r31d/rollback_edited.gif" style="max-width:100%;"></a>
+</p>
+
+<p><strong>Requerimientos</strong></p>
+
+<p><strong>Parámetros</strong></p>
+
+<p><strong>Valores de configuración</strong></p>
+
+<hr>
+
+<h2>
+<a id="user-content-createrepo" class="anchor" href="#createrepo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>createrepo</h2>
+
+<div class="highlight highlight-source-shell"><pre>gorilla createrepo -e [environment]</pre></div>
+
+<p>Descripción de la tarea en una línea.</p>
+
+<p>Explicación más extensa del método.</p>
+
+<p>Ejemplos de código, si es necesario.</p>
+
+<p align="center">
+  <a href="https://camo.githubusercontent.com/8e9fb50b1eb2333f0172e825bc9e83a9330ba757/687474703a2f2f7333302e706f7374696d672e6f72672f6e33727132723331642f726f6c6c6261636b5f6564697465642e676966" target="_blank"><img src="https://camo.githubusercontent.com/8e9fb50b1eb2333f0172e825bc9e83a9330ba757/687474703a2f2f7333302e706f7374696d672e6f72672f6e33727132723331642f726f6c6c6261636b5f6564697465642e676966" alt="GorillaJS rollback example" data-canonical-src="http://s30.postimg.org/n3rq2r31d/rollback_edited.gif" style="max-width:100%;"></a>
+</p>
+
+<p><strong>Requerimientos</strong></p>
+
+<p><strong>Parámetros</strong></p>
+
+<p><strong>Valores de configuración</strong></p>

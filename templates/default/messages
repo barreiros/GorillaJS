@@ -40,7 +40,7 @@
         "009" : "Unable to open your browser.",
         "010" : "The machine ip is not valid.",
         "011" : "Unable to remove empty directory",
-        "012" : "Unable to remove server files",
+        "012" : "Unable to remove server file. Maybe it doesn't exists.",
         "013" : "Unable to save your current branch work"
     },
 

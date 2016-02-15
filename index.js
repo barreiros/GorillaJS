@@ -153,37 +153,42 @@ function deploy(){
 
 function rollback(){
 
-    var promisesPack = [
+    var promisesPack = [];
+
+    promisesPack = [
+        [tools.param, ['git', 'branchdeploy'], 'branch-deploy'],
+
         [git.config, projectPath],
         [git.initRepo, gorillaFolder],
         [git.currentBranch, null, 'current-branch'],
         [git.add, '.'],
         git.stash,
 
-        [git.createBranch, [tools.param('git', 'branchdeploy')]],
-        [git.listCommits, [tools.param('git', 'branchdeploy'), 'rollback'], 'commits'],
-        [tools.param, ['git', 'rollbackdate', '::commits', null, false], 'rollback-point'],
-        [git.commitDate, [tools.param('git', 'branchdeploy')], 'commit-date'], // last param autofilled
-        [git.listFiles, ['::commit-date', datef(new Date(), 'yyyy-mm-dd HH:MM:ss o'), tools.param('git', 'branchdeploy'), true], 'list'],
+        [git.createBranch, '::branch-deploy::'],
+        [git.listCommits, ['::branch-deploy::', 'rollback'], 'commits'],
+        [tools.param, ['git', 'rollbackdate', '::commits::', null, false], 'rollback-point'],
+        [git.commitDate, '::branch-deploy::', 'commit-date'], // last param autofilled
+        [git.listFiles, ['::commit-date::', datef(new Date(), 'yyyy-mm-dd HH:MM:ss o'), '::branch-deploy::', true], 'list'],
 
         // [Aquí hago un reset --hard al commit inicial para recuperar todos los archivos],
-        [git.reset, [tools.param('git', 'branchdeploy'), '::rollback-point']],
-        [tools.fusionObjectNodes, ['deleted', 'modified', '::list']],
-        [cross.moveFiles, [workingPath + '/' + tools.param('project', 'srcout'), true]], // last param autofilled
+        [git.reset, ['::branch-deploy::', '::rollback-point::']],
+        [tools.fusionObjectNodes, ['deleted', 'modified', '::list::']],
+        [cross.moveFiles, [workingPath, true]], // last param autofilled
 
         // Como voy hacia atrás en el tiempo, los archivos eliminados ahora son añadidos y a la inversa.
-        [tools.fusionObjectNodes, ['added', null, '::list'], 'list-deleted'],
-        [cross.removeFiles, [workingPath + '/' + tools.param('project', 'srcout'), true, null, '::list-deleted']],
-        [cross.removeFiles, [projectPath + '/', false, null, 'promises:list-deleted']],
+        [tools.fusionObjectNodes, ['added', null, '::list::'], 'list-deleted'],
+        [cross.removeFiles, [workingPath, true, null, '::list-deleted::']],
+        [cross.removeFiles, [projectPath + '/', false, null, '::list-deleted::']],
 
-        [git.listCommits, [tools.param('git', 'branchdeploy'), 'deploy']],
+        [git.listCommits, ['::branch-deploy::', 'deploy']],
         [tools.selectArrayValue, 0], // last param autofilled
-        [git.reset, [tools.param('git', 'branchdeploy')]], // last param autofilled
+        [git.reset, '::branch-deploy::'], // last param autofilled
 
-        [git.createBranch, '::current-branch'],
+        [git.createBranch, '::current-branch::'],
         [git.stash, 'pop'],
         ssh.close
     ];
+
     promises.add(promisesPack);
     promises.start();
 }
