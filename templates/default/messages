@@ -75,6 +75,7 @@
         "hosts": {
         },
         "project": {
+            "slug": "An identifier for your project"
         },
         "ssh": {
             "enable": "The actual environment is not 'local'. Do you want to initiate a ssh session with a remote server?"
