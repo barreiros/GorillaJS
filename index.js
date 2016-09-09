@@ -205,9 +205,8 @@ function docker(){
         [tools.param, ['project', 'slug', null, tools.sanitize], 'slug'],
         [tools.paramForced, ['docker', 'gorillafolder', gorillaFolder]],
 
-        // [cross.moveFiles, [projectPath + '/' + gorillaFolder, false, ['.DS_Store'], templatesPath + '/common']],
-        // [cross.moveFiles, [projectPath + '/' + gorillaFolder, false, ['.DS_Store'], templatesPath + '/{{template}}']],
-        // [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/**/*'],
+        [cross.moveFiles, [projectPath + '/' + gorillaFolder, false, ['.DS_Store'], templatesPath + '/{{template}}']],
+        [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/**/*'],
 
         // [promises.cond, [
         //     [cross.moveFiles, [workingPath + '/' + gorillaFolder, true, ['.DS_Store'], projectPath + '/' + gorillaFolder]]
