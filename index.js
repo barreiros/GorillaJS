@@ -19,6 +19,7 @@ var promises = require(__dirname + '/lib/promises.js');
 
 var gorillaPath = __dirname;
 var gorillaFolder = '.gorilla';
+var gorillaTemplateFolder = 'template';
 var gorillaFile = 'gorillafile';
 var messagesFile = 'messages';
 var projectPath = process.cwd();
@@ -200,15 +201,16 @@ function docker(){
 
     promisesPack = [
         [tools.param, ['docker', 'template', templateOptions], 'template'],
-        [cross.moveFiles, [projectPath + '/' + gorillaFolder + '/{{template}}', false, ['.DS_Store'], templatesPath + '/{{template}}']],
-        [tools.createTemplateEnvironment, [projectPath, gorillaFolder, gorillaFile, messagesFile, '{{template}}']],
+        [tools.checkTemplatePath, [templateOptions, '{{template}}', templatesPath], 'template-path'],
+        [cross.moveFiles, [projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder, false, ['.DS_Store'], '{{template-path}}']],
+        [tools.createTemplateEnvironment, [projectPath, gorillaFolder, gorillaFile, messagesFile, gorillaTemplateFolder]],
         [tools.param, ['docker', 'machinename'], 'machine-name'],
         [tools.param, ['docker', 'port'], 'port'],
         [tools.param, ['project', 'slug', null, tools.sanitize], 'slug'],
         [tools.paramForced, ['docker', 'gorillafolder', gorillaFolder]],
+        [tools.paramForced, ['docker', 'templatefolder', gorillaTemplateFolder]],
 
-        // [tools.resetEnvVariables, [[projectPath + '/' + gorillaFolder + '/{{template}}/*', '!' + projectPath + '/' + gorillaFolder + '/gorillafile']]]
-        [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/{{template}}/*'],
+        [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*'],
 
         [promises.cond, '{{ssh-enabled}}', [
             [cross.moveFiles, [workingPath + '/' + gorillaFolder, true, ['.DS_Store'], projectPath + '/' + gorillaFolder]]
@@ -217,7 +219,7 @@ function docker(){
         [tools.getPlatform],
         [m_docker.config],
         [m_docker.check, ['{{machine-name}}', '{{ssh-enabled}}']],
-        [m_docker.start, ['{{machine-name}}', workingPath + '/' + gorillaFolder + '/{{template}}/' + composeFile, '{{slug}}', '{{ssh-enabled}}']],
+        [m_docker.start, ['{{machine-name}}', workingPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/' + composeFile, '{{slug}}', '{{ssh-enabled}}']],
 
         [promises.cond, '{{ssh-enabled}}', [
             [tools.param, ['project', 'domain'], 'domain'],
@@ -243,6 +245,7 @@ function docker(){
         ]],
 
         [promises.cond, '{{ssh-enabled}}', [ssh.close]],
+        [tools.resetEnvVariables, [[projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*', '!' + projectPath + '/' + gorillaFolder + '/gorillafile']]]
     ];
 
     promises.add(promisesPack);
