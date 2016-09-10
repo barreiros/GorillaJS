@@ -205,8 +205,8 @@ function docker(){
         [tools.param, ['project', 'slug', null, tools.sanitize], 'slug'],
         [tools.paramForced, ['docker', 'gorillafolder', gorillaFolder]],
 
-        // [cross.moveFiles, [projectPath + '/' + gorillaFolder, false, ['.DS_Store'], templatesPath + '/{{template}}']],
-        [cross.moveFiles, [projectPath + '/' + gorillaFolder, false, ['.DS_Store'], templatesPath + '/common']],
+        [cross.moveFiles, [projectPath + '/' + gorillaFolder, false, ['.DS_Store'], templatesPath + '/{{template}}']],
+        // [cross.moveFiles, [projectPath + '/' + gorillaFolder, false, ['.DS_Store'], templatesPath + '/common']],
         [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/**/*'],
 
         [promises.cond, '{{ssh-enabled}}', [
@@ -214,11 +214,11 @@ function docker(){
         ]],
 
         [tools.getPlatform],
-        // [m_docker.config],
-        // [m_docker.check, ['{{machine-name}}', '{{ssh-enabled']],
-        // [m_docker.start, ['{{machine-name}}', workingPath + '/' + gorillaFolder + '/' + composeFile, '{{slug}}', '{{ssh-enabled}}']],
-        // [tools.resetEnvVariables, projectPath + '/' + gorillaFolder + '/**/*']
-        //
+        [m_docker.config],
+        [m_docker.check, ['{{machine-name}}', '{{ssh-enabled}}']],
+        [m_docker.start, ['{{machine-name}}', workingPath + '/' + gorillaFolder + '/' + composeFile, '{{slug}}', '{{ssh-enabled}}']],
+        // [tools.resetEnvVariables, [[projectPath + '/' + gorillaFolder + '/**/*', '!' + projectPath + '/' + gorillaFolder + '/gorillafile']]]
+
         // [promises.cond, '{{ssh-enabled}}', [
         //     [tools.param, ['project', 'domain'], 'domain'],
         //     [tools.param, ['system', 'platform', ['apache', 'nginx', 'none'], 'management']],

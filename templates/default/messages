@@ -61,7 +61,7 @@
         "tools-setvariables" : "Setting Docker variables...",
         "tools-provision": "Provisioning the machine...",
         "tools-filecommands": "Running your file commands...",
-        "docker-checkplatform" : "Checking your platform...",
+        "docker-checkplatform" : "Configuring your docker machine...",
         "docker-start" : "Starting Docker...",
         "tools-createtemplate" : "Checking for gorillafile template...",
         "hosts-adddomain": "Adding your new domain to hosts file (maybe you must enter your root password)",

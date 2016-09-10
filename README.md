@@ -184,6 +184,10 @@ Ejemplos de código, si es necesario.
 </p>
 
 **Requerimientos**
+* Tener instalado Docker ([Mac](https://docs.docker.com/engine/installation/mac/#/docker-toolbox), [Linux]()).
+* Tener instalado Virtualbox.
+* En mac tendremos que tener iniciada la máquina de Docker que hayamos indicado en "dockermachine".
+* Para iniciar los contenedores se usa Docker Compose, por lo que siempre será necesario un archivo docker-compose.yml en la template.
 
 **Parámetros**
 
