@@ -1,10 +1,10 @@
 web:
   image: gorillajs/apache-base
   ports:  
-    - "${docker.port}:80"
+    - "{{docker.port}}:80"
   volumes:
-    - ../${docker.gorillafolder}:/root/templates
-    - ../${project.srcout}:/var/www/${project.domain}/${project.srcout}
+    - ../{{docker.gorillafolder}}:/root/templates
+    - ../{{project.srcout}}:/var/www/${project.domain}/{{project.srcout}}
   links:
     - mysql:database
 mysql:
@@ -12,6 +12,6 @@ mysql:
   expose: 
     - 3306
   volumes:
-    - ../${docker.gorillafolder}:/root/templates
-    - ../${project.datafolder}:/var/lib/mysql
+    - ../{{docker.gorillafolder}}:/root/templates
+    - ../{{project.datafolder}}:/var/lib/mysql
 
