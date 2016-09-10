@@ -245,7 +245,7 @@ function docker(){
         ]],
 
         [promises.cond, '{{ssh-enabled}}', [ssh.close]],
-        [tools.resetEnvVariables, [[projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*', '!' + projectPath + '/' + gorillaFolder + '/gorillafile']]]
+        // [tools.resetEnvVariables, [[projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*', '!' + projectPath + '/' + gorillaFolder + '/gorillafile']]]
     ];
 
     promises.add(promisesPack);
