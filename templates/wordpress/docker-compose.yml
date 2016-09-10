@@ -3,7 +3,7 @@ web:
   ports:  
     - "{{docker.port}}:80"
   volumes:
-    - ../{{docker.gorillafolder}}:/root/templates
+    - ../{{docker.template}}:/root/templates
     - ../{{project.srcout}}:/var/www/{{project.domain}}/{{project.srcout}}
   links:
     - mysql:database
@@ -12,6 +12,6 @@ mysql:
   expose: 
     - 3306
   volumes:
-    - ../{{docker.gorillafolder}}:/root/templates
+    - ../{{docker.template}}:/root/templates
     - ../{{project.datafolder}}:/var/lib/mysql
 
