@@ -222,11 +222,13 @@ Por ejemplo, se puede imprimir el mensaje "Hola" en el servidor justo antes de i
 <h2>
 <a id="user-content-docker" class="anchor" href="#docker" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>docker</h2>
 
-<div class="highlight highlight-source-shell"><pre>gorilla rollback -e [environment]</pre></div>
+<div class="highlight highlight-source-shell"><pre>gorilla docker -e [environment]</pre></div>
 
-<p>Descripción de la tarea en una línea.</p>
+<p>Instala, configura e inicia contenedores de Docker usando Docker Compose.  </p>
 
 <p>Explicación más extensa del método.</p>
+
+<p>Para poder crear el entorno, GorillaJS utiliza un sistema de plantillas. Además de las predefinidas, cualquier usuario puede usar sus <a href="#user-content-crear%20plantillas">propias plantillas personalizadas</a>. </p>
 
 <p>Ejemplos de código, si es necesario.</p>
 
@@ -237,7 +239,7 @@ Por ejemplo, se puede imprimir el mensaje "Hola" en el servidor justo antes de i
 <p><strong>Requerimientos</strong></p>
 
 <ul>
-<li>Tener instalado Docker (<a href="https://docs.docker.com/engine/installation/mac/#/docker-toolbox">Mac</a>, <a href="">Linux</a>).</li>
+<li>Tener instalado Docker y Docker Compose (<a href="https://docs.docker.com/engine/installation/mac/#/docker-toolbox">Mac</a>, <a href="">Linux</a>).</li>
 <li>Tener instalado Virtualbox.</li>
 <li>En mac tendremos que tener iniciada la máquina de Docker que hayamos indicado en "dockermachine".</li>
 <li>Para iniciar los contenedores se usa Docker Compose, por lo que siempre será necesario un archivo docker-compose.yml en la template.</li>
@@ -246,6 +248,35 @@ Por ejemplo, se puede imprimir el mensaje "Hola" en el servidor justo antes de i
 <p><strong>Parámetros</strong></p>
 
 <p><strong>Valores de configuración</strong></p>
+
+<h3>
+<a id="user-content-plantillas-predefinidas" class="anchor" href="#plantillas-predefinidas" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Plantillas predefinidas</h3>
+
+<h4>
+<a id="user-content-wordpress" class="anchor" href="#wordpress" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Wordpress</h4>
+
+<p>Esta plantilla usa dos contenedores basados en Ubuntu: uno con Apache y otro con MySQL. Y crea dos carpetas en la raíz del proyecto: application y application-db.</p>
+
+<ul>
+<li>
+<p>En <em>application</em> es donde van a ir los archivos del proyecto. Es el directorio público (httdocs, <a href="http://www...">www...</a>) de cualquier servidor. Aquí irán los archivos del repositorio oficial de Wordpress o los de cualquier otro proyecto de WP.<br>
+Por defecto GorillaJS añade un archivo wp-config.php listo para usar con la configuración correcta de base de datos. Se puede sobreescribir este archivo, pero hay que tener en cuenta que las variables como, por ejemplo, DB_HOST tienen un valor concreto para poder conectarse al contenedor de MySQL. 
+Lo más aconsejable sería conservar los valores que vienen predefinidos por GorillaJS y sobreescribir el resto del archivo.</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-c1">define</span>(<span class="pl-c1">DB_NAME</span>, <span class="pl-c1">getenv</span>(<span class="pl-c1">DB_NAME</span>));</span>
+<span class="pl-s1"><span class="pl-c1">define</span>(<span class="pl-c1">DB_USER</span>, <span class="pl-c1">getenv</span>(<span class="pl-c1">DB_USER</span>));</span>
+<span class="pl-s1"><span class="pl-c1">define</span>(<span class="pl-c1">DB_PASSWORD</span>, <span class="pl-c1">getenv</span>(<span class="pl-c1">DB_PASSWORD</span>));</span>
+<span class="pl-s1"><span class="pl-c1">define</span>(<span class="pl-c1">DB_HOST</span>, <span class="pl-c1">getenv</span>(<span class="pl-c1">DB_HOST</span>));</span>
+<span class="pl-s1"><span class="pl-c1">define</span>(<span class="pl-c1">DB_CHARSET</span>, <span class="pl-c1">getenv</span>(<span class="pl-c1">DB_CHARSET</span>));</span>
+<span class="pl-s1"><span class="pl-c1">define</span>(<span class="pl-c1">DB_COLLATE</span>, <span class="pl-c1">getenv</span>(<span class="pl-c1">DB_COLLATE</span>));</span></pre></div>
+</li>
+<li><p>En <em>application-db</em> irán los archivos de base de datos. De esta forma no se pierden los datos cuando Docker se apaga.</p></li>
+</ul>
+
+<p><strong>Valores de configuración</strong></p>
+
+<h3>
+<a id="user-content-plantillas-personalizadas" class="anchor" href="#plantillas-personalizadas" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Plantillas personalizadas</h3>
 
 <hr>
 

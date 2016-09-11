@@ -169,13 +169,16 @@ Al igual que en la tarea deploy, GorillaJS puede ejecutar comandos de bash antes
 
 docker
 ---
+
 ```shell
-gorilla rollback -e [environment]
+gorilla docker -e [environment]
 ```
 
-Descripción de la tarea en una línea.
+Instala, configura e inicia contenedores de Docker usando Docker Compose.  
 
 Explicación más extensa del método.
+
+Para poder crear el entorno, GorillaJS utiliza un sistema de plantillas. Además de las predefinidas, cualquier usuario puede usar sus [propias plantillas personalizadas](#user-content-crear plantillas). 
 
 Ejemplos de código, si es necesario.
 
@@ -184,7 +187,7 @@ Ejemplos de código, si es necesario.
 </p>
 
 **Requerimientos**
-* Tener instalado Docker ([Mac](https://docs.docker.com/engine/installation/mac/#/docker-toolbox), [Linux]()).
+* Tener instalado Docker y Docker Compose ([Mac](https://docs.docker.com/engine/installation/mac/#/docker-toolbox), [Linux]()).
 * Tener instalado Virtualbox.
 * En mac tendremos que tener iniciada la máquina de Docker que hayamos indicado en "dockermachine".
 * Para iniciar los contenedores se usa Docker Compose, por lo que siempre será necesario un archivo docker-compose.yml en la template.
@@ -192,6 +195,31 @@ Ejemplos de código, si es necesario.
 **Parámetros**
 
 **Valores de configuración**
+
+### Plantillas predefinidas  
+#### Wordpress 
+Esta plantilla usa dos contenedores basados en Ubuntu: uno con Apache y otro con MySQL. Y crea dos carpetas en la raíz del proyecto: application y application-db.
+
+ * En *application* es donde van a ir los archivos del proyecto. Es el directorio público (httdocs, www...) de cualquier servidor. Aquí irán los archivos del repositorio oficial de Wordpress o los de cualquier otro proyecto de WP.  
+ Por defecto GorillaJS añade un archivo wp-config.php listo para usar con la configuración correcta de base de datos. Se puede sobreescribir este archivo, pero hay que tener en cuenta que las variables como, por ejemplo, DB_HOST tienen un valor concreto para poder conectarse al contenedor de MySQL. 
+ Lo más aconsejable sería conservar los valores que vienen predefinidos por GorillaJS y sobreescribir el resto del archivo.
+
+ ```php 
+define('DB_NAME', getenv('DB_NAME'));
+define('DB_USER', getenv('DB_USER'));
+define('DB_PASSWORD', getenv('DB_PASSWORD'));
+define('DB_HOST', getenv('DB_HOST'));
+define('DB_CHARSET', getenv('DB_CHARSET'));
+define('DB_COLLATE', getenv('DB_COLLATE'));
+ ```
+
+ * En *application-db* irán los archivos de base de datos. De esta forma no se pierden los datos cuando Docker se apaga.
+
+
+**Valores de configuración**
+
+### Plantillas personalizadas  
+
 
 ******
 
