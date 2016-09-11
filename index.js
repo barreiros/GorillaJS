@@ -200,6 +200,8 @@ function docker(){
     var promisesPack = [];
 
     promisesPack = [
+        [tools.paramForced, ['docker', 'gorillafolder', gorillaFolder]],
+        [tools.paramForced, ['docker', 'templatefolder', gorillaTemplateFolder]],
         [tools.param, ['docker', 'template', templateOptions], 'template'],
         [tools.checkTemplatePath, [templateOptions, '{{template}}', templatesPath], 'template-path'],
         [cross.moveFiles, [projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder, false, ['.DS_Store'], '{{template-path}}']],
@@ -207,8 +209,6 @@ function docker(){
         [tools.param, ['docker', 'machinename'], 'machine-name'],
         [tools.param, ['docker', 'port'], 'port'],
         [tools.param, ['project', 'slug', null, tools.sanitize], 'slug'],
-        [tools.paramForced, ['docker', 'gorillafolder', gorillaFolder]],
-        [tools.paramForced, ['docker', 'templatefolder', gorillaTemplateFolder]],
 
         [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*'],
 

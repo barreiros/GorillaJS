@@ -178,7 +178,16 @@ Instala, configura e inicia contenedores de Docker usando Docker Compose.
 
 Explicación más extensa del método.
 
-Para poder crear el entorno, GorillaJS utiliza un sistema de plantillas. Además de las predefinidas, cualquier usuario puede usar sus [propias plantillas personalizadas](#user-content-crear plantillas). 
+Para poder crear el entorno, GorillaJS utiliza un sistema de plantillas. Además de las [predefinidas](#user-content-plantillas-predefinidas), cualquier usuario puede usar sus propias [plantillas personalizadas](#user-content-plantillas-personalizadas). 
+Una vez creado el entono se pueden usar los métodos nativos de Docker. Por ejemplo, para entrar en la máquina de base de datos se puede usar
+
+```shell
+docker exec -i -t DOCKER_CONTAINER_ID /bin/bash
+
+ó
+
+docker build -t gorilla/apache-base . -f dockerfile-apache
+```
 
 Ejemplos de código, si es necesario.
 
@@ -188,8 +197,7 @@ Ejemplos de código, si es necesario.
 
 **Requerimientos**
 * Tener instalado Docker y Docker Compose ([Mac](https://docs.docker.com/engine/installation/mac/#/docker-toolbox), [Linux]()).
-* Tener instalado Virtualbox.
-* En mac tendremos que tener iniciada la máquina de Docker que hayamos indicado en "dockermachine".
+* Tener instalado Virtualbox (solo Mac).
 * Para iniciar los contenedores se usa Docker Compose, por lo que siempre será necesario un archivo docker-compose.yml en la template.
 
 **Parámetros**
@@ -204,14 +212,6 @@ Esta plantilla usa dos contenedores basados en Ubuntu: uno con Apache y otro con
  Por defecto GorillaJS añade un archivo wp-config.php listo para usar con la configuración correcta de base de datos. Se puede sobreescribir este archivo, pero hay que tener en cuenta que las variables como, por ejemplo, DB_HOST tienen un valor concreto para poder conectarse al contenedor de MySQL. 
  Lo más aconsejable sería conservar los valores que vienen predefinidos por GorillaJS y sobreescribir el resto del archivo.
 
- ```php 
-define('DB_NAME', getenv('DB_NAME'));
-define('DB_USER', getenv('DB_USER'));
-define('DB_PASSWORD', getenv('DB_PASSWORD'));
-define('DB_HOST', getenv('DB_HOST'));
-define('DB_CHARSET', getenv('DB_CHARSET'));
-define('DB_COLLATE', getenv('DB_COLLATE'));
- ```
 
  * En *application-db* irán los archivos de base de datos. De esta forma no se pierden los datos cuando Docker se apaga.
 

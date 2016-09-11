@@ -228,7 +228,10 @@ Por ejemplo, se puede imprimir el mensaje "Hola" en el servidor justo antes de i
 
 <p>Explicación más extensa del método.</p>
 
-<p>Para poder crear el entorno, GorillaJS utiliza un sistema de plantillas. Además de las predefinidas, cualquier usuario puede usar sus <a href="#user-content-crear%20plantillas">propias plantillas personalizadas</a>. </p>
+<p>Para poder crear el entorno, GorillaJS utiliza un sistema de plantillas. Además de las <a href="#user-content-plantillas-predefinidas">predefinidas</a>, cualquier usuario puede usar sus propias <a href="#user-content-plantillas-personalizadas">plantillas personalizadas</a>. 
+Una vez creado el entono se pueden usar los métodos nativos de Docker. Por ejemplo, para entrar en la máquina de base de datos se puede usar</p>
+
+<div class="highlight highlight-source-shell"><pre>docker <span class="pl-c1">exec</span> -i -t DOCKER_CONTAINER_ID /bin/bash</pre></div>
 
 <p>Ejemplos de código, si es necesario.</p>
 
@@ -240,8 +243,7 @@ Por ejemplo, se puede imprimir el mensaje "Hola" en el servidor justo antes de i
 
 <ul>
 <li>Tener instalado Docker y Docker Compose (<a href="https://docs.docker.com/engine/installation/mac/#/docker-toolbox">Mac</a>, <a href="">Linux</a>).</li>
-<li>Tener instalado Virtualbox.</li>
-<li>En mac tendremos que tener iniciada la máquina de Docker que hayamos indicado en "dockermachine".</li>
+<li>Tener instalado Virtualbox (solo Mac).</li>
 <li>Para iniciar los contenedores se usa Docker Compose, por lo que siempre será necesario un archivo docker-compose.yml en la template.</li>
 </ul>
 

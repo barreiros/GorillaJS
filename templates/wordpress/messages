@@ -2,6 +2,9 @@
     "questions": {
         "docker": {
             "gorillafolder": "The Gorilla folder"
+        },
+        "database": {
+            "dbname": "The data base name. Just letters and numbers, no special characters"
         }
     }
 }
