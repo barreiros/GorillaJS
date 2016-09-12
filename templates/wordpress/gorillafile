@@ -20,7 +20,7 @@
         "database": {
             "username": "gorilla",
             "password": "",
-            "dbname": "gorilla-db"
+            "dbname": "gorilladb"
         }
     }
 }
