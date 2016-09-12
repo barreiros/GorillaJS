@@ -228,7 +228,7 @@ function docker(){
                 [host.open, ['http://{{domain}}' + ':' + '{{port}}', 15, 'Waiting for opening your web']]
             ], [
                 [host.create, ['{{management}}', projectPath + '/' + gorillaFolder + '/{{management}}-proxy.conf', workingPath + '/' + gorillaFolder + '/{{management}}-proxy.conf', '{{domain}}']],
-                [host.open, ['http://{{domain}}' , 15, 'Waiting for opening your web']]
+                [host.open, ['http://{{domain}}' , 3, 'Waiting for opening your web']]
             ]]
         ], [
             [tools.param, ['host', 'enabled', ['ip', 'domain']], 'host-enabled'],
@@ -237,16 +237,15 @@ function docker(){
                 [tools.param, ['project', 'domain'], 'domain'],
                 [tools.param, ['system', 'hostsfile'], 'hosts-file'],
                 [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']],
-                [host.open, ['http://{{domain}}' + ':' + '{{port}}', 15, 'Waiting for opening your web']]
+                [host.open, ['http://{{domain}}' + ':' + '{{port}}', 3, 'Waiting for opening your web']]
             ], [
                 [m_docker.ip, '{{machine-name}}', 'ip'],
                 [tools.paramForced, ['project', 'domain', '{{ip}}']],
-                [host.open, ['http://{{ip}}:{{port}}', 15, 'Waiting for opening your web']]
+                [host.open, ['http://{{ip}}:{{port}}', 3, 'Waiting for opening your web']]
             ]]
         ]],
 
         [promises.cond, '{{ssh-enabled}}', [ssh.close]],
-        // [tools.resetEnvVariables, [[projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*', '!' + projectPath + '/' + gorillaFolder + '/gorillafile']]]
     ];
 
     promises.add(promisesPack);
