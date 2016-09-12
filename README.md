@@ -186,7 +186,7 @@ docker exec -i -t DOCKER_CONTAINER_ID /bin/bash
 
 ó
 
-docker build -t gorilla/apache-base . -f dockerfile-apache
+docker build -t gorillajs/apache-base . -f templates/wordpress/dockerfile-apache
 ```
 
 Ejemplos de código, si es necesario.
