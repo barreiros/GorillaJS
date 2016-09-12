@@ -233,6 +233,7 @@ function docker(){
         ], [
             [tools.param, ['host', 'enabled', ['ip', 'domain']], 'host-enabled'],
             [promises.cond, '{{host-enabled}}::domain', [
+                [m_docker.ip, '{{machine-name}}', 'ip'],
                 [tools.param, ['project', 'domain'], 'domain'],
                 [tools.param, ['system', 'hostsfile'], 'hosts-file'],
                 [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']],
