@@ -4,7 +4,8 @@
             "gorillafolder": "The Gorilla folder"
         },
         "database": {
-            "dbname": "The data base name. Just letters and numbers, no special characters"
+            "dbname": "The data base name. Just letters and numbers, no special characters",
+            "password": "The data base password. If you have already a wp-config.php file, this value must be equal to constant DB_PASSWORD."
         }
     }
 }
