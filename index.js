@@ -7,6 +7,7 @@ var exec = require('child_process').exec;
 var prompt = require('readline-sync');
 var color = require('colors');
 var datef = require('dateformat');
+var mkdirp = require('mkdirp');
 
 var tools = require(__dirname + '/lib/tools.js');
 var events = require(__dirname + '/lib/pubsub.js');
@@ -23,12 +24,12 @@ var gorillaTemplateFolder = 'template';
 var gorillaFile = 'gorillafile';
 var messagesFile = 'messages';
 var projectPath = process.cwd();
-var templatesPath = gorillaPath + '/templates';
 var commonPath = projectPath + '/' + gorillaFolder + '/common';
+var workingPath = projectPath;
+var templatesPath = gorillaPath + '/templates';
 var composeFile = 'docker-compose.yml';
 var env = argv.e ? argv.e : 'local';
 var verbose = argv.v ? argv.v : false;
-var workingPath = projectPath;
 var templateOptions = ['wordpress', 'other'];
 
 events.subscribe('ERROR', showError);
@@ -45,6 +46,13 @@ function checkUserInput(){
     var promisesPack = [];
 
     if(argv._[0] === 'init' || argv._[0] === 'docker' || argv._[0] === 'pack' || argv._[0] === 'deploy' || argv._[0] === 'rollback' || argv._[0] === 'provision'){
+
+        if(argv._[0] && argv._[1]){
+            mkdirp.sync(argv._[1]);
+            projectPath = argv._[1];
+            commonPath = projectPath + '/' + gorillaFolder + '/common';
+            workingPath = projectPath;
+        }
 
         promisesPack.push(
             [tools.config, [env, argv.f]],
