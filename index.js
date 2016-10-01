@@ -232,9 +232,10 @@ function docker(){
 
             [tools.param, ['docker', 'machinename'], 'machine-name'],
             [m_docker.check, ['{{machine-name}}', '{{ssh-enabled}}']],
-            [m_docker.start, ['{{machine-name}}', workingPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/' + composeFile, '{{slug}}', '{{ssh-enabled}}']]
 
         ]],
+
+        [m_docker.start, ['{{machine-name}}', workingPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/' + composeFile, '{{slug}}', '{{ssh-enabled}}']],
 
         [promises.cond, '{{ssh-enabled}}', [
 
