@@ -1,5 +1,5 @@
 # Este archivo se tiene que ejecutar desde la raíz de GorillaJS.
-# docker build -t gorilla/apache-base . -f templates/wordpress/dockerfile-apache
+# docker build -t gorillajs/apache-base . -f templates/wordpress/dockerfile-apache
 
 FROM ubuntu:14.04
 
