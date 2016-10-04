@@ -1,11 +1,24 @@
 {
     "questions": {
-        "docker": {
-            "gorillafolder": "The Gorilla folder"
-        },
         "database": {
             "dbname": "The data base name. Just letters and numbers, no special characters",
+            "username": "The data base user name",
             "password": "The data base password. If you have already a wp-config.php file, this value must be equal to constant DB_PASSWORD."
+        },
+        "docker": {
+            "template": "Select your favorite Docker template"
+        },
+        "host": {
+            "enabled": "How do you prefer to access your site, through domain name or ip?"
+        },
+        "project": {
+            "slug": "Tell me a name for your project",
+            "domain": "Tell me your local project url (without http://)",
+            "srcout": "What is your public folder?",
+            "datafolder": "Where do you want to store the data base files"
+        },
+        "system": {
+            "hostsfile": "Tell me the absolute path of your host file, pleeeeeeease"
         }
     }
 }

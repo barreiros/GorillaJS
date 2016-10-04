@@ -218,7 +218,6 @@ function init(){
         [tools.param, ['docker', 'port'], 'port'],
         [tools.param, ['project', 'slug', null, tools.sanitize], 'slug'],
 
-        [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*'],
 
         [promises.cond, '{{ssh-enabled}}', [
 
@@ -235,7 +234,6 @@ function init(){
 
         ]],
 
-        [m_docker.start, ['{{machine-name}}', workingPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/' + composeFile, '{{slug}}', '{{ssh-enabled}}']],
 
         [promises.cond, '{{ssh-enabled}}', [
 
@@ -250,7 +248,9 @@ function init(){
                 [host.create, ['{{management}}', projectPath + '/' + gorillaFolder + '/{{management}}-proxy.conf', workingPath + '/' + gorillaFolder + '/{{management}}-proxy.conf', '{{domain}}']],
                 [host.open, ['http://{{domain}}' , 3, 'Waiting for opening your web']]
 
-            ]]
+            ]],
+
+            [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*']
 
         ], [
 
@@ -260,20 +260,24 @@ function init(){
                 [m_docker.ip, '{{machine-name}}', 'ip'],
                 [tools.param, ['project', 'domain'], 'domain'],
                 [tools.param, ['system', 'hostsfile'], 'hosts-file'],
-                [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']],
-                [host.open, ['http://{{domain}}' + ':' + '{{port}}', 3, 'Waiting for opening your web']]
+                [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']]
 
             ], [
 
                 [m_docker.ip, '{{machine-name}}', 'ip'],
                 [tools.paramForced, ['project', 'domain', '{{ip}}']],
-                [host.open, ['http://{{ip}}:{{port}}', 3, 'Waiting for opening your web']]
+                [tools.param, ['project', 'domain'], 'domain']
 
-            ]]
+            ]],
+
+            [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*'],
+            [m_docker.start, ['{{machine-name}}', workingPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/' + composeFile, '{{slug}}', '{{ssh-enabled}}']],
+            [host.open, ['http://{{domain}}:{{port}}', 3, 'Waiting for opening your web']]
 
         ]],
 
-        [promises.cond, '{{ssh-enabled}}', [ssh.close]],
+        [promises.cond, '{{ssh-enabled}}', [ssh.close]]
+
     ];
 
     promises.add(promisesPack);
