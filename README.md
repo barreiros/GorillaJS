@@ -4,7 +4,7 @@
 
 **GorillaJS es una herramienta basada en Docker que simplifica la creación de entornos de desarrollo web**
 
-### Objetivo y filosofía  
+# Objetivo y filosofía  
 
 GorillaJS pretende servir de apoyo a los desarrolladores web ahorrándoles tiempo en la ejecución de tareas repetitivas, como podrían ser la configuración e instalación de aplicaciones, la creación de bases de datos o la réplica del proyecto.
 
@@ -53,7 +53,7 @@ El path es opcional y si no se indica se crea el proyecto en la ruta actual.
 | -v | Enable verbose mode |  
 | -f | Ask you again       |  
 
-### Plantillas por defecto
+# Plantillas por defecto
 
 Por defecto GorillaJS viene con una plantilla para crear proyectos de Wordpress. Para poder usar esta plantilla es necesario aportar los siguientes valores:
 
@@ -86,7 +86,7 @@ Es muy importante saber que si ya existe un proyecto de Wordpress previo, como G
 Docker necesita una carpeta en la que guardar los datos de la base de datos porque, por naturaleza, los borra cada vez que se apaga el contenedor. Esta carpeta se usa para salvar esos datos y no perderlos. Es uno de los dos [*volumes*](https://docs.docker.com/engine/tutorials/dockervolumes/) que usa esta plantilla. El otro es la carpeta pública en la que van los archivos de Wordpress.
 
 
-### Plantillas personalizadas
+# Plantillas personalizadas
 
 > Esta parte solo es para los usuarios que quieran hacer una plantilla personalizada, y requiere conocimientos avanzados de Docker.
 
