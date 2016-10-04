@@ -45,7 +45,7 @@ function checkUserInput(){
 
     var promisesPack = [];
 
-    if(argv._[0] === 'init' || argv._[0] === 'docker' || argv._[0] === 'pack' || argv._[0] === 'deploy' || argv._[0] === 'rollback' || argv._[0] === 'provision'){
+    if(argv._[0] === 'init'){
 
         if(argv._[0] && argv._[1]){
             mkdirp.sync(argv._[1]);
@@ -203,7 +203,7 @@ function rollback(){
     promises.start();
 }
 
-function docker(){
+function init(){
 
     var promisesPack = [];
 
@@ -283,44 +283,6 @@ function docker(){
 function exit(text){
     console.log(text);
     events.publish('PROMISEME');
-}
-
-function init(){
-
-    var remote, promisesPack;
-
-    promisesPack = [];
-
-    if (ssh.get()){
-        remote = true;
-    }
-
-    if (argv.c || argv.r) {
-        promisesPack.push(
-            [git.config, workingPath],
-            [git.initRepo, gorillaFolder]
-        );
-    }
-
-    if (argv.c) {
-        promisesPack.push(
-            [git.clone, [tools.param('git', 'clonefromurl'), tools.param('git', 'clonefrombranch'), projectPath + '/temp_repo/']],
-            [cross.moveFiles, [projectPath + '/', false, ['.git'], projectPath + '/temp_repo/']],
-            [tools.removeDir, projectPath + '/temp_repo/'],
-            [git.createBranch, tools.param('git', 'branchdevel')],
-            [git.commit, ['GorillaJS has cloned the repo ' + tools.param('git', 'clonefromurl'), true]]
-        );
-    }
-
-    if (argv.r) {
-        promisesPack.push(
-            [git.createRemote, [tools.param('git', 'platform', ['github', 'bitbucket', 'gitlab']), tools.param('git', 'username'), (tools.param('git', 'platform') !== 'gitlab' ? tools.param('git', 'password') : tools.param('git', 'token')), tools.param('git', 'private', ['true', 'false']), tools.param('project', 'slug', null, tools.sanitize)]],
-            [git.addOrigin, [tools.param('git', 'platform', ['github', 'bitbucket', 'gitlab']), tools.param('git', 'username'), tools.param('project', 'slug'), workingPath]]
-        );
-    }
-
-    promises.add(promisesPack);
-    promises.start();
 }
 
 function provision(){
