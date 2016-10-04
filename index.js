@@ -55,6 +55,7 @@ function checkUserInput(){
         }
 
         promisesPack.push(
+            [tools.printLogo],
             [tools.config, [env, argv.f]],
             [tools.createBaseEnvironment, [projectPath, templatesPath, gorillaPath, gorillaFile, gorillaFolder, messagesFile]]
         );
