@@ -6,8 +6,9 @@
 
 ### Objetivo y filosofía  
 
-GorillaJS pretende servir de apoyo a los desarrolladores web ahorrándoles tiempo en la ejecución de tareas repetitivas, como podrían ser la configuración e instalación de aplicaciones, la creación de bases de datos o la réplica del proyecto en otras máquinas.  
-Para conseguir esto, GorillaJS utiliza un sistema simple de preguntas y respuesta que va almacenando en el archivo .gorilla/gorillafile y que después utiliza para configurar el proyecto.   
+GorillaJS pretende servir de apoyo a los desarrolladores web ahorrándoles tiempo en la ejecución de tareas repetitivas, como podrían ser la configuración e instalación de aplicaciones, la creación de bases de datos o la réplica del proyecto.
+
+Para conseguir esto, GorillaJS utiliza un sistema simple de preguntas y respuestas que va almacenando en el archivo .gorilla/gorillafile y que después utiliza para configurar el proyecto.   
 > Es importante saber que, aunque GorillaJS se base en Docker y Nodejs, no es necesario tener ningún conocimiento en estas tecnologías, más allá de la simple instalación de ambas.
   
 <p align="center">
@@ -49,8 +50,8 @@ El path es opcional y si no se indica se crea el proyecto en la ruta actual.
 
 ##### Parámetros
 
--v | Enable verbose mode  
--f | Ask you again
+| -v | Enable verbose mode |  
+| -f | Ask you again       |  
 
 ### Plantillas por defecto
 
@@ -87,22 +88,22 @@ Docker necesita una carpeta en la que guardar los datos de la base de datos porq
 
 ### Plantillas personalizadas
 
-***Esta parte solo es para los usuarios que quieran hacer una plantilla personalizada, y requiere conocimientos avanzados de Docker.***  
+> Esta parte solo es para los usuarios que quieran hacer una plantilla personalizada, y requiere conocimientos avanzados de Docker.
 
 Además de las plantillas que trae por defecto, GorillaJS permite crear plantillas personalizadas. El único requisito para crear una plantilla es que ésta debe tener un archivo *docker-compose.yml*. [Aquí hay más información sobre Docker Compose](https://docs.docker.com/compose/).
 Por ejemplo, la plantilla de Wordpress, que está en .../templates/wordpress/ utiliza varios archivos a lo largo del proceso de configuración. 
 
-* apache-httpd.conf | Se usa una vez iniciados los contenedores, para sobreescribir la configuración por defecto de Apache.
-* apache-init.conf | Se usa al iniciar Apache y se encarga de descargar Wordpress del repositorio oficial y de instalarlo a través de WP-CLI. También se encarga de configurar el archivo wp-config y de renombrar el dominio, si fuera necesario.
-* apache-vhost.conf | Se usa para crear el virtualhost dentro del contenedor de Apache.
-* docker-compose.yml |  Generar los contenedores de Docker (Apache y MySQL) y los volúmenes en los que va la aplicación y los datos persistentes de mysql.
-* gorillafile | Se usa para pasarle a GorillaJS valores de configuración iniciales de plantilla. [Más información](#user-content-archivo-gorillafile).
-* messages | Se usar para indicarle a GorillaJS qué debe preguntar para conseguir un valor. [Más información](#user-content-archivo-messages).
-* mysql-debian.cnf, mysql-init.conf | Son archivos de configuración de mysql, como Apache.
-* php-php5-fpm.conf | Configuración inicial de php-fpm.
-* waiting.html | Se usa en lugar del index.html que viene por defecto en Apache.
+| apache-httpd.conf                 | Se usa una vez iniciados los contenedores, para sobreescribir la configuración por defecto de Apache.                                                                                                                         |  
+| apache-init.conf                  | Se usa al iniciar Apache y se encarga de descargar Wordpress del repositorio oficial y de instalarlo a través de WP-CLI. También se encarga de configurar el archivo wp-config y de renombrar el dominio, si fuera necesario. |  
+| apache-vhost.conf                 | Se usa para crear el virtualhost dentro del contenedor de Apache.                                                                                                                                                             |  
+| docker-compose.yml                | Generar los contenedores de Docker (Apache y MySQL) y los volúmenes en los que va la aplicación y los datos persistentes de mysql.                                                                                            |  
+| gorillafile                       | Se usa para pasarle a GorillaJS valores de configuración iniciales de plantilla. [Más información](#user-content-archivo-gorillafile).                                                                                        |  
+| messages                          | Se usar para indicarle a GorillaJS qué debe preguntar para conseguir un valor. [Más información](#user-content-archivo-messages).                                                                                             |  
+| mysql-debian.cnf, mysql-init.conf | Son archivos de configuración de mysql, como Apache.                                                                                                                                                                          |  
+| php-php5-fpm.conf                 | Configuración inicial de php-fpm.                                                                                                                                                                                             |  
+| waiting.html                      | Se usa en lugar del index.html que viene por defecto en Apache.                                                                                                                                                               |  
 
-Estos archivos están en la plantilla porque, de alguna manera, se encargan de la configuración de una parte del proyecto que no puede ser igual a la de otro proyecto. Por ejemplo, el virtualhost de Apache: 
+Estos archivos están en la plantilla porque, de alguna manera, se encargan de la configuración de una parte del proyecto que debe ser única. Por ejemplo, el virtualhost de Apache: 
 
 ```bash
 
@@ -128,7 +129,9 @@ Estos archivos están en la plantilla porque, de alguna manera, se encargan de l
 
 En este archivo los valores de ServerName, DocumentRoot, etc... tienen que ser únicos, por razones obvias. De otra manera, si se quisiera acceder al proyecto a través del nombre de dominio, y las configuraciones no fuera únicas, el host no sabría qué proyecto mostrar. Esto, como ya se ha dicho antes, es opcional; pues en este ejemplo en concreto se podría acceder a través de ip y dejar la configuración por defecto de Apache.  
 
-Para que GorillaJS pueda reconocer las variables que hay en la plantilla se usa un marcado específico:
+#### Uso de variables en la plantilla.
+
+GorillaJS recorre todos los archivos que hay en la carpeta de la plantilla para localizar variables y poder asignarles los valores que hay en el archivo [*gorillafile*](#user-content-archivo-gorillafile). Estas variables siguen un marcado específico: siempre van encerradas entre {{}}. Por ejemplo: 
 
 ```bash
 {{NOMBRE_DE_LA_VARIABLE}}  
@@ -147,11 +150,7 @@ GorillaJS solo reconoce hasta un segundo nivel de profundidad. El siguiente ejem
 
 ```
 
-Todos estos valores son reemplazados por GorillaJS cada vez que se ejecuta el comando:
-
-```bash
-gorilla init
-```
+> GorillaJS recorre los archivos cada vez que ejecutamos el comando *gorilla init*, es decir, siempre que se inicia el proyecto. 
 
 #### Archivo gorillafile
 
@@ -247,7 +246,7 @@ De esta manera, se podría crear un archivo gorillafile en la plantilla que fuer
 }
 
 ```
-Por lo que si hay un archivo en la plantilla con las variables {{database.name}} GorillaJS le sugerirá al usuario que use el valor *application-db*, mientras que si en la plantilla hay una variable {{project.domain}}, GorillaJS no le preguntará nada al usuario y rellenará ese varaible con el valor *gorilla.local*, a menos que el usuario haya ejecutado gorilla init -f, en cuyo caso solo le sugerirá usar el valor *gorilla-local*.
+De esta forma, si hay un archivo en la plantilla con las variables {{database.name}} GorillaJS le sugerirá al usuario que use el valor *application-db*, mientras que si en la plantilla hay una variable {{project.domain}}, GorillaJS no le preguntará nada al usuario y rellenará ese varaible con el valor *gorilla.local*, a menos que el usuario haya ejecutado gorilla init -f, en cuyo caso solo le sugerirá usar el valor *gorilla-local*.
 
 #### Archivo messages
 
@@ -268,6 +267,4 @@ Un ejemplo de archivo message sería este:
 
 Esta vez el árbol tiene que empezar con el valor "questions", seguido de la ruta a las variables a las que se le quiere cambiar la pregunta. Si no hay ninguna pregunta, el formato será el que viene por defecto en GorillaJS: 
 
-```bash
-Please, enter the NOMBRE_DEL_GRUPO NOMBRE_DE_LA_VARIALBE value.
-```
+*"Please, enter the NOMBRE_DEL_GRUPO NOMBRE_DE_LA_VARIALBE value."*
