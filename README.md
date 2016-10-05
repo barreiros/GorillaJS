@@ -34,7 +34,7 @@ Todo esto lo consigue con un solo comando y en menos de 2 minutos.
 
 ##### Instalación
 
-> GorillaJS está en fase beta. Por ahora solo funciona en Mac, se está probando en Linux y en un futuro estará disponible en Windows.
+> GorillaJS está en fase beta, y es compatible con Mac y Linux. En un futuro estará disponible en Windows.
 
 GorillaJS se instala desde [npm](https://docs.npmjs.com/getting-started/installing-node) y necesita Docker y Docker Compose ([MAC](https://docs.docker.com/docker-for-mac/), [Linux](https://docs.docker.com/engine/installation/linux/), [Windows](https://docs.docker.com/docker-for-windows/)) para funcionar.
 
