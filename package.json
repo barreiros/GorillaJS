@@ -5,14 +5,18 @@
     "email": "hola@davidbarreiros.es",
     "url": "davidbarreiros.es"
   },
-  "version": "0.0.21",
+  "version": "0.0.23",
   "description": "GorillaJS is a Docker tool-based that helps you to kickstart new projects. It get save time making easier repeated task such as database creation, clone repositories or install applications. To do so, GorillaJS provides a environment that works with templates.",
   "keywords": [
-    "Docker", "templates", "Wordpress", "html5", "productivity"
+    "Docker",
+    "templates",
+    "Wordpress",
+    "html5",
+    "productivity"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/barreiros/GorillaJS" 
+    "url": "https://github.com/barreiros/GorillaJS"
   },
   "license": "MIT License",
   "preferGlobal": true,
@@ -20,7 +24,10 @@
     "gorilla": "index.js"
   },
   "files": [
-    "lib", "templates", "README.md"
+    "lib",
+    "templates",
+    "README.md",
+    "index.js"
   ],
   "dependencies": {
     "ascii-art": "^1.0.3",
