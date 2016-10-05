@@ -2,6 +2,8 @@
   <img src="http://s23.postimg.org/ka5fnkw23/logo_mini.jpg" alt="GorillaJS logo"/>
 </p>
 
+> I'm translating the documentation. For now, you can read it in Spanish, which is a very nice language.
+
 **GorillaJS es una herramienta basada en Docker que simplifica la creación de entornos de desarrollo web**
 
 # Objetivo y filosofía  
@@ -31,6 +33,8 @@ Todo esto lo consigue con un solo comando y en menos de 2 minutos.
 ---
 
 ##### Instalación
+
+> GorillaJS está en fase beta. Por ahora solo funciona en Mac, se está probando en Linux y en un futuro estará disponible en Windows.
 
 GorillaJS se instala desde [npm](https://docs.npmjs.com/getting-started/installing-node) y necesita Docker y Docker Compose ([MAC](https://docs.docker.com/docker-for-mac/), [Linux](https://docs.docker.com/engine/installation/linux/), [Windows](https://docs.docker.com/docker-for-windows/)) para funcionar.
 
