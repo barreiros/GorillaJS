@@ -54,40 +54,42 @@ El path es opcional y si no se indica se crea el proyecto en la ruta actual.
 
 ##### Parámetros
 
-| -v | Enable verbose mode |  
-| -f | Ask you again       |  
+| Nombre | Función             |
+| ---    | ---                 |
+| -v     | Enable verbose mode |
+| -f     | Ask you again       |
 
 # Plantillas por defecto
 
 Por defecto GorillaJS viene con una plantilla para crear proyectos de Wordpress. Para poder usar esta plantilla es necesario aportar los siguientes valores:
 
 * **Select the docker template value from the list above**  
-Por ahora solo se puede elegir entre wordpress o una [plantilla personalizada](#user-content-plantillas-personalizadas).
+> Por ahora solo se puede elegir entre wordpress o una [plantilla personalizada](#user-content-plantillas-personalizadas).
 
 * **Tell me a name for your project**  
-Un nombre identificativo para el proyecto. Algo corto.
+> Un nombre identificativo para el proyecto. Algo corto.
 
 * **How do you prefer to access your site, through domain name or ip?**  
-Con GorillaJS se puede elegir cómo acceder al sitio del proyecto. Si se selecciona *domain*, aparecen además estos otros valores:
+> Con GorillaJS se puede elegir cómo acceder al sitio del proyecto. Si se selecciona *domain*, aparecen además estos otros valores:
 
  * **Tell me your local project url**  
- El nombre de dominio a través del cual se quiere acceder al site. Hay que poner solo el nombre: sin http://, ni https://.
+> El nombre de dominio a través del cual se quiere acceder al site. Hay que poner solo el nombre: sin http://, ni https://.
  
  * **Enter the system hostsfile value**  
- La ruta absoluta del archivo hosts del ordenador desde el que se está ejecutando GorillaJS. Para más información sobre [dónde encontrar](https://en.wikipedia.org/wiki/Hosts_file la ruta del archivo hosts).
+> La ruta absoluta del archivo hosts del ordenador desde el que se está ejecutando GorillaJS. Para más información sobre [dónde encontrar](https://en.wikipedia.org/wiki/Hosts_file la ruta del archivo hosts).
 
 * **What is your public folder?**  
-La carpeta pública en la que irán los archivos de Wordpress. Si ya existe una carpeta con los archivos, GorillaJS no la sobreescribe: usa esa misma carpeta, respetando los contenidos.
+> La carpeta pública en la que irán los archivos de Wordpress. Si ya existe una carpeta con los archivos, GorillaJS no la sobreescribe: usa esa misma carpeta, respetando los contenidos.
 
 * **The data base name**
 
 * **The data base user name**
 
 * **The data base password**  
-Es muy importante saber que si ya existe un proyecto de Wordpress previo, como GorillaJS no sobreescribe los archivos, la configuración de estos tres últimos valores tiene que seguir igual que la del archivo wp-config, y en este archivo es necesario cambiar el valor de la constante DB_HOST a *mysql*.
+> Es muy importante saber que si ya existe un proyecto de Wordpress previo, como GorillaJS no sobreescribe los archivos, la configuración de estos tres últimos valores tiene que seguir igual que la del archivo wp-config, y en este archivo es necesario cambiar el valor de la constante DB_HOST a *mysql*.
 
 * **Where do you want to store the data base files**  
-Docker necesita una carpeta en la que guardar los datos de la base de datos porque, por naturaleza, los borra cada vez que se apaga el contenedor. Esta carpeta se usa para salvar esos datos y no perderlos. Es uno de los dos [*volumes*](https://docs.docker.com/engine/tutorials/dockervolumes/) que usa esta plantilla. El otro es la carpeta pública en la que van los archivos de Wordpress.
+> Docker necesita una carpeta en la que guardar los datos de la base de datos porque, por naturaleza, los borra cada vez que se apaga el contenedor. Esta carpeta se usa para salvar esos datos y no perderlos. Es uno de los dos [*volumes*](https://docs.docker.com/engine/tutorials/dockervolumes/) que usa esta plantilla. El otro es la carpeta pública en la que van los archivos de Wordpress.
 
 
 # Plantillas personalizadas
@@ -97,15 +99,17 @@ Docker necesita una carpeta en la que guardar los datos de la base de datos porq
 Además de las plantillas que trae por defecto, GorillaJS permite crear plantillas personalizadas. El único requisito para crear una plantilla es que ésta debe tener un archivo *docker-compose.yml*. [Aquí hay más información sobre Docker Compose](https://docs.docker.com/compose/).
 Por ejemplo, la plantilla de Wordpress, que está en .../templates/wordpress/ utiliza varios archivos a lo largo del proceso de configuración. 
 
-| apache-httpd.conf                 | Se usa una vez iniciados los contenedores, para sobreescribir la configuración por defecto de Apache.                                                                                                                         |  
-| apache-init.conf                  | Se usa al iniciar Apache y se encarga de descargar Wordpress del repositorio oficial y de instalarlo a través de WP-CLI. También se encarga de configurar el archivo wp-config y de renombrar el dominio, si fuera necesario. |  
-| apache-vhost.conf                 | Se usa para crear el virtualhost dentro del contenedor de Apache.                                                                                                                                                             |  
-| docker-compose.yml                | Generar los contenedores de Docker (Apache y MySQL) y los volúmenes en los que va la aplicación y los datos persistentes de mysql.                                                                                            |  
-| gorillafile                       | Se usa para pasarle a GorillaJS valores de configuración iniciales de plantilla. [Más información](#user-content-archivo-gorillafile).                                                                                        |  
-| messages                          | Se usar para indicarle a GorillaJS qué debe preguntar para conseguir un valor. [Más información](#user-content-archivo-messages).                                                                                             |  
-| mysql-debian.cnf, mysql-init.conf | Son archivos de configuración de mysql, como Apache.                                                                                                                                                                          |  
-| php-php5-fpm.conf                 | Configuración inicial de php-fpm.                                                                                                                                                                                             |  
-| waiting.html                      | Se usa en lugar del index.html que viene por defecto en Apache.                                                                                                                                                               |  
+| Nombre                            | Función                                                                                                                                                                                                                       |
+| ---                               | ---                                                                                                                                                                                                                           |
+| apache-httpd.conf                 | Se usa una vez iniciados los contenedores, para sobreescribir la configuración por defecto de Apache.                                                                                                                         |
+| apache-init.conf                  | Se usa al iniciar Apache y se encarga de descargar Wordpress del repositorio oficial y de instalarlo a través de WP-CLI. También se encarga de configurar el archivo wp-config y de renombrar el dominio, si fuera necesario. |
+| apache-vhost.conf                 | Se usa para crear el virtualhost dentro del contenedor de Apache.                                                                                                                                                             |
+| docker-compose.yml                | Generar los contenedores de Docker (Apache y MySQL) y los volúmenes en los que va la aplicación y los datos persistentes de mysql.                                                                                            |
+| gorillafile                       | Se usa para pasarle a GorillaJS valores de configuración iniciales de plantilla. [Más información](#user-content-archivo-gorillafile).                                                                                        |
+| messages                          | Se usar para indicarle a GorillaJS qué debe preguntar para conseguir un valor. [Más información](#user-content-archivo-messages).                                                                                             |
+| mysql-debian.cnf, mysql-init.conf | Son archivos de configuración de mysql, como Apache.                                                                                                                                                                          |
+| php-php5-fpm.conf                 | Configuración inicial de php-fpm.                                                                                                                                                                                             |
+| waiting.html                      | Se usa en lugar del index.html que viene por defecto en Apache.                                                                                                                                                               |
 
 Estos archivos están en la plantilla porque, de alguna manera, se encargan de la configuración de una parte del proyecto que debe ser única. Por ejemplo, el virtualhost de Apache: 
 
