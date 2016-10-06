@@ -14,8 +14,8 @@ Para conseguir esto, GorillaJS utiliza un sistema simple de preguntas y respuest
 > Es importante saber que, aunque GorillaJS se base en Docker y Nodejs, no es necesario tener ningún conocimiento en estas tecnologías, más allá de la simple instalación de ambas.
   
 <p align="center">
-    <a href="http://www.youtube.com/watch?feature=player_embedded&v=jS3oq_xmlSo" target="_blank">
-        <img src="http://img.youtube.com/vi/jS3oq_xmlSo/0.jpg" alt="How to install Wordpress in 80 seconds" width="50%" height="auto" border="3" />
+    <a href="http://www.youtube.com/watch?feature=player_embedded&v=LKXsY0a4BWo" target="_blank">
+        <img src="http://img.youtube.com/vi/LKXsY0a4BWo/0.jpg" alt="How to install Wordpress in 80 seconds" width="50%" height="auto" border="3" />
     </a>
 </p>
 
