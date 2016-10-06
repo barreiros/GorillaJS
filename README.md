@@ -2,7 +2,7 @@
   <img src="http://s23.postimg.org/ka5fnkw23/logo_mini.jpg" alt="GorillaJS logo"/>
 </p>
 
-> I'm translating the documentation. For now, you can read it in Spanish, which is a very nice language.
+> *English version*: I'm translating the documentation. For now, you can read it in Spanish, which is a very nice language.
 
 **GorillaJS es una herramienta basada en Docker que simplifica la creación de entornos de desarrollo web**
 
@@ -36,21 +36,41 @@ Todo esto lo consigue con un solo comando y en menos de 2 minutos.
 
 > GorillaJS está en fase beta, y es compatible con Mac y Linux. En un futuro estará disponible en Windows.
 
-GorillaJS se instala desde [npm](https://docs.npmjs.com/getting-started/installing-node) y necesita Docker y Docker Compose ([MAC](https://docs.docker.com/docker-for-mac/), [Linux](https://docs.docker.com/engine/installation/linux/), [Windows](https://docs.docker.com/docker-for-windows/)) para funcionar.
+GorillaJS se instala desde [npm](https://docs.npmjs.com/getting-started/installing-node) y necesita Docker para funcionar.
 
 ```nodejs
 npm install -g gorillajs
 ```
 
+##### Instalar Docker
+
+* [Mac](https://docs.docker.com/docker-for-mac/)
+> Es necesario tener instaldo Docker for Mac. Con Docker Toolbox no funciona.
+
+* Linux
+> Instalar [Docker](https://docs.docker.com/engine/getstarted/linux_install_help/) y [Docker Compose](https://docs.docker.com/compose/install/). 
+
+* [Windows](https://docs.docker.com/docker-for-windows/)
+> Es necesario tener instalado Docker for Windows. Con Docker Toolbox no funciona.
+
 ##### Cómo se usa
 
-Para usar GorillaJS simplemente hay que iniciarlo desde la consola, con el comando *init*
+GorillaJS tiene un solo comando: 
 
 ```nodejs
 gorilla init [path]
 ```  
 
-El path es opcional y si no se indica se crea el proyecto en la ruta actual. 
+> El path es opcional y si no se indica GorillaJS creará el proyecto en el directorio actual.
+
+Este comando sirve tanto para instalar un proyecto como para iniciarlo. La diferencia es que si se ejecuta *gorilla init [path]* en un directorio en el que ya existe un proyecto de GorillaJS se vuelve a configurar el proyecto con los valores que se guardaron la última vez y se reinician los contenedores de Docker. Para cambiar los valores hay que usar el parámetro -f. 
+
+> GorillaJS solo sobreescribe archivos de configuración, **nunca borra los archivos del proyecto**.
+
+```nodejs
+gorilla init [path] -f
+```
+
 
 ##### Parámetros
 
