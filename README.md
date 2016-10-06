@@ -65,11 +65,11 @@ gorilla init [path]
 
 Este comando sirve tanto para instalar un proyecto como para iniciarlo. La diferencia es que si se ejecuta *gorilla init [path]* en un directorio en el que ya existe un proyecto de GorillaJS se vuelve a configurar el proyecto con los valores que se guardaron la última vez y se reinician los contenedores de Docker. Para cambiar los valores hay que usar el parámetro -f. 
 
-> GorillaJS solo sobreescribe archivos de configuración, **nunca borra los archivos del proyecto**.
-
 ```nodejs
 gorilla init [path] -f
 ```
+
+> GorillaJS solo sobreescribe archivos de configuración, **nunca borra los archivos del proyecto**.
 
 
 ##### Parámetros
