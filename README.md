@@ -19,7 +19,7 @@ Para conseguir esto, GorillaJS utiliza un sistema simple de preguntas y respuest
     </a>
 </p>
 
-En este ejemplo GorillaJS usa la [plantilla predefinida de Wordpress](#templates) para:
+En este ejemplo GorillaJS usa la [plantilla predefinida de Wordpress](#plantillas-por-defecto) para:
 * iniciar los contenedores de Docker
 * instalar el entorno LAMP
 * crear y configurar la base de datos
