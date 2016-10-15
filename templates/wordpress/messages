@@ -13,7 +13,7 @@
         },
         "project": {
             "slug": "Tell me a name for your project",
-            "domain": "Tell me your local project url (without http://)",
+            "domain": "Tell me your local project url (without http:// and without www)",
             "srcout": "What is your public folder?",
             "datafolder": "Where do you want to store the data base files"
         },
