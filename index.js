@@ -24,10 +24,14 @@ var gorillaTemplateFolder = 'template';
 var gorillaFile = 'gorillafile';
 var messagesFile = 'messages';
 var projectPath = process.cwd();
+var homeUserPath = (process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library' : '/var/local'))
 var commonPath = projectPath + '/' + gorillaFolder + '/common';
 var workingPath = projectPath;
 var templatesPath = gorillaPath + '/templates';
 var composeFile = 'docker-compose.yml';
+var proxyName = 'gorillajs';
+var proxyHost = 'localhost';
+var proxyPort = 80;
 var env = argv.e ? argv.e : 'local';
 var verbose = argv.v ? argv.v : false;
 var templateOptions = ['wordpress', 'other'];
@@ -61,6 +65,10 @@ function checkUserInput(){
             workingPath = projectPath;
         }
 
+        if(argv.hasOwnProperty('p')){
+            proxyPort = argv.p;
+        }
+
         promisesPack.push(
             [tools.printLogo],
             [tools.config, [env, argv.f]],
@@ -90,6 +98,7 @@ function checkUserInput(){
         promises.add(promisesPack);
         promises.start();
     }
+
 }
 
 function initFromApp(path){
@@ -159,25 +168,16 @@ function init(){
 
         ], [
 
-            [tools.param, ['host', 'enabled', ['ip', 'domain']], 'host-enabled'],
-            [promises.cond, '{{host-enabled}}::domain', [
-
-                [m_docker.ip, '{{machine-name}}', 'ip'],
-                [tools.param, ['project', 'domain'], 'domain'],
-                [tools.param, ['system', 'hostsfile'], 'hosts-file'],
-                [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']]
-
-            ], [
-
-                [m_docker.ip, '{{machine-name}}', 'ip'],
-                [tools.paramForced, ['project', 'domain', '{{ip}}']],
-                [tools.param, ['project', 'domain'], 'domain']
-
-            ]],
-
+            [tools.param, ['project', 'domain'], 'domain'],
+            [tools.paramForced, ['proxy', 'userpath', homeUserPath + '/' +  proxyName + '/' + gorillaTemplateFolder]],
+            [tools.paramForced, ['proxy', 'port', proxyPort]],
+            [tools.paramForced, ['proxy', 'host', proxyHost]],
+            [cross.moveFiles, [homeUserPath + '/' + proxyName + '/' + gorillaTemplateFolder, false, ['.DS_Store'], templatesPath + '/proxy']],
+            [tools.setEnvVariables, homeUserPath + '/' + proxyName + '/' + gorillaTemplateFolder + '/*'],
             [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*'],
             [m_docker.start, ['{{machine-name}}', workingPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/' + composeFile, '{{slug}}', '{{ssh-enabled}}']],
-            [host.open, ['http://{{domain}}:{{port}}', 3, 'Waiting for opening your web']]
+            [m_docker.base, [proxyPort, homeUserPath + '/' + proxyName + '/' + gorillaTemplateFolder + '/' + composeFile, proxyName]],
+            [host.open, ['http://{{domain}}', 3, 'Waiting for opening your web']]
 
         ]],
 

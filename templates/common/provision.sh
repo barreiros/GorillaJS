@@ -15,9 +15,9 @@ sudo sh -c "curl -L https://github.com/docker/compose/releases/download/1.5.2/do
 sudo chmod +x /usr/local/bin/docker-compose
 sudo sh -c "curl -L https://raw.githubusercontent.com/docker/compose/1.5.2/contrib/completion/bash/docker-compose > /etc/bash_completion.d/docker-compose"
 
-# Create the gorilla folder needded for store Docker and Gorilla's files.
-sudo mkdir -p /var/gorilla
-sudo chown $USER:root /var/gorilla
+# Create the {{database.username}} folder needded for store Docker and Gorilla's files.
+sudo mkdir -p /var/{{database.username}}
+sudo chown $USER:root /var/{{database.username}}
 
 # Configure Docker to use it without sudo
 sudo groupadd docker
