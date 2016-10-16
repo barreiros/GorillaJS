@@ -1,0 +1,11 @@
+proxy:
+  image: gorillajs/apache-base
+  ports:  
+    - "{{proxy.port}}:80"
+  volumes:
+    - {{proxy.userpath}}:/root/templates
+  expose: 
+    - {{docker.port}}
+  external_links:
+    - gorillajslanding
+  container_name: gorillajsproxy

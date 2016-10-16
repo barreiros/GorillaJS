@@ -26,7 +26,8 @@
         "024" : "Unable to reset your branch to the desired point",
         "025" : "Last rollback point. Is not possible rollback again.",
         "026" : "Unable to check current branch.",
-        "027" : "Problems to complete your file commands"
+        "027" : "Problems to complete your file commands",
+        "028" : "Unable to start base proxy. Check if your base port (default, 80) is used by others. i.e. Apache."
     },
 
     "warnings": {

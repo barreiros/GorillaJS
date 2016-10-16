@@ -14,4 +14,7 @@ web:
     - ../../{{project.srcout}}:/var/www/{{project.domain}}/{{project.srcout}}
   links:
     - mysql:mysql
+  expose: 
+    - {{docker.port}}
+  container_name: {{project.slug}}
 
