@@ -1,3 +1,10 @@
+mysql:
+  image: gorillajs/mysql
+  expose: 
+    - 3306
+  volumes:
+    - ../{{docker.templatefolder}}:/root/templates
+    - ../../{{project.datafolder}}:/var/lib/mysql
 web:
   image: gorillajs/apache-base
   ports:  
@@ -7,11 +14,4 @@ web:
     - ../../{{project.srcout}}:/var/www/{{project.domain}}/{{project.srcout}}
   links:
     - mysql:mysql
-mysql:
-  image: gorillajs/mysql
-  expose: 
-    - 3306
-  volumes:
-    - ../{{docker.templatefolder}}:/root/templates
-    - ../../{{project.datafolder}}:/var/lib/mysql
 

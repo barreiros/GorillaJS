@@ -37,9 +37,16 @@ events.subscribe('VERBOSE', showVerbose);
 events.subscribe('WARNING', tools.showWarning);
 events.subscribe('STEP', tools.showStep);
 events.subscribe('MESSAGE', tools.showMessage);
+events.subscribe('ANSWER', tools.answer);
 
 checkUserInput();
 
+module.exports = {
+    
+    init: initFromApp,
+    events: events
+
+}
 
 function checkUserInput(){
 
@@ -83,6 +90,103 @@ function checkUserInput(){
         promises.add(promisesPack);
         promises.start();
     }
+}
+
+function initFromApp(path){
+
+    var promisesPack = [];
+
+    promisesPack.push(
+        [tools.printLogo],
+        [tools.config, [env]],
+        [tools.createBaseEnvironment, [projectPath, templatesPath, gorillaPath, gorillaFile, gorillaFolder, messagesFile]],
+        [init]
+    );
+
+    promises.add(promisesPack);
+    promises.start();
+
+}
+
+function init(){
+
+    var promisesPack = [];
+
+    promisesPack = [
+
+        [tools.paramForced, ['docker', 'gorillafolder', gorillaFolder]],
+        [tools.paramForced, ['docker', 'templatefolder', gorillaTemplateFolder]],
+        [tools.param, ['docker', 'template', templateOptions], 'template'],
+        [tools.checkTemplatePath, [templateOptions, '{{template}}', templatesPath], 'template-path'],
+        [cross.moveFiles, [projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder, false, ['.DS_Store'], '{{template-path}}']],
+        [tools.createTemplateEnvironment, [projectPath, gorillaFolder, gorillaFile, messagesFile, gorillaTemplateFolder]],
+        [tools.param, ['docker', 'port'], 'port'],
+        [tools.param, ['project', 'slug', null, tools.sanitize], 'slug'],
+
+
+        [promises.cond, '{{ssh-enabled}}', [
+
+            [cross.moveFiles, [workingPath + '/' + gorillaFolder, true, ['.DS_Store'], projectPath + '/' + gorillaFolder]]
+
+        ]],
+
+        [m_docker.config],
+        [tools.getPlatform, [], 'platform'],
+        [promises.cond, '{{platform}}', [
+
+            [tools.param, ['docker', 'machinename'], 'machine-name'],
+            [m_docker.check, ['{{machine-name}}', '{{ssh-enabled}}']],
+
+        ]],
+
+
+        [promises.cond, '{{ssh-enabled}}', [
+
+            [tools.param, ['project', 'domain'], 'domain'],
+            [tools.param, ['system', 'platform', ['apache', 'nginx', 'none'], 'management']],
+            [promises.cond, '{{management}}::none', [
+
+                [host.open, ['http://{{domain}}' + ':' + '{{port}}', 15, 'Waiting for opening your web']]
+
+            ], [
+
+                [host.create, ['{{management}}', projectPath + '/' + gorillaFolder + '/{{management}}-proxy.conf', workingPath + '/' + gorillaFolder + '/{{management}}-proxy.conf', '{{domain}}']],
+                [host.open, ['http://{{domain}}' , 3, 'Waiting for opening your web']]
+
+            ]],
+
+            [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*']
+
+        ], [
+
+            [tools.param, ['host', 'enabled', ['ip', 'domain']], 'host-enabled'],
+            [promises.cond, '{{host-enabled}}::domain', [
+
+                [m_docker.ip, '{{machine-name}}', 'ip'],
+                [tools.param, ['project', 'domain'], 'domain'],
+                [tools.param, ['system', 'hostsfile'], 'hosts-file'],
+                [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']]
+
+            ], [
+
+                [m_docker.ip, '{{machine-name}}', 'ip'],
+                [tools.paramForced, ['project', 'domain', '{{ip}}']],
+                [tools.param, ['project', 'domain'], 'domain']
+
+            ]],
+
+            [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*'],
+            [m_docker.start, ['{{machine-name}}', workingPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/' + composeFile, '{{slug}}', '{{ssh-enabled}}']],
+            [host.open, ['http://{{domain}}:{{port}}', 3, 'Waiting for opening your web']]
+
+        ]],
+
+        [promises.cond, '{{ssh-enabled}}', [ssh.close]]
+
+    ];
+
+    promises.add(promisesPack);
+    promises.start();
 }
 
 function deploy(){
@@ -198,87 +302,6 @@ function rollback(){
         [git.createBranch, '{{current-branch}}'],
         [git.stash, 'pop'],
         ssh.close
-    ];
-
-    promises.add(promisesPack);
-    promises.start();
-}
-
-function init(){
-
-    var promisesPack = [];
-
-    promisesPack = [
-
-        [tools.paramForced, ['docker', 'gorillafolder', gorillaFolder]],
-        [tools.paramForced, ['docker', 'templatefolder', gorillaTemplateFolder]],
-        [tools.param, ['docker', 'template', templateOptions], 'template'],
-        [tools.checkTemplatePath, [templateOptions, '{{template}}', templatesPath], 'template-path'],
-        [cross.moveFiles, [projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder, false, ['.DS_Store'], '{{template-path}}']],
-        [tools.createTemplateEnvironment, [projectPath, gorillaFolder, gorillaFile, messagesFile, gorillaTemplateFolder]],
-        [tools.param, ['docker', 'port'], 'port'],
-        [tools.param, ['project', 'slug', null, tools.sanitize], 'slug'],
-
-
-        [promises.cond, '{{ssh-enabled}}', [
-
-            [cross.moveFiles, [workingPath + '/' + gorillaFolder, true, ['.DS_Store'], projectPath + '/' + gorillaFolder]]
-
-        ]],
-
-        [m_docker.config],
-        [tools.getPlatform, [], 'platform'],
-        [promises.cond, '{{platform}}', [
-
-            [tools.param, ['docker', 'machinename'], 'machine-name'],
-            [m_docker.check, ['{{machine-name}}', '{{ssh-enabled}}']],
-
-        ]],
-
-
-        [promises.cond, '{{ssh-enabled}}', [
-
-            [tools.param, ['project', 'domain'], 'domain'],
-            [tools.param, ['system', 'platform', ['apache', 'nginx', 'none'], 'management']],
-            [promises.cond, '{{management}}::none', [
-
-                [host.open, ['http://{{domain}}' + ':' + '{{port}}', 15, 'Waiting for opening your web']]
-
-            ], [
-
-                [host.create, ['{{management}}', projectPath + '/' + gorillaFolder + '/{{management}}-proxy.conf', workingPath + '/' + gorillaFolder + '/{{management}}-proxy.conf', '{{domain}}']],
-                [host.open, ['http://{{domain}}' , 3, 'Waiting for opening your web']]
-
-            ]],
-
-            [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*']
-
-        ], [
-
-            [tools.param, ['host', 'enabled', ['ip', 'domain']], 'host-enabled'],
-            [promises.cond, '{{host-enabled}}::domain', [
-
-                [m_docker.ip, '{{machine-name}}', 'ip'],
-                [tools.param, ['project', 'domain'], 'domain'],
-                [tools.param, ['system', 'hostsfile'], 'hosts-file'],
-                [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']]
-
-            ], [
-
-                [m_docker.ip, '{{machine-name}}', 'ip'],
-                [tools.paramForced, ['project', 'domain', '{{ip}}']],
-                [tools.param, ['project', 'domain'], 'domain']
-
-            ]],
-
-            [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*'],
-            [m_docker.start, ['{{machine-name}}', workingPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/' + composeFile, '{{slug}}', '{{ssh-enabled}}']],
-            [host.open, ['http://{{domain}}:{{port}}', 3, 'Waiting for opening your web']]
-
-        ]],
-
-        [promises.cond, '{{ssh-enabled}}', [ssh.close]]
-
     ];
 
     promises.add(promisesPack);
