@@ -169,15 +169,21 @@ function init(){
         ], [
 
             [tools.param, ['project', 'domain'], 'domain'],
-            [tools.paramForced, ['proxy', 'userpath', homeUserPath + '/' +  proxyName + '/' + gorillaTemplateFolder]],
+            [tools.paramForced, ['proxy', 'userpath', homeUserPath + '/' +  proxyName]],
             [tools.paramForced, ['proxy', 'port', proxyPort]],
             [tools.paramForced, ['proxy', 'host', proxyHost]],
-            [cross.moveFiles, [homeUserPath + '/' + proxyName + '/' + gorillaTemplateFolder, false, ['.DS_Store'], templatesPath + '/proxy']],
-            [tools.setEnvVariables, homeUserPath + '/' + proxyName + '/' + gorillaTemplateFolder + '/*'],
+            [cross.moveFiles, [homeUserPath + '/' + proxyName + '/template', false, ['.DS_Store'], templatesPath + '/proxy']],
+
+            [tools.setEnvVariables, homeUserPath + '/' + proxyName + '/template/*'],
             [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*'],
+
             [m_docker.start, ['{{machine-name}}', workingPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/' + composeFile, '{{slug}}', '{{ssh-enabled}}']],
             [m_docker.base, [proxyPort, homeUserPath + '/' + proxyName + '/' + gorillaTemplateFolder + '/' + composeFile, proxyName]],
-            [host.open, ['http://{{domain}}:{{port}}', 3, 'Waiting for opening your web']]
+
+            [m_docker.ip, '{{machine-name}}', 'ip'],
+            [tools.param, ['system', 'hostsfile'], 'hosts-file'],
+            [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']],
+            [host.open, ['http://{{domain}}', 3, 'Waiting for opening your web']]
 
         ]],
 

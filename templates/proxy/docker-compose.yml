@@ -3,9 +3,10 @@ proxy:
   ports:  
     - "{{proxy.port}}:80"
   volumes:
-    - {{proxy.userpath}}:/root/templates
-  expose: 
-    - {{docker.port}}
+    - {{proxy.userpath}}/template:/root/templates
+    - {{proxy.userpath}}/sites-enabled:/etc/apache2/sites-enabled
+    - {{proxy.userpath}}/sites-available:/etc/apache2/sites-available
   external_links:
     - gorillajslanding
+    - proxytest
   container_name: gorillajsproxy
