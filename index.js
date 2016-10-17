@@ -178,6 +178,7 @@ function init(){
             [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*'],
 
             [m_docker.start, ['{{machine-name}}', workingPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/' + composeFile, '{{slug}}', '{{ssh-enabled}}']],
+            [m_docker.checkContainers, [homeUserPath + '/' + proxyName + '/' + gorillaTemplateFolder + '/' + composeFile]],
             [m_docker.base, [proxyPort, homeUserPath + '/' + proxyName + '/' + gorillaTemplateFolder + '/' + composeFile, proxyName]],
 
             [m_docker.ip, '{{machine-name}}', 'ip'],
