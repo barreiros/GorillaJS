@@ -76,8 +76,8 @@ gorilla init [path] -f
 
 | Nombre | Función             |
 | ---    | ---                 |
-| -v     | Enable verbose mode |
-| -f     | Ask you again       |
+| -d     | Enable debug mode |
+| -f     | Force to recreate the project (this action don't remove your project files)|
 
 # Plantillas por defecto
 
@@ -86,14 +86,8 @@ Por defecto GorillaJS viene con una plantilla para crear proyectos de Wordpress.
 * **Select the docker template value from the list above**  
 > Por ahora solo se puede elegir entre wordpress o una [plantilla personalizada](#user-content-plantillas-personalizadas).
 
-* **Tell me a name for your project**  
-> Un nombre identificativo para el proyecto. Algo corto.
-
-* **How do you prefer to access your site, through domain name or ip?**  
-> Con GorillaJS se puede elegir cómo acceder al sitio del proyecto. Si se selecciona *domain*, aparecen además estos otros valores:
-
  * **Tell me your local project url**  
-> El nombre de dominio a través del cual se quiere acceder al site. Hay que poner solo el nombre: sin http://, ni https://.
+> El nombre de dominio a través del cual se quiere acceder al site. Hay que poner solo el nombre: sin http://, ni https://, nin www.
  
  * **Enter the system hostsfile value**  
 > La ruta absoluta del archivo hosts del ordenador desde el que se está ejecutando GorillaJS. Para más información sobre [dónde encontrar](https://en.wikipedia.org/wiki/Hosts_file la ruta del archivo hosts).
