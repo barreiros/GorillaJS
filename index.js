@@ -33,7 +33,7 @@ var proxyName = 'gorillajs';
 var proxyHost = 'localhost';
 var proxyPort = 80;
 var env = argv.e ? argv.e : 'local';
-var verbose = argv.v ? argv.v : false;
+var verbose = argv.d ? argv.d : false;
 var templateOptions = ['wordpress', 'other'];
 
 events.subscribe('ERROR', showError);
@@ -58,20 +58,36 @@ function checkUserInput(){
 
     if(argv._[0] === 'init'){
 
+        promisesPack.push(
+            [tools.printLogo]
+        );
+
         if(argv._[0] && argv._[1]){
+
             mkdirp.sync(argv._[1]);
             projectPath = argv._[1];
             commonPath = projectPath + '/' + gorillaFolder + '/common';
             workingPath = projectPath;
+
         }
 
         if(argv.hasOwnProperty('p')){
+
             proxyPort = argv.p;
+
+        }
+
+        if(argv.hasOwnProperty('f')){
+
+            promisesPack.push(
+                [tools.force, [projectPath + '/' + gorillaFolder + '/' + gorillaFile], 'old-domain'],
+                [tools.removeDir, projectPath + '/' + gorillaFolder]
+            );
+
         }
 
         promisesPack.push(
-            [tools.printLogo],
-            [tools.config, [env, argv.f]],
+            [tools.config, env],
             [tools.createBaseEnvironment, [projectPath, templatesPath, gorillaPath, gorillaFile, gorillaFolder, messagesFile]]
         );
 
@@ -130,7 +146,6 @@ function init(){
         [cross.moveFiles, [projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder, false, ['.DS_Store'], '{{template-path}}']],
         [tools.createTemplateEnvironment, [projectPath, gorillaFolder, gorillaFile, messagesFile, gorillaTemplateFolder]],
         [tools.param, ['docker', 'port'], 'port'],
-        [tools.param, ['project', 'slug', null, tools.sanitize], 'slug'],
 
 
         [promises.cond, '{{ssh-enabled}}', [
@@ -152,6 +167,8 @@ function init(){
         [promises.cond, '{{ssh-enabled}}', [
 
             [tools.param, ['project', 'domain'], 'domain'],
+            [tools.sanitize, '{{domain}}', 'slug'],
+            [tools.paramForced, ['project', 'slug', '{{slug}}']],
             [tools.param, ['system', 'platform', ['apache', 'nginx', 'none'], 'management']],
             [promises.cond, '{{management}}::none', [
 
@@ -169,6 +186,8 @@ function init(){
         ], [
 
             [tools.param, ['project', 'domain'], 'domain'],
+            [tools.sanitize, '{{domain}}', 'slug'],
+            [tools.paramForced, ['project', 'slug', '{{slug}}']],
             [tools.paramForced, ['proxy', 'userpath', homeUserPath + '/' +  proxyName]],
             [tools.paramForced, ['proxy', 'port', proxyPort]],
             [tools.paramForced, ['proxy', 'host', proxyHost]],
@@ -177,12 +196,18 @@ function init(){
             [tools.setEnvVariables, homeUserPath + '/' + proxyName + '/template/*'],
             [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*'],
 
+            [m_docker.ip, '{{machine-name}}', 'ip'],
+            [tools.param, ['system', 'hostsfile'], 'hosts-file'],
+
+            [promises.cond, '{{old-domain}}!:""', [
+                [tools.sanitize, '{{old-domain}}', 'old-slug'],
+                [m_docker.removeSite, [homeUserPath + '/' + proxyName + '/', '{{old-domain}}', '{{old-slug}}']]
+            ]],
+
             [m_docker.start, ['{{machine-name}}', workingPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/' + composeFile, '{{slug}}', '{{ssh-enabled}}']],
             [m_docker.checkContainers, [homeUserPath + '/' + proxyName + '/' + gorillaTemplateFolder + '/' + composeFile]],
             [m_docker.base, [proxyPort, homeUserPath + '/' + proxyName + '/' + gorillaTemplateFolder + '/' + composeFile, proxyName]],
 
-            [m_docker.ip, '{{machine-name}}', 'ip'],
-            [tools.param, ['system', 'hostsfile'], 'hosts-file'],
             [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']],
             [host.open, ['http://{{domain}}', 3, 'Waiting for opening your web']]
 
