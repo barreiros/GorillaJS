@@ -34,7 +34,7 @@ var proxyHost = 'localhost';
 var proxyPort = 80;
 var env = argv.e ? argv.e : 'local';
 var verbose = argv.d ? argv.d : false;
-var templateOptions = ['wordpress', 'other'];
+var templateOptions = ['wordpress', 'blank', 'blank+database', 'other'];
 
 events.subscribe('ERROR', showError);
 events.subscribe('VERBOSE', showVerbose);

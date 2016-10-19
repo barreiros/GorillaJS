@@ -1,0 +1,11 @@
+{
+    "default": {
+        "project": {
+            "srcout": "application",
+            "domain": "gorilla.local"
+        },
+        "system": {
+            "hostsfile": "/etc/hosts"
+        }
+    }
+}
