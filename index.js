@@ -3,7 +3,6 @@
 'use strict';
 
 var argv = require('minimist')(process.argv.slice(2));
-var exec = require('child_process').exec;
 var prompt = require('readline-sync');
 var color = require('colors');
 var datef = require('dateformat');
@@ -17,6 +16,8 @@ var git = require(__dirname + '/lib/git.js');
 var host = require(__dirname + '/lib/host.js');
 var cross = require(__dirname + '/lib/crossExec.js');
 var promises = require(__dirname + '/lib/promises.js');
+
+var pluginWordpress = require(__dirname + '/plugins/wordpress.js');
 
 var gorillaPath = __dirname;
 var gorillaFolder = '.gorilla';
@@ -58,10 +59,6 @@ function checkUserInput(){
 
     if(argv._[0] === 'init'){
 
-        promisesPack.push(
-            [tools.printLogo]
-        );
-
         if(argv._[0] && argv._[1]){
 
             mkdirp.sync(argv._[1]);
@@ -70,6 +67,17 @@ function checkUserInput(){
             workingPath = projectPath;
 
         }
+
+    }
+
+    promisesPack.push(
+        [tools.printLogo],
+        [tools.config, env],
+        [tools.createBaseEnvironment, [projectPath, templatesPath, gorillaPath, gorillaFile, gorillaFolder, messagesFile]],
+        [events.publish, ['INIT_PLUGINS', projectPath + '/' + gorillaFolder + '/' + gorillaFile], true]
+    );
+
+    if(argv._[0] === 'init'){
 
         if(argv.hasOwnProperty('p')){
 
@@ -87,33 +95,13 @@ function checkUserInput(){
         }
 
         promisesPack.push(
-            [tools.config, env],
-            [tools.createBaseEnvironment, [projectPath, templatesPath, gorillaPath, gorillaFile, gorillaFolder, messagesFile]]
-        );
-
-        if(env !== 'local') {
-            promisesPack.push(
-                [tools.param, ['ssh', 'enable', true], 'ssh-enabled'],
-                [promises.cond, '{{ssh-enabled}}', [
-                    [tools.param, ['ssh', 'workingpath'], 'working-path'],
-                    [tools.param, ['ssh', 'host'], 'host'],
-                    [tools.param, ['ssh', 'port'], 'ssh-port'],
-                    [tools.param, ['ssh', 'username'], 'user-name'],
-                    [tools.param, ['ssh', 'key'], 'key'],
-                    [tools.param, ['ssh', 'passphrase'], 'passphrase'],
-                    [setWorkingPath, '{{working-path}}'],
-                    [ssh.connect, ['{{host}}', '{{ssh-port}}', '{{user-name}}', '{{key}}', '{{passphrase}}']]
-                ]]
-            );
-        }
-
-        promisesPack.push(
             eval(argv._[0])
         );
 
-        promises.add(promisesPack);
-        promises.start();
     }
+
+    promises.add(promisesPack);
+    promises.start();
 
 }
 
