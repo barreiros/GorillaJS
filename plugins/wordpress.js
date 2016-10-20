@@ -27,13 +27,13 @@ function init(gorillaFile){
                         case 'import':
 
                             destiny = argv._.hasOwnProperty(3) ? argv._[3] : null;
-                            if(destiny){
+                            if(destiny && data.hasOwnProperty('local')){
 
                                 dbImport(data.local, destiny);
 
                             }else{
 
-                                events.publish('ERROR', ['031']);
+                                events.publish('ERROR', ['030']);
 
                             }
 
@@ -41,8 +41,16 @@ function init(gorillaFile){
 
                         case 'export':
 
-                            destiny = argv._.hasOwnProperty(3) ? argv._[3] : process.cwd() + '/' + Date.now() + '.sql';
-                            dbExport(data.local, destiny);
+                            if(data.hasOwnProperty('local')){
+
+                                destiny = argv._.hasOwnProperty(3) ? argv._[3] : process.cwd() + '/' + Date.now() + '.sql';
+                                dbExport(data.local, destiny);
+
+                            }else{
+
+                                events.publish('ERROR', ['030']);
+
+                            }
 
                             break;
 
@@ -65,13 +73,37 @@ function init(gorillaFile){
 
 function dbExport(data, destiny){
     
-    cross.exec('docker exec -i ' + data.project.slug + '_mysql mysqldump -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' > ' + destiny, function(err, stdout, stderr){
+    if(data.hasOwnProperty('project') && data.hasOwnProperty('database')){
 
-    });
+        cross.exec('docker exec -i ' + data.project.slug + '_mysql mysqldump -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' > ' + destiny, function(err, stdout, stderr){
+            if (err) events.publish('ERROR', ['032']);
+            events.publish('VERBOSE', [stderr + err + stdout]);
+        });
 
+    }else{
+
+        events.publish('ERROR', ['030']);
+
+    }
 }
 
 function dbImport(data, file){
+
+    console.log(data, file);
+
+    if(data.hasOwnProperty('project') && data.hasOwnProperty('database')){
+
+        cross.exec('docker exec -i ' + data.project.slug + '_mysql mysql -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' < ' + file, function(err, stdout, stderr){
+            if (err) events.publish('ERROR', ['032']);
+            events.publish('VERBOSE', [stderr + err + stdout]);
+
+        });
+
+    }else{
+
+        events.publish('ERROR', ['030']);
+
+    }
 
 }
 
