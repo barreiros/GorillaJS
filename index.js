@@ -68,6 +68,21 @@ function checkUserInput(){
 
         }
 
+        if(argv.hasOwnProperty('f')){
+
+            promisesPack.push(
+                [tools.force, [projectPath + '/' + gorillaFolder + '/' + gorillaFile], 'old-domain'],
+                [tools.removeDir, projectPath + '/' + gorillaFolder]
+            );
+
+        }
+
+        if(argv.hasOwnProperty('p')){
+
+            proxyPort = argv.p;
+
+        }
+
     }
 
     promisesPack.push(
@@ -78,21 +93,6 @@ function checkUserInput(){
     );
 
     if(argv._[0] === 'init'){
-
-        if(argv.hasOwnProperty('p')){
-
-            proxyPort = argv.p;
-
-        }
-
-        if(argv.hasOwnProperty('f')){
-
-            promisesPack.push(
-                [tools.force, [projectPath + '/' + gorillaFolder + '/' + gorillaFile], 'old-domain'],
-                [tools.removeDir, projectPath + '/' + gorillaFolder]
-            );
-
-        }
 
         promisesPack.push(
             eval(argv._[0])
