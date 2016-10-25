@@ -85,7 +85,7 @@ gorilla init [path] -f
 Por defecto GorillaJS viene con una plantilla para crear proyectos de Wordpress. Para poder usar esta plantilla es necesario aportar los siguientes valores:
 
 * **Select the docker template value from the list above**  
-> Por ahora se puede elegir entre un proyecto en blanco (blank) en el que hay una carpeta public con un servidor Apache configurado, un proyecto en blanco con base de datos (blank+database) o un proyecto de Wordpress (wordpress). Te animo a que hagas tus [propias plantillas](#plantillas-personalizadas).
+> Por ahora se puede elegir entre un proyecto en blanco (blank) en el que hay una carpeta public con un servidor Apache configurado, un proyecto en blanco con base de datos (blank+database) o un proyecto de Wordpress (wordpress). Si con estas no tienes suficiente, te animo a que hagas tus [propias plantillas](#plantillas-personalizadas) :-)
 
  * **Tell me your local project url**  
 > El nombre de dominio a través del cual se quiere acceder al site. Hay que poner solo el nombre: sin http://, ni https://, nin www.
