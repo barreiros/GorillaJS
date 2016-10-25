@@ -78,6 +78,7 @@ gorilla init [path] -f
 | ---    | ---                 |
 | -d     | Enable debug mode |
 | -f     | Force to recreate the project (this action don't remove your project files)|
+| -p | Select a custom port for the GorillaJS proxy. By default it use 80. If this port is used by other application i.e Apache, GorillaJS will return error.
 
 # Plantillas por defecto
 
