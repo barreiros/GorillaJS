@@ -25,7 +25,8 @@ var gorillaTemplateFolder = 'template';
 var gorillaFile = 'gorillafile';
 var messagesFile = 'messages';
 var projectPath = process.cwd();
-var homeUserPath = (process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library' : '/var/local'))
+var homeUserPath = (process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library' : '/var/local'));
+var hostsFile = process.platform === 'windows' ? '%WINDIR%\system32\drivers\etc\hosts' : '/etc/hosts';
 var commonPath = projectPath + '/' + gorillaFolder + '/common';
 var workingPath = projectPath;
 var templatesPath = gorillaPath + '/templates';
@@ -141,16 +142,7 @@ function init(){
             [cross.moveFiles, [workingPath + '/' + gorillaFolder, true, ['.DS_Store'], projectPath + '/' + gorillaFolder]]
 
         ]],
-
         [m_docker.config],
-        [tools.getPlatform, [], 'platform'],
-        [promises.cond, '{{platform}}', [
-
-            [tools.param, ['docker', 'machinename'], 'machine-name'],
-            [m_docker.check, ['{{machine-name}}', '{{ssh-enabled}}']],
-
-        ]],
-
 
         [promises.cond, '{{ssh-enabled}}', [
 
@@ -179,13 +171,13 @@ function init(){
             [tools.paramForced, ['proxy', 'userpath', homeUserPath + '/' +  proxyName]],
             [tools.paramForced, ['proxy', 'port', proxyPort]],
             [tools.paramForced, ['proxy', 'host', proxyHost]],
+            [tools.paramForced, ['system', 'hostsfile', hostsFile], 'hosts-file'],
             [cross.moveFiles, [homeUserPath + '/' + proxyName + '/template', false, ['.DS_Store'], templatesPath + '/proxy']],
 
             [tools.setEnvVariables, homeUserPath + '/' + proxyName + '/template/*'],
             [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*'],
 
             [m_docker.ip, '{{machine-name}}', 'ip'],
-            [tools.param, ['system', 'hostsfile'], 'hosts-file'],
 
             [promises.cond, '{{old-domain}}!:""', [
                 [tools.sanitize, '{{old-domain}}', 'old-slug'],
