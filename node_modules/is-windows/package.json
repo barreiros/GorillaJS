@@ -40,7 +40,8 @@
   },
   "_requiredBy": [
     "/global-modules",
-    "/global-prefix"
+    "/global-prefix",
+    "/is-absolute"
   ],
   "_resolved": "https://registry.npmjs.org/is-windows/-/is-windows-0.2.0.tgz",
   "_shasum": "de1aa6d63ea29dd248737b69f1ff8b8002d2108c",

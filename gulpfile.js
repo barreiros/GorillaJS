@@ -17,7 +17,7 @@ var PATHS = {
     },
     videos: {
         source: [
-            BASE_PATH + '/docs/videos/*.mp4'
+            BASE_PATH + '/docs/videos/**/*.mp4'
             // BASE_PATH + '/docs/videos/*.mov'
         ]
     },
