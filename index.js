@@ -169,7 +169,7 @@ function init(){
             [tools.sanitize, '{{domain}}', 'slug'],
             [tools.paramForced, ['project', 'slug', '{{slug}}']],
             [tools.paramForced, ['proxy', 'userpath', homeUserPath + '/' +  proxyName]],
-            [tools.paramForced, ['proxy', 'port', proxyPort]],
+            [tools.paramForced, ['proxy', 'port', proxyPort], 'proxyport'],
             [tools.paramForced, ['proxy', 'host', proxyHost]],
             [tools.paramForced, ['system', 'hostsfile', hostsFile], 'hosts-file'],
             [cross.moveFiles, [homeUserPath + '/' + proxyName + '/template', false, ['.DS_Store'], templatesPath + '/proxy']],
@@ -189,7 +189,11 @@ function init(){
             [m_docker.base, [proxyPort, homeUserPath + '/' + proxyName + '/' + gorillaTemplateFolder + '/' + composeFile, proxyName]],
 
             [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']],
-            [host.open, ['http://{{domain}}', 3, 'Waiting for opening your web']]
+            [promises.cond, 'proxyport::80', [
+                [host.open, ['http://{{domain}}', 3, 'Waiting for opening your web']]
+            ], [
+                [host.open, ['http://{{domain}}:{{proxyport}}', 3, 'Waiting for opening your web']]
+            ]],
 
         ]],
 
