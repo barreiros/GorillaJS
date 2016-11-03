@@ -7,6 +7,7 @@ var prompt = require('readline-sync');
 var color = require('colors');
 var datef = require('dateformat');
 var mkdirp = require('mkdirp');
+var paths = require('path');
 
 var tools = require(__dirname + '/lib/tools.js');
 var events = require(__dirname + '/lib/pubsub.js');
@@ -26,10 +27,10 @@ var gorillaFile = 'gorillafile';
 var messagesFile = 'messages';
 var projectPath = process.cwd();
 var homeUserPath = (process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library' : '/var/local'));
-var hostsFile = process.platform === 'windows' ? '%WINDIR%\system32\drivers\etc\hosts' : '/etc/hosts';
-var commonPath = projectPath + '/' + gorillaFolder + '/common';
+var hostsFile = process.platform === 'win32' ? 'C:\\Windows\\System32\\drivers\\etc\\hosts' : '/etc/hosts';
+var commonPath = paths.join(projectPath, gorillaFolder, 'common');
 var workingPath = projectPath;
-var templatesPath = gorillaPath + '/templates';
+var templatesPath = paths.join(gorillaPath, 'templates');
 var composeFile = 'docker-compose.yml';
 var proxyName = 'gorillajs';
 var proxyHost = 'localhost';
@@ -64,7 +65,7 @@ function checkUserInput(){
 
             mkdirp.sync(argv._[1]);
             projectPath = argv._[1];
-            commonPath = projectPath + '/' + gorillaFolder + '/common';
+            commonPath = paths.join(projectPath, gorillaFolder, 'common');
             workingPath = projectPath;
 
         }
@@ -72,8 +73,8 @@ function checkUserInput(){
         if(argv.hasOwnProperty('f')){
 
             promisesPack.push(
-                [tools.force, [projectPath + '/' + gorillaFolder + '/' + gorillaFile], 'old-domain'],
-                [tools.removeDir, projectPath + '/' + gorillaFolder]
+                [tools.force, [paths.join(projectPath, gorillaFolder, gorillaFile)], 'old-domain'],
+                [tools.removeDir, paths.join(projectPath, gorillaFolder)]
             );
 
         }
@@ -90,7 +91,7 @@ function checkUserInput(){
         [tools.printLogo],
         [tools.config, env],
         [tools.createBaseEnvironment, [projectPath, templatesPath, gorillaPath, gorillaFile, gorillaFolder, messagesFile]],
-        [events.publish, ['INIT_PLUGINS', projectPath + '/' + gorillaFolder + '/' + gorillaFile], true]
+        [events.publish, ['INIT_PLUGINS', paths.join(projectPath, gorillaFolder, gorillaFile)], true]
     );
 
     if(argv._[0] === 'init'){
@@ -132,14 +133,14 @@ function init(){
         [tools.paramForced, ['docker', 'templatefolder', gorillaTemplateFolder]],
         [tools.param, ['docker', 'template', templateOptions], 'template'],
         [tools.checkTemplatePath, [templateOptions, '{{template}}', templatesPath], 'template-path'],
-        [cross.moveFiles, [projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder, false, ['.DS_Store'], '{{template-path}}']],
+        [cross.moveFiles, [paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store'], '{{template-path}}']],
         [tools.createTemplateEnvironment, [projectPath, gorillaFolder, gorillaFile, messagesFile, gorillaTemplateFolder]],
         [tools.param, ['docker', 'port'], 'port'],
 
 
         [promises.cond, '{{ssh-enabled}}', [
 
-            [cross.moveFiles, [workingPath + '/' + gorillaFolder, true, ['.DS_Store'], projectPath + '/' + gorillaFolder]]
+            [cross.moveFiles, [paths.join(workingPath, gorillaFolder), true, ['.DS_Store'], paths.join(projectPath, gorillaFolder)]]
 
         ]],
         [m_docker.config],
@@ -156,12 +157,12 @@ function init(){
 
             ], [
 
-                [host.create, ['{{management}}', projectPath + '/' + gorillaFolder + '/{{management}}-proxy.conf', workingPath + '/' + gorillaFolder + '/{{management}}-proxy.conf', '{{domain}}']],
+                [host.create, ['{{management}}', paths.join(projectPath, gorillaFolder, '{{management}}-proxy.conf'), paths.join(workingPath, gorillaFolder, '{{management}}-proxy.conf'), '{{domain}}']],
                 [host.open, ['http://{{domain}}' , 3, 'Waiting for opening your web']]
 
             ]],
 
-            [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*']
+            [tools.setEnvVariables, paths.join(projectPath, gorillaFolder, gorillaTemplateFolder, '*')]
 
         ], [
 
@@ -172,21 +173,21 @@ function init(){
             [tools.paramForced, ['proxy', 'port', proxyPort], 'proxyport'],
             [tools.paramForced, ['proxy', 'host', proxyHost]],
             [tools.paramForced, ['system', 'hostsfile', hostsFile], 'hosts-file'],
-            [cross.moveFiles, [homeUserPath + '/' + proxyName + '/template', false, ['.DS_Store'], templatesPath + '/proxy']],
+            [cross.moveFiles, [paths.join(homeUserPath, proxyName, 'template'), false, ['.DS_Store'], paths.join(templatesPath, 'proxy')]],
 
-            [tools.setEnvVariables, homeUserPath + '/' + proxyName + '/template/*'],
-            [tools.setEnvVariables, projectPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/*'],
+            [tools.setEnvVariables, paths.join(homeUserPath, proxyName, 'template', '*')],
+            [tools.setEnvVariables, paths.join(projectPath, gorillaFolder, gorillaTemplateFolder, '*')],
 
             [m_docker.ip, '{{machine-name}}', 'ip'],
 
             [promises.cond, '{{old-domain}}!:""', [
                 [tools.sanitize, '{{old-domain}}', 'old-slug'],
-                [m_docker.removeSite, [homeUserPath + '/' + proxyName + '/', '{{old-domain}}', '{{old-slug}}']]
+                [m_docker.removeSite, [paths.join(homeUserPath, proxyName, ''), '{{old-domain}}', '{{old-slug}}']]
             ]],
 
-            [m_docker.start, ['{{machine-name}}', workingPath + '/' + gorillaFolder + '/' + gorillaTemplateFolder + '/' + composeFile, '{{slug}}', '{{ssh-enabled}}']],
-            [m_docker.checkContainers, [homeUserPath + '/' + proxyName + '/' + gorillaTemplateFolder + '/' + composeFile]],
-            [m_docker.base, [proxyPort, homeUserPath + '/' + proxyName + '/' + gorillaTemplateFolder + '/' + composeFile, proxyName]],
+            [m_docker.start, ['{{machine-name}}', paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}', '{{ssh-enabled}}']],
+            [m_docker.checkContainers, [paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile)]],
+            [m_docker.base, [proxyPort, paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile), proxyName]],
 
             [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']],
             [promises.cond, 'proxyport::80', [
