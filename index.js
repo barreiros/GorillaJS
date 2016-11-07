@@ -190,7 +190,7 @@ function init(){
             [m_docker.base, [proxyPort, paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile), proxyName]],
 
             [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']],
-            [promises.cond, 'proxyport::80', [
+            [promises.cond, '{{proxyport}}::80', [
                 [host.open, ['http://{{domain}}', 3, 'Waiting for opening your web']]
             ], [
                 [host.open, ['http://{{domain}}:{{proxyport}}', 3, 'Waiting for opening your web']]
