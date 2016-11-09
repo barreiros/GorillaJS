@@ -44,6 +44,7 @@
     "htmlencode": "0.0.4",
     "inquirer": "^0.11.4",
     "ip": "^1.1.0",
+    "is-online": "^5.1.2",
     "jshint": "^2.9.1",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
