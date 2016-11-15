@@ -35,9 +35,10 @@ var composeFile = 'docker-compose.yml';
 var proxyName = 'gorillajs';
 var proxyHost = 'localhost';
 var proxyPort = 80;
+var proxySslPort = 443;
 var env = argv.e ? argv.e : 'local';
 var verbose = argv.d ? argv.d : false;
-var templateOptions = ['wordpress', 'blank', 'blank+database', 'other'];
+var templateOptions = ['blank', 'blank+database', 'nodejs', 'wordpress', 'other'];
 
 events.subscribe('ERROR', showError);
 events.subscribe('VERBOSE', showVerbose);
@@ -171,6 +172,7 @@ function init(){
             [tools.paramForced, ['project', 'slug', '{{slug}}']],
             [tools.paramForced, ['proxy', 'userpath', homeUserPath + '/' +  proxyName]],
             [tools.paramForced, ['proxy', 'port', proxyPort], 'proxyport'],
+            [tools.paramForced, ['proxy', 'sslport', proxySslPort], 'proxysslport'],
             [tools.paramForced, ['proxy', 'host', proxyHost]],
             [tools.paramForced, ['system', 'hostsfile', hostsFile], 'hosts-file'],
             [cross.moveFiles, [paths.join(homeUserPath, proxyName, 'template'), false, ['.DS_Store'], paths.join(templatesPath, 'proxy')]],

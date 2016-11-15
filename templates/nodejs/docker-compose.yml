@@ -1,0 +1,9 @@
+nodejs:
+  image: gorillajs/nodejs-base
+  ports:  
+    - "{{docker.port}}:80"
+  volumes:
+    - ../{{docker.templatefolder}}:/root/templates
+    - ../../.:/var/www/{{project.domain}}/
+  container_name: {{project.slug}}
+

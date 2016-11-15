@@ -1,15 +1,16 @@
 # Este archivo se tiene que ejecutar desde la raíz de GorillaJS.
-# docker build -t gorillajs/apache-base . -f templates/wordpress/dockerfile-apache
+# docker build -t gorillajs/apache-base . -f templates/common/dockerfile-apache
 
 FROM ubuntu:14.04
 
 RUN echo "deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -cs) main restricted multiverse\ndeb-src http://archive.ubuntu.com/ubuntu $(lsb_release -cs) main restricted multiverse" | sudo tee -a /etc/apt/sources.list > /dev/null
-RUN apt-get update && apt-get -y --fix-missing install apache2-mpm-prefork apache2-mpm-worker libapache2-mod-php5 libapache2-mod-fastcgi php5-fpm php5-memcached memcached php-apc php5-mysql supervisor php5-curl curl && export DEBIAN_FRONTEND=noninteractive && apt-get -q -y install phpmyadmin
+RUN apt-get update && apt-get -y --fix-missing install apache2-mpm-prefork apache2-mpm-worker libapache2-mod-php5 libapache2-mod-fastcgi php5-fpm php5-memcached memcached php-apc php5-mysql supervisor php5-curl curl wget && export DEBIAN_FRONTEND=noninteractive && apt-get -q -y install phpmyadmin
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp
 
 COPY templates/wordpress/apache-supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 RUN sed -i 's/;pm.start_servers/pm.start_servers/g' /etc/php5/fpm/pool.d/www.conf
+RUN wget https://dl.eff.org/certbot-auto && chmod a+x certbot-auto
 RUN echo "fs.file-max = 10240" >> /etc/sysctl.conf 
 RUN echo "* soft nofile 10240 \n* hard nofile 10240 \n* soft nproc 10240 \n* hard nproc 10240" > /etc/security/limits.conf
 RUN echo "Include httpd.conf" >> /etc/apache2/apache2.conf

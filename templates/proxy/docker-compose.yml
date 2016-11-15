@@ -2,6 +2,7 @@ proxy:
   image: gorillajs/apache-base
   ports:  
     - "{{proxy.port}}:80"
+    - "{{proxy.sslport}}:443"
   volumes:
     - {{proxy.userpath}}/template:/root/templates
     - {{proxy.userpath}}/sites-enabled:/etc/apache2/sites-enabled

@@ -1,0 +1,16 @@
+# Este archivo se tiene que ejecutar desde la raíz de GorillaJS.
+# docker build -t gorillajs/crossedior-base . -f templates/common/dockerfile-crosseditor
+
+FROM ubuntu:14.04
+
+RUN echo "deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -cs) main restricted multiverse\ndeb-src http://archive.ubuntu.com/ubuntu $(lsb_release -cs) main restricted multiverse" | sudo tee -a /etc/apt/sources.list > /dev/null
+RUN apt-get update && apt-get -y --fix-missing install curl supervisor git
+RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+RUN apt-get update && apt-get -y --fix-missing install nodejs build-essential supervisor vim
+RUN mkdir /root/temp && cd /root/temp && git clone https://github.com/barreiros/vim . && cp -a /root/temp/. /root/ && rm -rf /root/temp/
+RUN mkdir -p /root/.vim/bundle/ && git clone https://github.com/VundleVim/Vundle.vim.git /root/.vim/bundle/Vundle.vim
+RUN vim +PluginInstall +qa
+
+COPY templates/nodejs/nodejs-supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+CMD ["/usr/bin/supervisord"]
