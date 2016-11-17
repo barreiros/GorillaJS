@@ -60,51 +60,59 @@ function checkUserInput(){
 
     var promisesPack = [];
 
-    if(argv._[0] === 'init'){
+    if(argv.hasOwnProperty('v')){
 
-        if(argv._[0] && argv._[1]){
+        console.log(tools.printVersion());
 
-            mkdirp.sync(argv._[1]);
-            projectPath = argv._[1];
-            commonPath = paths.join(projectPath, gorillaFolder, 'common');
-            workingPath = projectPath;
+    }else{
+
+        if(argv._[0] === 'init'){
+
+            if(argv._[0] && argv._[1]){
+
+                mkdirp.sync(argv._[1]);
+                projectPath = argv._[1];
+                commonPath = paths.join(projectPath, gorillaFolder, 'common');
+                workingPath = projectPath;
+
+            }
+
+            if(argv.hasOwnProperty('f')){
+
+                promisesPack.push(
+                    [tools.force, [paths.join(projectPath, gorillaFolder, gorillaFile)], 'old-domain'],
+                    [tools.removeDir, paths.join(projectPath, gorillaFolder)]
+                );
+
+            }
+
+            if(argv.hasOwnProperty('p')){
+
+                proxyPort = argv.p;
+
+            }
 
         }
 
-        if(argv.hasOwnProperty('f')){
+        promisesPack.push(
+            [tools.printLogo],
+            [tools.config, env],
+            [tools.createBaseEnvironment, [projectPath, templatesPath, gorillaPath, gorillaFile, gorillaFolder, messagesFile]],
+            [events.publish, ['INIT_PLUGINS', paths.join(projectPath, gorillaFolder, gorillaFile)], true]
+        );
+
+        if(argv._[0] === 'init'){
 
             promisesPack.push(
-                [tools.force, [paths.join(projectPath, gorillaFolder, gorillaFile)], 'old-domain'],
-                [tools.removeDir, paths.join(projectPath, gorillaFolder)]
+                eval(argv._[0])
             );
 
         }
 
-        if(argv.hasOwnProperty('p')){
-
-            proxyPort = argv.p;
-
-        }
+        promises.add(promisesPack);
+        promises.start();
 
     }
-
-    promisesPack.push(
-        [tools.printLogo],
-        [tools.config, env],
-        [tools.createBaseEnvironment, [projectPath, templatesPath, gorillaPath, gorillaFile, gorillaFolder, messagesFile]],
-        [events.publish, ['INIT_PLUGINS', paths.join(projectPath, gorillaFolder, gorillaFile)], true]
-    );
-
-    if(argv._[0] === 'init'){
-
-        promisesPack.push(
-            eval(argv._[0])
-        );
-
-    }
-
-    promises.add(promisesPack);
-    promises.start();
 
 }
 
