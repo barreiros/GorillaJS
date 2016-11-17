@@ -64,6 +64,28 @@ function checkUserInput(){
 
         console.log(tools.printVersion());
 
+    }else if(argv.hasOwnProperty('help')){
+
+        var text;
+
+        text = '';
+        text += 'Usage:';
+        text += '\n';
+        text += '\tgorilla init [parameters](optional)\n';
+        text += '\n';
+        text += 'Parameters:';
+        text += '\n';
+        text += '\t-d Enable debug / verbose mode';
+        text += '\n';
+        text += '\t-f Force to recreate the project (This action don\'t remove your current project files)';
+        text += '\n';
+        text += '\t-p Select a custom port for the GorillaJS proxy. By default it use 80. If this port is used by other application i.e Apache, GorillaJS will return error.';
+        text += '\n';
+        text += '\t-v Get the GorillaJS version';
+        text += '\n';
+
+        console.log(text);
+
     }else{
 
         if(argv._[0] === 'init'){

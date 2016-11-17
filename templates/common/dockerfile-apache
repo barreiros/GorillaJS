@@ -10,7 +10,7 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
 COPY templates/wordpress/apache-supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 RUN sed -i 's/;pm.start_servers/pm.start_servers/g' /etc/php5/fpm/pool.d/www.conf
-RUN wget https://dl.eff.org/certbot-auto && chmod a+x certbot-auto
+RUN wget https://dl.eff.org/certbot-auto -P /etc/certbot && chmod a+x /etc/certbot/certbot-auto 
 RUN echo "fs.file-max = 10240" >> /etc/sysctl.conf 
 RUN echo "* soft nofile 10240 \n* hard nofile 10240 \n* soft nproc 10240 \n* hard nproc 10240" > /etc/security/limits.conf
 RUN echo "Include httpd.conf" >> /etc/apache2/apache2.conf
