@@ -79,7 +79,9 @@
         "hosts": {
         },
         "project": {
-            "slug": "An identifier for your project"
+            "slug": "An identifier for your project",
+            "sslenable": "Do you want to enable free ssl support with Let's Encrypt?",
+            "sslemail": "Let's Encrypt need an email account to send info and notifications related to your ssl certified"
         },
         "ssh": {
             "enable": "The actual environment is not 'local'. Do you want to initiate a ssh session with a remote server?"

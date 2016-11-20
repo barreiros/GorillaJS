@@ -19,7 +19,7 @@
         },
         "database": {
             "username": "gorilla",
-            "password": "",
+            "password": "1234",
             "dbname": "gorilladb"
         }
     }

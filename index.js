@@ -163,6 +163,18 @@ function init(){
         [tools.paramForced, ['docker', 'gorillafolder', gorillaFolder]],
         [tools.paramForced, ['docker', 'templatefolder', gorillaTemplateFolder]],
         [tools.param, ['docker', 'template', templateOptions], 'template'],
+        [tools.param, ['project', 'sslenable', ['yes', 'no']], 'sslenable'],
+
+        [promises.cond, '{{sslenable}}::yes', [
+
+            [tools.param, ['project', 'sslemail'], 'sslemail']
+
+        ], [
+
+            [tools.paramForced, ['project', 'sslemail', false]]
+
+        ]],
+
         [tools.checkTemplatePath, [templateOptions, '{{template}}', templatesPath], 'template-path'],
         [cross.moveFiles, [paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store'], '{{template-path}}']],
         [tools.createTemplateEnvironment, [projectPath, gorillaFolder, gorillaFile, messagesFile, gorillaTemplateFolder]],
