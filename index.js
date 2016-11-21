@@ -163,17 +163,7 @@ function init(){
         [tools.paramForced, ['docker', 'gorillafolder', gorillaFolder]],
         [tools.paramForced, ['docker', 'templatefolder', gorillaTemplateFolder]],
         [tools.param, ['docker', 'template', templateOptions], 'template'],
-        [tools.param, ['project', 'sslenable', ['yes', 'no']], 'sslenable'],
 
-        [promises.cond, '{{sslenable}}::yes', [
-
-            [tools.param, ['project', 'sslemail'], 'sslemail']
-
-        ], [
-
-            [tools.paramForced, ['project', 'sslemail', false]]
-
-        ]],
 
         [tools.checkTemplatePath, [templateOptions, '{{template}}', templatesPath], 'template-path'],
         [cross.moveFiles, [paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store'], '{{template-path}}']],
@@ -181,68 +171,77 @@ function init(){
         [tools.param, ['docker', 'port'], 'port'],
 
 
-        [promises.cond, '{{ssh-enabled}}', [
+        [tools.param, ['project', 'domain'], 'domain'],
+        [tools.sanitize, '{{domain}}', 'slug'],
+        [tools.isLocalProject, '{{domain}}', 'islocal'],
+        [tools.paramForced, ['project', 'islocal', '{{islocal}}']],
+        [tools.paramForced, ['project', 'slug', '{{slug}}']],
 
-            [cross.moveFiles, [paths.join(workingPath, gorillaFolder), true, ['.DS_Store'], paths.join(projectPath, gorillaFolder)]]
+        [promises.cond, '{{islocal}}::no', [
 
-        ]],
-        [m_docker.config],
+            [tools.param, ['project', 'sslenable', ['yes', 'no']], 'sslenable'],
 
-        [promises.cond, '{{ssh-enabled}}', [
+            [promises.cond, '{{sslenable}}::yes', [
 
-            [tools.param, ['project', 'domain'], 'domain'],
-            [tools.sanitize, '{{domain}}', 'slug'],
-            [tools.paramForced, ['project', 'slug', '{{slug}}']],
-            [tools.param, ['system', 'platform', ['apache', 'nginx', 'none'], 'management']],
-            [promises.cond, '{{management}}::none', [
-
-                [host.open, ['http://{{domain}}' + ':' + '{{port}}', 15, 'Waiting for opening your web']]
+                [tools.param, ['project', 'sslemail'], 'sslemail'],
+                [tools.paramForced, ['project', 'protocol', 'https'], 'protocol']
 
             ], [
 
-                [host.create, ['{{management}}', paths.join(projectPath, gorillaFolder, '{{management}}-proxy.conf'), paths.join(workingPath, gorillaFolder, '{{management}}-proxy.conf'), '{{domain}}']],
-                [host.open, ['http://{{domain}}' , 3, 'Waiting for opening your web']]
+                [tools.paramForced, ['project', 'sslemail', false]],
+                [tools.paramForced, ['project', 'protocol', 'http'], 'protocol']
 
             ]],
-
-            [tools.setEnvVariables, paths.join(projectPath, gorillaFolder, gorillaTemplateFolder, '*')]
 
         ], [
 
-            [tools.param, ['project', 'domain'], 'domain'],
-            [tools.sanitize, '{{domain}}', 'slug'],
-            [tools.paramForced, ['project', 'slug', '{{slug}}']],
-            [tools.paramForced, ['proxy', 'userpath', homeUserPath + '/' +  proxyName]],
-            [tools.paramForced, ['proxy', 'port', proxyPort], 'proxyport'],
-            [tools.paramForced, ['proxy', 'sslport', proxySslPort], 'proxysslport'],
-            [tools.paramForced, ['proxy', 'host', proxyHost]],
-            [tools.paramForced, ['system', 'hostsfile', hostsFile], 'hosts-file'],
-            [cross.moveFiles, [paths.join(homeUserPath, proxyName, 'template'), false, ['.DS_Store'], paths.join(templatesPath, 'proxy')]],
-
-            [tools.setEnvVariables, paths.join(homeUserPath, proxyName, 'template', '*')],
-            [tools.setEnvVariables, paths.join(projectPath, gorillaFolder, gorillaTemplateFolder, '*')],
-
-            [m_docker.ip, '{{machine-name}}', 'ip'],
-
-            [promises.cond, '{{old-domain}}!:""', [
-                [tools.sanitize, '{{old-domain}}', 'old-slug'],
-                [m_docker.removeSite, [paths.join(homeUserPath, proxyName, ''), '{{old-domain}}', '{{old-slug}}']]
-            ]],
-
-            [m_docker.start, ['{{machine-name}}', paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}', '{{ssh-enabled}}']],
-            [m_docker.checkContainers, [paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile)]],
-            [m_docker.base, [proxyPort, paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile), proxyName]],
-
-            [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']],
-            [promises.cond, '{{proxyport}}::80', [
-                [host.open, ['http://{{domain}}', 3, 'Waiting for opening your web']]
-            ], [
-                [host.open, ['http://{{domain}}:{{proxyport}}', 3, 'Waiting for opening your web']]
-            ]],
+            [tools.paramForced, ['project', 'sslenable', 'no']],
+            [tools.paramForced, ['project', 'sslemail', false]],
+            [tools.paramForced, ['project', 'protocol', 'http'], 'protocol']
 
         ]],
 
-        [promises.cond, '{{ssh-enabled}}', [ssh.close]]
+        [m_docker.config],
+
+        [tools.paramForced, ['proxy', 'userpath', homeUserPath + '/' +  proxyName]],
+        [tools.paramForced, ['proxy', 'port', proxyPort], 'proxyport'],
+        [tools.paramForced, ['proxy', 'sslport', proxySslPort], 'proxysslport'],
+        [tools.paramForced, ['proxy', 'host', proxyHost]],
+        [tools.paramForced, ['system', 'hostsfile', hostsFile], 'hosts-file'],
+        [cross.moveFiles, [paths.join(homeUserPath, proxyName, 'template'), false, ['.DS_Store'], paths.join(templatesPath, 'proxy')]],
+
+        [tools.setEnvVariables, paths.join(homeUserPath, proxyName, 'template', '*')],
+        [tools.setEnvVariables, paths.join(projectPath, gorillaFolder, gorillaTemplateFolder, '*')],
+
+        [m_docker.ip, '{{machine-name}}', 'ip'],
+
+        [promises.cond, '{{old-domain}}!:""', [
+
+            [tools.sanitize, '{{old-domain}}', 'old-slug'],
+            [m_docker.removeSite, [paths.join(homeUserPath, proxyName, ''), '{{old-domain}}', '{{old-slug}}']]
+
+        ]],
+
+        [m_docker.start, ['{{machine-name}}', paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}', '{{ssh-enabled}}']],
+        [m_docker.checkContainers, [paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile)]],
+        [m_docker.base, [proxyPort, paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile), proxyName]],
+
+
+        [promises.cond, '{{islocal}}::yes', [
+
+            [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']],
+
+            [promises.cond, '{{proxyport}}::80', [
+
+                [host.open, ['{{protocol}}://{{domain}}', 3, 'Waiting for opening your web']]
+
+            ], [
+
+                [host.open, ['{{protocol}}://{{domain}}:{{proxyport}}', 3, 'Waiting for opening your web']]
+
+            ]]
+
+        ]]
 
     ];
 
