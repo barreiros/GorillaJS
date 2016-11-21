@@ -233,11 +233,11 @@ function init(){
 
             [promises.cond, '{{proxyport}}::80', [
 
-                [host.open, ['{{protocol}}://{{domain}}', 3, 'Waiting for opening your web']]
+                [host.open, ['{{protocol}}://{{domain}}', 0, 'Waiting for opening your web']]
 
             ], [
 
-                [host.open, ['{{protocol}}://{{domain}}:{{proxyport}}', 3, 'Waiting for opening your web']]
+                [host.open, ['{{protocol}}://{{domain}}:{{proxyport}}', 0, 'Waiting for opening your web']]
 
             ]]
 
