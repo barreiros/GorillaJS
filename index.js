@@ -131,10 +131,10 @@ function checkUserInput(){
 
         }
 
-        promises.add(promisesPack);
-        promises.start();
-
     }
+
+    promises.add(promisesPack);
+    promises.start();
 
 }
 
