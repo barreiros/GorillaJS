@@ -7,6 +7,7 @@ RUN echo "deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -cs) main restrict
 RUN apt-get update && apt-get -y --fix-missing install curl supervisor 
 RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 RUN apt-get update && apt-get -y --fix-missing install nodejs build-essential supervisor 
+RUN npm install forever -g
 
 COPY templates/nodejs/nodejs-supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
