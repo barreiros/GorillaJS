@@ -2,6 +2,7 @@
 
 var argv = require('minimist')(process.argv.slice(2));
 var fs = require('fs');
+var path = require('path');
 
 var events = require(__dirname + '/../lib/pubsub.js');
 var cross = require(__dirname + '/../lib/crossExec.js');
@@ -76,6 +77,12 @@ function dbExport(data, destiny){
     
     if(data.hasOwnProperty('project') && data.hasOwnProperty('database')){
 
+        if(!fs.existsSync(path.dirname(destiny))){
+
+            fs.mkdirSync(path.dirname(destiny));
+
+        }
+
         cross.exec('docker exec -i ' + data.project.slug + '_mysql mysqldump -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' > ' + destiny, function(err, stdout, stderr){
 
             if (err) events.publish('ERROR', ['032']);
@@ -94,6 +101,7 @@ function dbExport(data, destiny){
 function dbImport(data, file){
 
     if(data.hasOwnProperty('project') && data.hasOwnProperty('database')){
+
 
         cross.exec('docker exec -i ' + data.project.slug + '_mysql mysql --force -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' < "' + file + '"', function(err, stdout, stderr){
 
