@@ -88,6 +88,9 @@
             "enable": "The actual environment is not 'local'. Do you want to initiate a ssh session with a remote server?"
         },
         "git": {
+        },
+        "docker": {
+            "template": "Select your favourite template"
         }
     }
 }
