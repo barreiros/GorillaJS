@@ -41,6 +41,22 @@ function init(gorillaFile){
 
                             break;
 
+                        case 'replace':
+
+                            destiny = argv._.hasOwnProperty(3) ? argv._[3] : null;
+
+                            if(destiny && data.hasOwnProperty('local')){
+
+                                dbReplace(data.local, destiny);
+
+                            }else{
+
+                                events.publish('ERROR', ['030']);
+
+                            }
+
+                            break;
+
                         case 'export':
 
                             if(data.hasOwnProperty('local')){
@@ -73,6 +89,73 @@ function init(gorillaFile){
 
 }
 
+function dbImport(data, file){
+
+    if(data.hasOwnProperty('project') && data.hasOwnProperty('database')){
+
+
+        cross.exec('docker exec -i ' + data.project.slug + '_mysql mysql --force -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' < "' + file + '"', function(err, stdout, stderr){
+
+            events.publish('VERBOSE', [stderr + err + stdout]);
+            if (err) events.publish('ERROR', ['032']);
+
+        });
+
+    }else{
+
+        events.publish('ERROR', ['030']);
+
+    }
+
+}
+
+function dbReplace(data, file){
+
+    if(data.hasOwnProperty('project') && data.hasOwnProperty('database')){
+
+
+        cross.exec('docker exec -i ' + data.project.slug + '_mysql mysql -u' + data.database.username + ' -p' + data.database.password + ' -e "DROP DATABASE ' + data.database.dbname + '"', function(err, stdout, stderr){
+
+
+            if (err) {
+
+                events.publish('VERBOSE', [stderr + err + stdout]);
+                events.publish('ERROR', ['032']);
+
+            }else{
+
+                cross.exec('docker exec -i ' + data.project.slug + '_mysql mysql -u' + data.database.username + ' -p' + data.database.password + ' -e "CREATE DATABASE ' + data.database.dbname + '"', function(err, stdout, stderr){
+
+                    if (err) {
+
+                        events.publish('VERBOSE', [stderr + err + stdout]);
+                        events.publish('ERROR', ['032']);
+
+                    }else{
+
+                        cross.exec('docker exec -i ' + data.project.slug + '_mysql mysql --force -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' < "' + file + '"', function(err, stdout, stderr){
+
+                            events.publish('VERBOSE', [stderr + err + stdout]);
+                            if (err) events.publish('ERROR', ['032']);
+
+                        });
+
+                    }
+
+                });
+
+            }
+
+        });
+
+    }else{
+
+        events.publish('ERROR', ['030']);
+
+    }
+
+}
+
 function dbExport(data, destiny){
     
     if(data.hasOwnProperty('project') && data.hasOwnProperty('database')){
@@ -85,8 +168,8 @@ function dbExport(data, destiny){
 
         cross.exec('docker exec -i ' + data.project.slug + '_mysql mysqldump -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' > ' + destiny, function(err, stdout, stderr){
 
-            if (err) events.publish('ERROR', ['032']);
             events.publish('VERBOSE', [stderr + err + stdout]);
+            if (err) events.publish('ERROR', ['032']);
 
         });
 
@@ -95,29 +178,5 @@ function dbExport(data, destiny){
         events.publish('ERROR', ['030']);
 
     }
-
-}
-
-function dbImport(data, file){
-
-    if(data.hasOwnProperty('project') && data.hasOwnProperty('database')){
-
-
-        cross.exec('docker exec -i ' + data.project.slug + '_mysql mysql --force -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' < "' + file + '"', function(err, stdout, stderr){
-
-            if (err) events.publish('ERROR', ['032']);
-            events.publish('VERBOSE', [stderr + err + stdout]);
-
-        });
-
-    }else{
-
-        events.publish('ERROR', ['030']);
-
-    }
-
-}
-
-function projectClone(){
 
 }
