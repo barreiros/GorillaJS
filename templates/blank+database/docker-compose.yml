@@ -5,7 +5,7 @@ mysql:
   volumes:
     - ../{{docker.templatefolder}}:/root/templates
     - ../../{{project.datafolder}}:/var/lib/mysql
-  container_name: {{project.slug}}_mysql
+  container_name: {{project.domain}}_mysql
 web:
   image: gorillajs/apache-base
   ports:  
@@ -15,5 +15,5 @@ web:
     - ../../{{project.srcout}}:/var/www/{{project.domain}}/{{project.srcout}}
   links:
     - mysql:mysql
-  container_name: {{project.slug}}
+  container_name: {{project.domain}}
 

@@ -5,5 +5,5 @@ nodejs:
   volumes:
     - ../{{docker.templatefolder}}:/root/templates
     - ../../.:/var/www/{{project.domain}}/
-  container_name: {{project.slug}}
+  container_name: {{project.domain}}
 

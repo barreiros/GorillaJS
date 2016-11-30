@@ -7,13 +7,17 @@ RUN echo "deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -cs) main restrict
 RUN apt-get update && apt-get -y --fix-missing install apache2-mpm-prefork apache2-mpm-worker libapache2-mod-php5 libapache2-mod-fastcgi php5-fpm php5-memcached memcached php-apc php5-mysql supervisor php5-curl curl wget git && export DEBIAN_FRONTEND=noninteractive && apt-get -q -y install phpmyadmin
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp
 
-COPY templates/wordpress/apache-supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY templates/common/apache-supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY templates/common/apache-httpd.conf /etc/apache2/httpd.conf
+COPY templates/common/config.inc.php /etc/phpmyadmin/config.inc.php
+COPY templates/common/php-php5-fpm.conf /etc/apache2/conf-available/php5-fpm.conf
 
 RUN sed -i 's/;pm.start_servers/pm.start_servers/g' /etc/php5/fpm/pool.d/www.conf
 RUN git clone https://github.com/Neilpang/acme.sh.git
 RUN echo "fs.file-max = 10240" >> /etc/sysctl.conf 
 RUN echo "* soft nofile 10240 \n* hard nofile 10240 \n* soft nproc 10240 \n* hard nproc 10240" > /etc/security/limits.conf
 RUN echo "Include httpd.conf" >> /etc/apache2/apache2.conf
+RUN touch /etc/apache2/httpd.conf
 RUN a2dismod mpm_event && a2enmod rewrite && a2enmod mpm_prefork && a2enmod actions fastcgi alias && a2enmod php5 
 
 CMD ["/usr/bin/supervisord"]

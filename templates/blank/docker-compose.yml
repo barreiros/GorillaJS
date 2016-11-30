@@ -5,5 +5,5 @@ web:
   volumes:
     - ../{{docker.templatefolder}}:/root/templates
     - ../../{{project.srcout}}:/var/www/{{project.domain}}/{{project.srcout}}
-  container_name: {{project.slug}}
+  container_name: {{project.domain}}
 
