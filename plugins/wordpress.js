@@ -94,7 +94,7 @@ function dbImport(data, file){
     if(data.hasOwnProperty('project') && data.hasOwnProperty('database')){
 
 
-        cross.exec('docker exec -i ' + data.project.slug + '_mysql mysql --force -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' < "' + file + '"', function(err, stdout, stderr){
+        cross.exec('docker exec -i ' + data.project.domain + '_mysql mysql --force -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' < "' + file + '"', function(err, stdout, stderr){
 
             events.publish('VERBOSE', [stderr + err + stdout]);
             if (err) events.publish('ERROR', ['032']);
@@ -114,7 +114,7 @@ function dbReplace(data, file){
     if(data.hasOwnProperty('project') && data.hasOwnProperty('database')){
 
 
-        cross.exec('docker exec -i ' + data.project.slug + '_mysql mysql -u' + data.database.username + ' -p' + data.database.password + ' -e "DROP DATABASE ' + data.database.dbname + '"', function(err, stdout, stderr){
+        cross.exec('docker exec -i ' + data.project.domain + '_mysql mysql -u' + data.database.username + ' -p' + data.database.password + ' -e "DROP DATABASE ' + data.database.dbname + '"', function(err, stdout, stderr){
 
 
             if (err) {
@@ -124,7 +124,7 @@ function dbReplace(data, file){
 
             }else{
 
-                cross.exec('docker exec -i ' + data.project.slug + '_mysql mysql -u' + data.database.username + ' -p' + data.database.password + ' -e "CREATE DATABASE ' + data.database.dbname + '"', function(err, stdout, stderr){
+                cross.exec('docker exec -i ' + data.project.domain + '_mysql mysql -u' + data.database.username + ' -p' + data.database.password + ' -e "CREATE DATABASE ' + data.database.dbname + '"', function(err, stdout, stderr){
 
                     if (err) {
 
@@ -133,7 +133,7 @@ function dbReplace(data, file){
 
                     }else{
 
-                        cross.exec('docker exec -i ' + data.project.slug + '_mysql mysql --force -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' < "' + file + '"', function(err, stdout, stderr){
+                        cross.exec('docker exec -i ' + data.project.domain + '_mysql mysql --force -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' < "' + file + '"', function(err, stdout, stderr){
 
                             events.publish('VERBOSE', [stderr + err + stdout]);
                             if (err) events.publish('ERROR', ['032']);
@@ -166,7 +166,7 @@ function dbExport(data, destiny){
 
         }
 
-        cross.exec('docker exec -i ' + data.project.slug + '_mysql mysqldump -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' > ' + destiny, function(err, stdout, stderr){
+        cross.exec('docker exec -i ' + data.project.domain + '_mysql mysqldump -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' > ' + destiny, function(err, stdout, stderr){
 
             events.publish('VERBOSE', [stderr + err + stdout]);
             if (err) events.publish('ERROR', ['032']);
