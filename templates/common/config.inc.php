@@ -116,3 +116,4 @@ foreach (glob('/etc/phpmyadmin/conf.d/*.php') as $filename)
 {
     include($filename);
 }
+
