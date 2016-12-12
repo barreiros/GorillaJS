@@ -177,25 +177,23 @@ function init(){
         [tools.paramForced, ['project', 'islocal', '{{islocal}}']],
         [tools.paramForced, ['project', 'slug', '{{slug}}']],
 
-        [promises.cond, '{{islocal}}::no', [
+        [tools.param, ['project', 'sslenable', ['yes', 'no']], 'sslenable'],
 
-            [tools.param, ['project', 'sslenable', ['yes', 'no']], 'sslenable'],
+        [promises.cond, '{{sslenable}}::yes', [
 
-            [promises.cond, '{{sslenable}}::yes', [
+            [tools.paramForced, ['project', 'protocol', 'https'], 'protocol'],
+            [promises.cond, '{{islocal}}::yes', [
 
-                [tools.param, ['project', 'sslemail'], 'sslemail'],
-                [tools.paramForced, ['project', 'protocol', 'https'], 'protocol']
+                [tools.paramForced, ['project', 'sslemail', false]]
 
             ], [
 
-                [tools.paramForced, ['project', 'sslemail', false]],
-                [tools.paramForced, ['project', 'protocol', 'http'], 'protocol']
+                [tools.param, ['project', 'sslemail'], 'sslemail']
 
-            ]],
+            ]]
 
         ], [
 
-            [tools.paramForced, ['project', 'sslenable', 'no']],
             [tools.paramForced, ['project', 'sslemail', false]],
             [tools.paramForced, ['project', 'protocol', 'http'], 'protocol']
 
