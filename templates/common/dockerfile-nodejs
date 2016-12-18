@@ -9,6 +9,6 @@ RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 RUN apt-get update && apt-get -y --fix-missing install nodejs build-essential supervisor 
 RUN npm install forever -g
 
-COPY templates/nodejs/nodejs-supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY templates/common/nodejs-supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 CMD ["/usr/bin/supervisord"]

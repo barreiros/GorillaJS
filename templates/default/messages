@@ -28,6 +28,7 @@
         "026" : "Unable to check current branch.",
         "027" : "Problems to complete your file commands",
         "028" : "Unable to start base proxy. Check if your base port (default, 80) is used by others. i.e. Apache.",
+        "029" : "Unable to start logging server.",
         "030" : "Please, init the project.",
         "031" : "No file specified",
         "032" : "Unable to work with the database",

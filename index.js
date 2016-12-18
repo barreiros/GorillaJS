@@ -36,6 +36,8 @@ var proxyName = 'gorillajs';
 var proxyHost = 'localhost';
 var proxyPort = 80;
 var proxySslPort = 443;
+var logsName = 'logging';
+var logsPort = 3001;
 var env = argv.e ? argv.e : 'local';
 var verbose = argv.d ? argv.d : false;
 var templateOptions = ['blank', 'blank+database', 'nodejs', 'wordpress', 'other'];
@@ -205,10 +207,14 @@ function init(){
         [tools.paramForced, ['proxy', 'port', proxyPort], 'proxyport'],
         [tools.paramForced, ['proxy', 'sslport', proxySslPort], 'proxysslport'],
         [tools.paramForced, ['proxy', 'host', proxyHost]],
+        [tools.paramForced, ['logs', 'port', logsPort], 'logsPort'],
         [tools.paramForced, ['system', 'hostsfile', hostsFile], 'hosts-file'],
+
         [cross.moveFiles, [paths.join(homeUserPath, proxyName, 'template'), false, ['.DS_Store'], paths.join(templatesPath, 'proxy')]],
+        [cross.moveFiles, [paths.join(homeUserPath, proxyName, 'template-logs'), false, ['.DS_Store'], paths.join(templatesPath, 'logging')]],
 
         [tools.setEnvVariables, paths.join(homeUserPath, proxyName, 'template', '*')],
+        [tools.setEnvVariables, paths.join(homeUserPath, proxyName, 'template-logs', '*')],
         [tools.setEnvVariables, paths.join(projectPath, gorillaFolder, gorillaTemplateFolder, '*')],
 
         [m_docker.ip, '{{machine-name}}', 'ip'],
@@ -222,8 +228,9 @@ function init(){
 
         [m_docker.start, ['{{machine-name}}', paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}', '{{ssh-enabled}}']],
         [m_docker.checkContainers, [paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile)]],
-        [m_docker.base, [proxyPort, paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile), proxyName]],
-
+        [m_docker.base, [paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile), proxyName]],
+        [m_docker.loggingBase, [paths.join(homeUserPath, proxyName, 'template-logs', composeFile), logsName]],
+        [m_docker.logging, [paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{domain}}', paths.join(homeUserPath, proxyName, 'logs'), paths.join(templatesPath, 'logging')]],
 
         [promises.cond, '{{islocal}}::yes', [
 

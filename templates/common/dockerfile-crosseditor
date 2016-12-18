@@ -11,6 +11,6 @@ RUN mkdir /root/temp && cd /root/temp && git clone https://github.com/barreiros/
 RUN mkdir -p /root/.vim/bundle/ && git clone https://github.com/VundleVim/Vundle.vim.git /root/.vim/bundle/Vundle.vim
 RUN vim +PluginInstall +qa
 
-COPY templates/nodejs/nodejs-supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY templates/common/nodejs-supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 CMD ["/usr/bin/supervisord"]
