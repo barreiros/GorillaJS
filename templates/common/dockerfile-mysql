@@ -1,10 +1,9 @@
 # Este archivo se tiene que ejecutar desde la raíz de GorillaJS.
-# docker build -t gorillajs/mysql-base . -f templates/common/dockerfile-mysql
+# docker build -t gorillajs/mysql . -f templates/common/dockerfile-mysql
 
 FROM ubuntu:14.04
 
-RUN apt-get update
-RUN apt-get -y install mysql-server supervisor
+RUN apt-get update && apt-get -y install mysql-server supervisor && apt-get autoremove
 
 COPY templates/common/mysql-supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
