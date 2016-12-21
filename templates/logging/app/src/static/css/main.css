@@ -1,0 +1,10 @@
+.container{
+    width: 100%;
+    text-align: center;
+    padding: 30px 20px;
+}
+
+#output{
+    font-size: 14px;
+    font-family: 'Sans';
+}

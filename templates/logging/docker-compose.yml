@@ -4,7 +4,9 @@ logging:
     - "{{logs.port}}:80"
   volumes:
     - {{proxy.userpath}}/template-logs:/root/templates
-    # - {{proxy.userpath}}/template-logs/app:/var/www/gorillajslogging/app
+    - {{proxy.userpath}}/logs:/root/logs
+    # - {{proxy.userpath}}/template-logs/app:/var/www/gorillajslogging/app 
+    - {{proxy.userpath}}/template-logs:/var/www/gorillajslogging #Esta línea tengo que eliminarla porque es solo para desarrollo y reemplaza la de arriba.
     - {{proxy.userpath}}/template-logs/logs:/var/www/gorillajslogging/logs
   container_name: gorillajslogging
 
