@@ -5,6 +5,9 @@
 }
 
 #output{
-    font-size: 14px;
+    font-size: 16px;
     font-family: 'Sans';
+    text-align: left;
+    margin: 20px auto;
+    max-width: 1000px;
 }

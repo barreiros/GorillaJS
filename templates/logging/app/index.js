@@ -5,7 +5,7 @@ var app = express();
 var server = require('http').createServer(app);  
 var io = require('socket.io')(server);
 var chokidar = require('chokidar');
-var Tail = require('tail').Tail;
+var Tail = require('always-tail2');
 var logsPath = '/root/logs';
 var watcher;
 var client;
@@ -80,14 +80,13 @@ io.on('connection', function(new_client) {
 
                 if (!err) {
 
-                    console.log('Hola, Bar', data);
                     client.emit('new_line', data);
 
                 }
 
             });
 
-            tail = new Tail(logsPath + '/' + currentProject + '/' + container);
+            tail = new Tail(logsPath + '/' + currentProject + '/' + container, '\n');
 
             tail.on('line', function(line){
                 
@@ -95,6 +94,8 @@ io.on('connection', function(new_client) {
                 client.emit('new_line', line);
                 
             });
+
+            tail.watch();
 
         }
 
@@ -133,12 +134,3 @@ function getDirectories(srcpath) {
     });
 
 }
-
-
-// Creo un watcher para detectar los cambios en las carpeta. Siempre que haya alguno, envío un evento con toda la estructura para refrescar el select del front-end.
-
-// Creo un listener para recibir el valor seleccionado por el usuario en el select.
-
-// Creo un listener para recibir la tab del contenedor que haya seleccionado el usuario. Cuando el front-end recibe por primera vez un nuevo proyecto y crea las tabs, me envía este evento con la tab por devecto.
-
-// Creo un watcher para detectar los cambios del archivo/proyecto que haya seleccionado el usuario desde el front-end. Antes de hacer esto tengo que comprobar si hay algún watcher en funcionamiento para eliminarlo, o si el actual es del mismo archivo.

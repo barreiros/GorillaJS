@@ -38,7 +38,16 @@ var Main = function(){
 
     socket.on('new_line', function(line){
 
-        $('#output').append(line);
+        if(line.indexOf('\n') === -1){
+
+            $('#output').append(line.replace(/[\r\n]/g, '<br />'));
+            $('#output').append('<br />');
+
+        }else{
+
+            $('#output').append(line.replace(/[\r\n]/g, '<br />'));
+
+        }
 
     });
 
