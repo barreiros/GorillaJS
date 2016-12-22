@@ -1,7 +1,21 @@
 .container{
     width: 100%;
     text-align: center;
-    padding: 30px 20px;
+    padding: 0 20px;
+}
+
+#autoscroll{
+    display: block;
+    width: 200px;
+    margin: 27px auto;
+}
+
+.fixed-head{
+    position: fixed;
+    width: 100%;
+    background-color: rgba(255,255,255,0.9);
+    top: 0;
+    padding: 20px 0;
 }
 
 #output{
@@ -10,4 +24,5 @@
     text-align: left;
     margin: 20px auto;
     max-width: 1000px;
+    padding: 134px 0 0;
 }

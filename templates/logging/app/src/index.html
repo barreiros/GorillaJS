@@ -17,36 +17,47 @@
 
     <div class="container">
 
-        <div id="projects" class="ui labeled icon top left pointing dropdown button red">
+        <div class="fixed-head">
 
-            <i class="star icon"></i>
-            <span class="text">Select project</span>
-            <div class="menu">
+            <div id="projects" class="ui labeled icon top left pointing dropdown button red">
 
-                <div class="ui search icon input">
-                    <i class="search icon"></i>
-                    <input type="text" name="search" placeholder="Search projects...">
+                <i class="star icon"></i>
+                <span class="text">Select project</span>
+                <div class="menu">
+
+                    <div class="ui search icon input">
+                        <i class="search icon"></i>
+                        <input type="text" name="search" placeholder="Search projects...">
+                    </div>
+                    <div class="divider"></div>
+
                 </div>
-                <div class="divider"></div>
+
+            </div>
+        
+            <div id="containers" class="ui labeled icon top left pointing dropdown button teal">
+
+                <i class="ship icon"></i>
+                <span class="text">Select container</span>
+                <div class="menu">
+
+                    <div class="ui search icon input">
+                        <i class="search icon"></i>
+                        <input type="text" name="search" placeholder="Search containers...">
+                    </div>
+                    <div class="divider"></div>
+
+                </div>
 
             </div>
 
-        </div>
-    
-        <div id="containers" class="ui labeled icon top left pointing dropdown button teal">
+            <div id="autoscroll" class="ui slider checkbox">
 
-            <i class="ship icon"></i>
-            <span class="text">Select container</span>
-            <div class="menu">
-
-                <div class="ui search icon input">
-                    <i class="search icon"></i>
-                    <input type="text" name="search" placeholder="Search containers...">
-                </div>
-                <div class="divider"></div>
+                <input type="checkbox" name="autoscroll">
+                <label>Activate autoscroll</label>
 
             </div>
-
+        
         </div>
 
         <div id="output"></div>

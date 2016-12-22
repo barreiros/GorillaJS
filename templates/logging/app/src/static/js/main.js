@@ -2,10 +2,6 @@ var Main = function(){
     
     var socket = io.connect('http://localhost:3001');
 
-    socket.on('connect', function(data) {
-
-    });
-
     socket.on('projects_list', function(projects){
 
         if(projects.length){
@@ -49,6 +45,14 @@ var Main = function(){
 
         }
 
+        if($('#autoscroll').checkbox('is checked')){
+
+            $('html, body').animate({ 
+                scrollTop: $(document).height() 
+            }, 200);
+
+        }
+
     });
 
     $('#projects').dropdown({
@@ -56,6 +60,17 @@ var Main = function(){
         onChange: function(value, text, $choice){
 
             socket.emit('change_project', value);
+
+        }
+
+    });
+
+    $('#autoscroll').checkbox('check');
+    $('#autoscroll').checkbox({
+
+        onChange: function(){
+
+            console.log('Hey, Bar');
 
         }
 
