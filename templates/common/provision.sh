@@ -11,9 +11,9 @@ sudo apt-get update
 sudo apt-get install lxc-docker -y
 
 # Install docker-compose.
-sudo sh -c "curl -L https://github.com/docker/compose/releases/download/1.5.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose"
+sudo sh -c "curl -L https://github.com/docker/compose/releases/download/1.9.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose"
 sudo chmod +x /usr/local/bin/docker-compose
-sudo sh -c "curl -L https://raw.githubusercontent.com/docker/compose/1.5.2/contrib/completion/bash/docker-compose > /etc/bash_completion.d/docker-compose"
+sudo sh -c "curl -L https://raw.githubusercontent.com/docker/compose/1.9.0/contrib/completion/bash/docker-compose > /etc/bash_completion.d/docker-compose"
 
 # Create the {{database.username}} folder needded for store Docker and Gorilla's files.
 sudo mkdir -p /var/{{database.username}}
