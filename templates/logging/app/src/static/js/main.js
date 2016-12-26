@@ -1,6 +1,6 @@
 var Main = function(){
     
-    var socket = io.connect('http://localhost:3001');
+    var socket = io.connect('/:3001');
 
     socket.on('projects_list', function(projects){
 
