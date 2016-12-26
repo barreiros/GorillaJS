@@ -1,6 +1,6 @@
 var Main = function(){
     
-    var socket = io.connect('/:3001');
+    var socket = io.connect(window.location.hostname + ':3001');
 
     socket.on('projects_list', function(projects){
 
@@ -69,8 +69,6 @@ var Main = function(){
     $('#autoscroll').checkbox({
 
         onChange: function(){
-
-            console.log('Hey, Bar');
 
         }
 
