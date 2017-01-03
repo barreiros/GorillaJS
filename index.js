@@ -47,6 +47,7 @@ var commonPath = paths.join(projectPath, gorillaFolder, 'common');
 var workingPath = projectPath;
 var templatesPath = paths.join(gorillaPath, 'templates');
 var composeFile = 'docker-compose.yml';
+var varnishName = 'varnish';
 var proxyName = 'gorillajs';
 var proxyHost = 'localhost';
 var proxyPort = 80;
@@ -231,6 +232,8 @@ function init(){
         [tools.setEnvVariables, paths.join(homeUserPath, proxyName, 'template', '*')],
         [tools.setEnvVariables, paths.join(homeUserPath, proxyName, 'template-logs', '*')],
         [tools.setEnvVariables, paths.join(projectPath, gorillaFolder, gorillaTemplateFolder, '*')],
+        [tools.setVarnish, [paths.join(workingPath, gorillaFolder), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), templatesPath, paths.join(homeUserPath, proxyName), varnishName, '{{domain}}']],
+        [tools.setEnvVariables],
 
         [m_docker.ip, '{{machine-name}}', 'ip'],
 

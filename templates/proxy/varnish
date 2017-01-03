@@ -1,0 +1,20 @@
+vcl 4.0;
+
+# Varnish needs at least one backend. If you remove the one below, make sure to have another project with backend.
+backend {{project.slug}} {
+
+    .host = "{{project.domain}}";
+
+}
+
+sub vcl_recv {
+
+   if (req.http.host == "{{project.domain}}") {
+
+        set req.backend_hint = {{project.slug}};
+
+        # You should filter all subroutines by the domain name to avoid global configurations.
+        
+   }
+
+}
