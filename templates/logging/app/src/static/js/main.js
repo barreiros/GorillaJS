@@ -47,7 +47,7 @@ var Main = function(){
 
         if($('#autoscroll').checkbox('is checked')){
 
-            $('html, body').animate({ 
+            $('html, body').stop().animate({ 
                 scrollTop: $(document).height() 
             }, 200);
 
