@@ -137,7 +137,7 @@ function checkUserInput(){
         promisesPack.push(
             [tools.printLogo],
             [tools.config, env],
-            [tools.createBaseEnvironment, [projectPath, templatesPath, gorillaPath, gorillaFile, gorillaFolder, messagesFile]],
+            [tools.createBaseEnvironment, [projectPath, templatesPath, gorillaPath, paths.join(homeUserPath, proxyName), gorillaFile, gorillaFolder, messagesFile]],
             [events.publish, ['INIT_PLUGINS', paths.join(projectPath, gorillaFolder, gorillaFile)], true]
         );
 

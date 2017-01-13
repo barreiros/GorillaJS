@@ -1,7 +1,7 @@
 {
     "questions": {
         "project": {
-            "domain": "Tell me your project url (without http:// and without www)",
+            "domain": "Your project url (without http:// and without www)",
             "srcout": "What is your public folder?"
         },
         "system": {

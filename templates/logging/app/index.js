@@ -1,6 +1,7 @@
 var path = require('path');
 var fs = require('fs');
 var express = require('express');
+var basic = require('express-authentication-basic');
 var app = express();
 var server = require('http').createServer(app);  
 var io = require('socket.io')(server);
@@ -10,10 +11,29 @@ var logsPath = '/root/logs';
 var watcher;
 var client;
 var currentProject;
+var userCredentials = JSON.parse(fs.readFileSync(__dirname + '/.password'));
+
+app.use(basic(function(challenge, callback) {
+
+    if (challenge.username === 'logs' && challenge.password === userCredentials.password) {
+
+        callback(null, true, { user: 'logs' });
+
+    } else {
+
+        callback(null, false, { error: 'INVALID_PASSWORD' });
+
+    }
+
+}));
 
 app.get('/', function(req, res){
 
-    res.sendFile(__dirname + '/src/index.html');
+    if (req.authenticated) {
+        res.sendFile(__dirname + '/src/index.html');
+    } else {
+        res.status(401).send();
+    }
 
 });
 app.use("/static", express.static(__dirname + '/src/static'));
