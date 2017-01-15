@@ -1,0 +1,16 @@
+vcl 4.0;
+
+sub vcl_backend_error {
+    synthetic( {"<!DOCTYPE html>
+            <html>
+            <head>
+            <title></title>
+            <meta http-equiv="refresh" content="0">
+            </head>
+            <body>
+            </body>
+            </html>
+            "} );
+    return (deliver);
+}
+
