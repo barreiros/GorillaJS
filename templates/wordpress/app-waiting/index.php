@@ -6,12 +6,20 @@
     </head>
     <body>
         
-        <p align="center">
-          <img src="http://s23.postimg.org/ka5fnkw23/logo_mini.jpg" alt="GorillaJS logo"/>
-        </p>
+        <div class="gorilla">
 
-        <div id="init" clas="message">Hello! Starting Wordpress configuration</div>
+            <div class="logo">
+              <img src="/static/img/logo_head.png" alt="GorillaJS logo"/>
+            </div>
 
+            <div id="init" class="message">Hello!</div>
+            <div id="downloading" class="message">Downloading the latest Wordpress official version</div>
+            <div id="database" class="message">Checking database</div>
+            <div id="end" class="message">Wordpress is ready!</div>
+
+        </div>
+
+        <script type="text/javascript" src="/static/js/jquery-3.1.1.slim.min.js"></script>
         <script type="text/javascript" src="/static/js/sketch.min.js"></script>
         <script type="text/javascript" src="/static/js/particles.js"></script>
         <script type="text/javascript" src="/static/js/main.js"></script>

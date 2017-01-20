@@ -33,16 +33,26 @@ function checkServer(){
 
 function callback() {
 
-    if(xhr.responseText === 'init'){
 
-    }else if(xhr.responseText === 'downloading'){
+    var text = xhr.responseText.toString().trim();
 
-    }else if(xhr.responseText === 'ssl'){
-
-    }else if(xhr.responseText === 'database'){
-
+    if(text === 'init'){
+        $('.message').hide();
+        $('#init').show();
+    }else if(text === 'downloading'){
+        $('.message').hide();
+        $('#downloading').show();
+    }else if(text === 'ssl'){
+        $('.message').hide();
+        $('#ssl').show();
+    }else if(text === 'database'){
+        $('.message').hide();
+        $('#database').show();
+    }else if(text === 'end'){
+        $('.message').hide();
+        $('#end').show();
     }else{
-
+        $('.message').hide();
     }
 
 }
