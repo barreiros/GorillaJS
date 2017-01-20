@@ -257,11 +257,13 @@ function init(){
 
             [promises.cond, '{{proxyport}}::80', [
 
-                [host.open, ['{{protocol}}://{{domain}}', 3000, 'Your project is ready!']]
+                [host.check, ['{{protocol}}://{{domain}}']],
+                [host.open, ['{{protocol}}://{{domain}}', 0, 'Your project is ready!']]
 
             ], [
 
-                [host.open, ['{{protocol}}://{{domain}}:{{proxyport}}', 3000, 'Your project is ready!']]
+                [host.check, ['{{protocol}}://{{domain}}']],
+                [host.open, ['{{protocol}}://{{domain}}:{{proxyport}}', 0, 'Your project is ready!']]
 
             ]]
 

@@ -5,7 +5,7 @@
     "email": "hola@davidbarreiros.es",
     "url": "davidbarreiros.es"
   },
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "GorillaJS is a Docker tool-based that helps you to kickstart new projects. It get save time making easier repeated task such as database creation, clone repositories or install applications.",
   "keywords": [
     "Docker",
@@ -18,7 +18,7 @@
     "type": "git",
     "url": "https://github.com/barreiros/GorillaJS"
   },
-  "license": "MIT License",
+  "license": "MIT",
   "preferGlobal": true,
   "bin": {
     "gorilla": "index.js"
@@ -53,6 +53,7 @@
     "openurl": "^1.1.1",
     "path": "^0.12.7",
     "readline-sync": "^1.2.21",
+    "request": "^2.79.0",
     "run-sequence": "^1.1.4",
     "split": "^1.0.0",
     "ssh2": "^0.4.13",
