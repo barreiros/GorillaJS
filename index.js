@@ -34,6 +34,7 @@ var cross = require(__dirname + '/lib/crossExec.js');
 var promises = require(__dirname + '/lib/promises.js');
 
 var pluginWordpress = require(__dirname + '/plugins/wordpress.js');
+var pluginDjango = require(__dirname + '/plugins/django.js');
 
 var gorillaPath = __dirname;
 var gorillaFolder = '.gorilla';
