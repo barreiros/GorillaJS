@@ -1,0 +1,8 @@
+mysql:
+  image: gorillajs/mysql
+  expose: 
+    - 3306
+  volumes:
+    - ../{{docker.templatefolder}}:/root/templates
+    - ../../{{project.datafolder}}:/var/lib/mysql
+  container_name: {{project.domain}}_mysql

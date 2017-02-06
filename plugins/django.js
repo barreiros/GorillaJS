@@ -2,14 +2,18 @@
 
 var argv = require('minimist')(process.argv.slice(2));
 var fs = require('fs');
+var fsx = require('fs-extra');
 var path = require('path');
 
 var events = require(__dirname + '/../lib/pubsub.js');
 var cross = require(__dirname + '/../lib/crossExec.js');
+var tools = require(__dirname + '/../lib/tools.js');
+var promises = require(__dirname + '/../lib/promises.js');
 var pty = require('pty.js');
 var stdin = process.openStdin();
 
 events.subscribe('INIT_PLUGINS', init);
+events.subscribe('MODIFY_COMPOSE_BY_django_PLUGIN', modifyComposeFile);
 
 function init(gorillaFile){
 
@@ -23,9 +27,10 @@ function init(gorillaFile){
 
             if(argv._[0] === 'django'){
 
+                argTail = process.argv.slice(4).join(' ');
+
                 if(argv._[1] === 'manage'){
 
-                    argTail = process.argv.slice(4).join(' ');
                     manageDjango(data.local, argTail);
 
                 }
@@ -39,6 +44,44 @@ function init(gorillaFile){
         events.publish('ERROR', ['030']);
 
     }
+
+}
+
+function modifyComposeFile(gorillaFile, templatePath){
+
+    var settings, folder, promisesPack;
+
+    settings = JSON.parse(fs.readFileSync(gorillaFile));
+
+    promisesPack = [
+
+        [tools.param, ['django', 'database', ['SQLite', 'PostgreSQL', 'MySQL']], 'engine'],
+        [configureEngine, [templatePath, '{{engine}}']]
+
+    ];
+    promises.sandwich(promisesPack);
+
+}
+
+function configureEngine(templatePath, engine){
+
+    var data;
+
+    if(engine === 'PostgreSQL'){
+
+        data = fs.readFileSync(templatePath + '/docker-compose-postgresql.yml');
+        fsx.removeSync(templatePath + '/mysql-init.conf');
+
+    }else if(engine === 'MySQL'){
+
+        data = fs.readFileSync(templatePath + '/docker-compose-mysql.yml');
+        fsx.removeSync(templatePath + '/postgresql-init.conf');
+
+    }
+
+    fs.appendFileSync(templatePath + '/docker-compose.yml', data);
+
+    events.publish('PROMISEME');
 
 }
 

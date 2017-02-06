@@ -230,6 +230,8 @@ function init(){
         [cross.moveFiles, [paths.join(homeUserPath, proxyName, 'template'), false, ['.DS_Store'], paths.join(templatesPath, 'proxy')]],
         [cross.moveFiles, [paths.join(homeUserPath, proxyName, 'template-logs'), false, ['.DS_Store'], paths.join(templatesPath, 'logging')]],
 
+        [events.publish, ['MODIFY_COMPOSE_BY_{{template}}_PLUGIN', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
+
         [tools.setEnvVariables, paths.join(homeUserPath, proxyName, 'template', '*')],
         [tools.setEnvVariables, paths.join(homeUserPath, proxyName, 'template-logs', '*')],
         [tools.setEnvVariables, paths.join(projectPath, gorillaFolder, gorillaTemplateFolder, '*')],
