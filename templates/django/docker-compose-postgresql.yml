@@ -1,8 +1,8 @@
-mysql:
-  image: gorillajs/mysql
+postgresql:
+  image: gorillajs/postgresql
   expose: 
-    - 3306
+    - 5432
   volumes:
     - ../{{docker.templatefolder}}:/root/templates
-    - ../../{{project.datafolder}}:/var/lib/mysql
-  container_name: {{project.domain}}_mysql
+    - ../../{{project.datafolder}}:/var/lib/postgresql/data
+  container_name: {{project.domain}}_postgresql

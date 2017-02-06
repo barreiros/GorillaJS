@@ -3,7 +3,7 @@
 
 FROM ubuntu:14.04
 
-RUN apt-get update && apt-get -y install postgresql postgresql-contrib supervisor && apt-get autoremove
+RUN apt-get update && apt-get -y install postgresql-9.3 postgresql-contrib-9.3 supervisor && apt-get autoremove
 
 COPY templates/common/postgresql-supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
