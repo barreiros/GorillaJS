@@ -1,0 +1,12 @@
+# START GORILLAJS DATABASE CONFIGURATION
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': '{{database.dbname}}',
+        'USER': '{{database.username}}',
+        'PASSWORD': '{{database.password}}',
+        'HOST': 'postgres', 
+        'PORT': '',
+    }
+}
+# END GORILLAJS DATABASE CONFIGURATION
