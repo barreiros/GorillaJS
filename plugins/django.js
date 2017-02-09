@@ -4,6 +4,7 @@ var argv = require('minimist')(process.argv.slice(2));
 var fs = require('fs');
 var fsx = require('fs-extra');
 var path = require('path');
+var yaml = require('yamljs');
 
 var events = require(__dirname + '/../lib/pubsub.js');
 var cross = require(__dirname + '/../lib/crossExec.js');
@@ -13,7 +14,8 @@ var pty = require('pty.js');
 var stdin = process.openStdin();
 
 events.subscribe('INIT_PLUGINS', init);
-events.subscribe('MODIFY_COMPOSE_BY_django_PLUGIN', modifyComposeFile);
+events.subscribe('MODIFY_BEFORE_SET_VARIABLES_django_PLUGIN', modifyComposeFileBefore);
+events.subscribe('MODIFY_AFTER_SET_VARIABLES_django_PLUGIN', modifyComposeFileAfter);
 
 function init(gorillaFile){
 
@@ -47,7 +49,7 @@ function init(gorillaFile){
 
 }
 
-function modifyComposeFile(gorillaFile, templatePath){
+function modifyComposeFileBefore(gorillaFile, templatePath){
 
     var settings, folder, promisesPack;
 
@@ -60,6 +62,37 @@ function modifyComposeFile(gorillaFile, templatePath){
 
     ];
     promises.sandwich(promisesPack);
+
+}
+
+function modifyComposeFileAfter(gorillaFile, templatePath){
+
+    var settings, links, composeFile;
+
+    links = [];
+    settings = JSON.parse(fs.readFileSync(gorillaFile));
+    composeFile = templatePath + '/docker-compose.yml';
+
+    if(settings.local.django.database === 'PostgreSQL'){
+
+        links.push('postgresql:postgresql');
+
+    }else if(settings.local.django.database === 'MySQL'){
+
+        links.push('mysql:mysql');
+
+    }
+
+    if(links.length){
+
+        yaml.load(composeFile, function(file){
+
+            file.web['links'] = links;
+            fs.writeFileSync(composeFile, yaml.stringify(file, 6));
+
+        });
+
+    }
 
 }
 

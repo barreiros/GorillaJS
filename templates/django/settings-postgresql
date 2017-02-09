@@ -5,7 +5,7 @@ DATABASES = {
         'NAME': '{{database.dbname}}',
         'USER': '{{database.username}}',
         'PASSWORD': '{{database.password}}',
-        'HOST': 'postgres', 
+        'HOST': 'postgresql', 
         'PORT': '',
     }
 }
