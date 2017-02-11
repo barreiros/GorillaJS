@@ -232,6 +232,7 @@ function init(){
 
         [events.publish, ['MODIFY_BEFORE_SET_VARIABLES_{{template}}_PLUGIN', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
 
+        [host.createSSHKeys, paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)],
         [tools.setEnvVariables, paths.join(homeUserPath, proxyName, 'template', '*')],
         [tools.setEnvVariables, paths.join(homeUserPath, proxyName, 'template-logs', '*')],
         [tools.setEnvVariables, paths.join(projectPath, gorillaFolder, gorillaTemplateFolder, '*')],
