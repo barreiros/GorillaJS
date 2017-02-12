@@ -1,11 +1,26 @@
 {
     "default": {
         "project": {
+            "srcin": "src",
             "srcout": "application",
+            "datafolder": "application-db",
             "domain": "gorilla.local"
         },
         "system": {
             "hostsfile": "/etc/hosts"
+        },
+        "apache": {
+            "adminemail": "test@yourdomain.com"
+        },
+        "docker": {
+            "machinename": "default",
+            "template": "wordpress",
+            "gorillafolder": ".gorilla"
+        },
+        "database": {
+            "username": "gorilla",
+            "password": "",
+            "dbname": "gorilladb"
         }
     }
 }

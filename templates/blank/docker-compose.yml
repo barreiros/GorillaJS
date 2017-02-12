@@ -1,7 +1,11 @@
-web:
-  image: gorillajs/apache-base
-  volumes:
-    - ../{{docker.templatefolder}}:/root/templates
-    - ../../{{project.srcout}}:/var/www/{{project.domain}}/{{project.srcout}}
-  container_name: {{project.domain}}
+version: '3'
+
+services:
+
+  web:
+    image: gorillajs/apache-base
+    volumes:
+      - ../{{docker.templatefolder}}:/root/templates
+      - ../../{{project.srcout}}:/var/www/{{project.domain}}/{{project.srcout}}
+    container_name: {{project.domain}}
 

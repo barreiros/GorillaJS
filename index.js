@@ -33,8 +33,9 @@ var host = require(__dirname + '/lib/host.js');
 var cross = require(__dirname + '/lib/crossExec.js');
 var promises = require(__dirname + '/lib/promises.js');
 
-var pluginWordpress = require(__dirname + '/plugins/wordpress.js');
+var pluginBlank = require(__dirname + '/plugins/blank.js');
 var pluginDjango = require(__dirname + '/plugins/django.js');
+var pluginWordpress = require(__dirname + '/plugins/wordpress.js');
 
 var gorillaPath = __dirname;
 var gorillaFolder = '.gorilla';
@@ -57,7 +58,7 @@ var logsName = 'logging';
 var logsPort = 3001;
 var env = argv.e ? argv.e : 'local';
 var verbose = argv.d ? argv.d : false;
-var templateOptions = ['blank', 'blank+database', 'django', 'nodejs', 'wordpress', 'other'];
+var templateOptions = ['blank', 'django', 'nodejs', 'wordpress', 'other'];
 
 events.subscribe('ERROR', showError);
 events.subscribe('VERBOSE', showVerbose);
@@ -268,12 +269,12 @@ function init(){
             [promises.cond, '{{proxyport}}::80', [
 
                 [host.check, ['{{protocol}}://{{domain}}']],
-                [host.open, ['{{protocol}}://{{domain}}', 0, 'Your project is ready!']]
+                [host.open, ['{{protocol}}://{{domain}}', 'Your project is ready!']]
 
             ], [
 
                 [host.check, ['{{protocol}}://{{domain}}']],
-                [host.open, ['{{protocol}}://{{domain}}:{{proxyport}}', 0, 'Your project is ready!']]
+                [host.open, ['{{protocol}}://{{domain}}:{{proxyport}}', 'Your project is ready!']]
 
             ]]
 

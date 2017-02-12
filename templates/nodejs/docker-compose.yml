@@ -1,7 +1,11 @@
-nodejs:
-  image: gorillajs/nodejs-base
-  volumes:
-    - ../{{docker.templatefolder}}:/root/templates
-    - ../../.:/var/www/{{project.domain}}/
-  container_name: {{project.domain}}
+version: '3'
+
+services: 
+
+  nodejs:
+    image: gorillajs/nodejs-base
+    volumes:
+      - ../{{docker.templatefolder}}:/root/templates
+      - ../../.:/var/www/{{project.domain}}/
+    container_name: {{project.domain}}
 
