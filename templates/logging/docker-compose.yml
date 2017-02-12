@@ -1,11 +1,15 @@
-logging:
-  image: gorillajs/nodejs-base
-  ports:  
-    - "{{logs.port}}:80"
-  volumes:
-    - {{proxy.userpath}}/template-logs:/root/templates
-    - {{proxy.userpath}}/logs:/root/logs
-    - {{proxy.userpath}}/template-logs/app:/var/www/gorillajslogging/app 
-    - {{proxy.userpath}}/template-logs/logs:/var/www/gorillajslogging/logs
-  container_name: gorillajslogging
+version: '3'
+
+services:
+
+  logging:
+    image: gorillajs/nodejs-base
+    ports:  
+      - "{{logs.port}}:80"
+    volumes:
+      - {{proxy.userpath}}/template-logs:/root/templates
+      - {{proxy.userpath}}/logs:/root/logs
+      - {{proxy.userpath}}/template-logs/app:/var/www/gorillajslogging/app 
+      - {{proxy.userpath}}/template-logs/logs:/var/www/gorillajslogging/logs
+    container_name: gorillajslogging
 

@@ -33,7 +33,9 @@
         "031" : "No file specified",
         "032" : "Unable to work with the database",
         "033" : "Unable to check your public project ip",
-        "034" : "Something is wrong with Django"
+        "034" : "Something is wrong with Django",
+        "035" : "Unable to create a network",
+        "036" : "Unable to connect the container to the network"
     },
 
     "warnings": {

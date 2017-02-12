@@ -1,8 +1,12 @@
-postgresql:
-  image: gorillajs/postgresql
-  expose: 
-    - 5432
-  volumes:
-    - ../{{docker.templatefolder}}:/root/templates
-    - ../../{{project.datafolder}}:/var/lib/postgresql_{{project.slug}}
-  container_name: {{project.domain}}_postgresql
+version: '3'
+
+services:
+
+  postgresql:
+    image: gorillajs/postgresql
+    expose: 
+      - 5432
+    volumes:
+      - ../{{docker.templatefolder}}:/root/templates
+      - ../../{{project.datafolder}}:/var/lib/postgresql_{{project.slug}}
+    container_name: {{project.domain}}_postgresql

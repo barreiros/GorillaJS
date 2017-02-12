@@ -67,52 +67,62 @@ function modifyComposeFileBefore(gorillaFile, templatePath){
 
 function modifyComposeFileAfter(gorillaFile, templatePath){
 
-    var settings, links, composeFile;
-
-    links = [];
-    settings = JSON.parse(fs.readFileSync(gorillaFile));
-    composeFile = templatePath + '/docker-compose.yml';
-
-    if(settings.local.django.database === 'PostgreSQL'){
-
-        links.push('postgresql:postgresql');
-
-    }else if(settings.local.django.database === 'MySQL'){
-
-        links.push('mysql:mysql');
-
-    }
-
-    if(links.length){
-
-        yaml.load(composeFile, function(file){
-
-            file.web['links'] = links;
-            fs.writeFileSync(composeFile, yaml.stringify(file, 6));
-
-        });
-
-    }
+    appendEngine(gorillaFile, templatePath);
 
 }
 
 function configureEngine(templatePath, engine){
 
-    var data;
-
     if(engine === 'PostgreSQL'){
 
-        data = fs.readFileSync(templatePath + '/docker-compose-postgresql.yml');
         fsx.removeSync(templatePath + '/mysql-init.conf');
 
     }else if(engine === 'MySQL'){
 
-        data = fs.readFileSync(templatePath + '/docker-compose-mysql.yml');
         fsx.removeSync(templatePath + '/postgresql-init.conf');
 
     }
 
-    fs.appendFileSync(templatePath + '/docker-compose.yml', data);
+    events.publish('PROMISEME');
+
+}
+
+function appendEngine(gorillaFile, templatePath){
+
+    var settings, links, composeFile, engineFile;
+
+    settings = JSON.parse(fs.readFileSync(gorillaFile));
+    composeFile = templatePath + '/docker-compose.yml';
+
+    if(settings.local.django.database === 'PostgreSQL'){
+
+        engineFile = templatePath + '/docker-compose-postgresql.yml';
+        yaml.load(engineFile, function(fileEngine){
+
+            yaml.load(composeFile, function(fileWeb){
+
+                fileWeb.services['postgresql'] = fileEngine.services.postgresql;
+                fs.writeFileSync(composeFile, yaml.stringify(fileWeb, 6));
+
+            });
+
+        });
+
+    }else if(settings.local.django.database === 'MySQL'){
+
+        engineFile = templatePath + '/docker-compose-mysql.yml';
+        yaml.load(engineFile, function(fileEngine){
+
+            yaml.load(composeFile, function(fileWeb){
+
+                fileWeb.services['mysql'] = fileEngine.services.mysql;
+                fs.writeFileSync(composeFile, yaml.stringify(fileWeb, 6));
+
+            });
+
+        });
+
+    }
 
     events.publish('PROMISEME');
 
