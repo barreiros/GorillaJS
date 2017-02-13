@@ -12,8 +12,6 @@ services:
 
   web:
     image: gorillajs/apache-base
-    ports:  
-      - "{{docker.port}}:80"
     volumes:
       - ../{{docker.templatefolder}}:/root/templates
       - ../../{{project.srcout}}:/var/www/{{project.domain}}/{{project.srcout}}
