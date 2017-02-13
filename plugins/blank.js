@@ -35,7 +35,7 @@ function modifyComposeFileBefore(gorillaFile, templatePath){
 
     promisesPack = [
 
-        [tools.param, ['database', 'engine', ['No, thanks!', 'MySQL', 'PostgresSQL']], 'engine'],
+        [tools.param, ['database', 'engine', ['No, thanks!', 'MySQL', 'PostgreSQL', 'MongoDB']], 'engine'],
         [configureEngine, [templatePath, '{{engine}}']]
 
     ];
@@ -58,7 +58,26 @@ function configureEngine(templatePath, engine){
         fsx.removeSync(templatePath + '/docker-compose-mysql.yml');
         fsx.removeSync(templatePath + '/apache-checkdb.php');
 
+        fsx.removeSync(templatePath + '/mongo-init.conf');
+        fsx.removeSync(templatePath + '/mongo-service');
+        fsx.removeSync(templatePath + '/mongod.conf');
+
     }else if(engine === 'MySQL'){
+
+        fsx.removeSync(templatePath + '/postgresql-init.conf');
+        fsx.removeSync(templatePath + '/postgresql.conf');
+        fsx.removeSync(templatePath + '/docker-compose-postgresql.yml');
+
+        fsx.removeSync(templatePath + '/mongo-init.conf');
+        fsx.removeSync(templatePath + '/mongo-service');
+        fsx.removeSync(templatePath + '/mongod.conf');
+
+    }else if(engine === 'MongoDB'){
+
+        fsx.removeSync(templatePath + '/mysql-init.conf');
+        fsx.removeSync(templatePath + '/mysql-debian.cnf');
+        fsx.removeSync(templatePath + '/docker-compose-mysql.yml');
+        fsx.removeSync(templatePath + '/apache-checkdb.php');
 
         fsx.removeSync(templatePath + '/postgresql-init.conf');
         fsx.removeSync(templatePath + '/postgresql.conf');
@@ -74,6 +93,10 @@ function configureEngine(templatePath, engine){
         fsx.removeSync(templatePath + '/postgresql-init.conf');
         fsx.removeSync(templatePath + '/postgresql.conf');
         fsx.removeSync(templatePath + '/docker-compose-postgresql.yml');
+
+        fsx.removeSync(templatePath + '/mongo-init.conf');
+        fsx.removeSync(templatePath + '/mongo-service');
+        fsx.removeSync(templatePath + '/mongod.conf');
 
     }
 
@@ -110,6 +133,20 @@ function appendEngine(gorillaFile, templatePath){
             yaml.load(composeFile, function(fileWeb){
 
                 fileWeb.services['mysql'] = fileEngine.services.mysql;
+                fs.writeFileSync(composeFile, yaml.stringify(fileWeb, 6));
+
+            });
+
+        });
+
+    }else if(settings.local.database.engine === 'MongoDB'){
+
+        engineFile = templatePath + '/docker-compose-mongo.yml';
+        yaml.load(engineFile, function(fileEngine){
+
+            yaml.load(composeFile, function(fileWeb){
+
+                fileWeb.services['mongo'] = fileEngine.services.mongo;
                 fs.writeFileSync(composeFile, yaml.stringify(fileWeb, 6));
 
             });

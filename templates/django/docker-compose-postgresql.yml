@@ -9,4 +9,3 @@ services:
     volumes:
       - ../{{docker.templatefolder}}:/root/templates
       - ../../{{project.datafolder}}:/var/lib/postgresql_{{project.slug}}
-    container_name: {{project.domain}}_postgresql
