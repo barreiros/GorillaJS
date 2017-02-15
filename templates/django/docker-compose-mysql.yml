@@ -1,7 +1,11 @@
-mysql:
-  image: gorillajs/mysql
-  expose: 
-    - 3306
-  volumes:
-    - ../{{docker.templatefolder}}:/root/templates
-    - ../../{{project.datafolder}}:/var/lib/mysql
+version: '3'
+
+services:
+
+  mysql:
+    image: gorillajs/mysql
+    expose: 
+      - 3306
+    volumes:
+      - ../{{docker.templatefolder}}:/root/templates
+      - ../../{{project.datafolder}}:/var/lib/mysql

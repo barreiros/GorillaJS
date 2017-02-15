@@ -1,0 +1,12 @@
+# START GORILLAJS DATABASE CONFIGURATION
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': '{{database.dbname}}',
+        'USER': '{{database.username}}',
+        'PASSWORD': '{{database.password}}',
+        'HOST': 'mysql', 
+        'PORT': '',
+    }
+}
+# END GORILLAJS DATABASE CONFIGURATION
