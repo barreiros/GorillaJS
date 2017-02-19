@@ -3,7 +3,8 @@
         "database": {
             "dbname": "The data base name. Just letters and numbers, no special characters",
             "username": "The data base user name",
-            "password": "The data base password."
+            "password": "The data base password.",
+            "engine": "Select your favourite database engine form below"
         },
         "docker": {
             "template": "Select your favorite Docker template"
@@ -18,6 +19,12 @@
         },
         "system": {
             "hostsfile": "Tell me the absolute path of your host file, pleeeeeeease"
+        },
+        "cache": {
+            "engine": "Do you want to use some caching system?"
+        },
+        "messages": {
+            "engine": "Do you want to use RabbitMQ (with Pika)?"
         }
     }
 }
