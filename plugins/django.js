@@ -98,14 +98,19 @@ function configureCache(templatePath, engine){
 
     if(engine === 'Redis'){
 
+        fsx.removeSync(templatePath + '/settings-memcached');
+
     }else if(engine === 'Memcached'){
 
         fsx.removeSync(templatePath + '/redis.conf');
+        fsx.removeSync(templatePath + '/settings-redis');
         fsx.removeSync(templatePath + '/docker-compose-redis.yml');
 
     }else{
 
         fsx.removeSync(templatePath + '/redis.conf');
+        fsx.removeSync(templatePath + '/settings-redis');
+        fsx.removeSync(templatePath + '/settings-memcached');
         fsx.removeSync(templatePath + '/docker-compose-redis.yml');
 
     }
