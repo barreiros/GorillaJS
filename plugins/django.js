@@ -28,7 +28,6 @@ function init(gorillaFile){
 
             if(data.local.docker.template === 'django'){
 
-
                 if(argv._[0] === 'django'){
 
                     argTail = process.argv.slice(4).join(' ');

@@ -33,6 +33,7 @@ var host = require(__dirname + '/lib/host.js');
 var cross = require(__dirname + '/lib/crossExec.js');
 var promises = require(__dirname + '/lib/promises.js');
 
+var pluginProxy = require(__dirname + '/plugins/proxy.js');
 var pluginBlank = require(__dirname + '/plugins/blank.js');
 var pluginDjango = require(__dirname + '/plugins/django.js');
 var pluginWordpress = require(__dirname + '/plugins/wordpress.js');
@@ -49,7 +50,6 @@ var commonPath = paths.join(projectPath, gorillaFolder, 'common');
 var workingPath = projectPath;
 var templatesPath = paths.join(gorillaPath, 'templates');
 var composeFile = 'docker-compose.yml';
-var varnishName = 'varnish';
 var proxyName = 'gorillajs';
 var proxyHost = 'localhost';
 var proxyPort = 80;
@@ -232,13 +232,12 @@ function init(){
         [cross.moveFiles, [paths.join(homeUserPath, proxyName, 'template-logs'), false, ['.DS_Store'], paths.join(templatesPath, 'logging')]],
 
         [events.publish, ['MODIFY_BEFORE_SET_VARIABLES_{{template}}_PLUGIN', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
+        [events.publish, ['CONFIGURE_PROXY', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(workingPath, gorillaFolder), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), paths.join(templatesPath, 'proxy'), paths.join(homeUserPath, proxyName)]], true],
 
         [host.createSSHKeys, paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)],
         [tools.setEnvVariables, paths.join(homeUserPath, proxyName, 'template', '*')],
         [tools.setEnvVariables, paths.join(homeUserPath, proxyName, 'template-logs', '*')],
         [tools.setEnvVariables, paths.join(projectPath, gorillaFolder, gorillaTemplateFolder, '*')],
-        [tools.setVarnish, [paths.join(workingPath, gorillaFolder), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), templatesPath, paths.join(homeUserPath, proxyName), varnishName, '{{domain}}']],
-        [tools.setEnvVariables],
 
         [events.publish, ['MODIFY_AFTER_SET_VARIABLES_{{template}}_PLUGIN', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
 

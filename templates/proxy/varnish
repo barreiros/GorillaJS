@@ -4,7 +4,7 @@ sub vcl_recv {
 
    if (req.http.host == "{{project.domain}}" || req.http.host == "www.{{project.domain}}") {
 
-        return (pass);
+        return (pipe);
 
         # You should filter all subroutines by the domain name to avoid global configurations.
         
