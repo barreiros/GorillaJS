@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    expose: 
+      - 5672
+    environment:
+      - "RABBITMQ_DEFAULT_USER=gorillajs"
+      - "RABBITMQ_DEFAULT_PASS=guest"
+      - "RABBITMQ_DEFAULT_VHOST=gorillajs_host"
