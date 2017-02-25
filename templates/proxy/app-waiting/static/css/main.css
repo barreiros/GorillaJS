@@ -24,7 +24,6 @@ html, body{
 }
 
 .gorilla .message{
-    display: none;
     color: white;
     font-size: 50px;
     font-family: Arial Black;

@@ -97,6 +97,7 @@ function configureEngine(templatePath, engine){
         fsx.removeSync(templatePath + '/mongo-init.conf');
         fsx.removeSync(templatePath + '/mongo-service');
         fsx.removeSync(templatePath + '/mongod.conf');
+        fsx.removeSync(templatePath + '/docker-compose-mongo.yml');
 
     }
 
