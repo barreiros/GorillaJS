@@ -24,7 +24,7 @@
             "engine": "Do you want to use some caching system?"
         },
         "messages": {
-            "engine": "Do you want to use RabbitMQ (with Pika)?"
+            "engine": "Do you want to use RabbitMQ (with Celery)?"
         }
     }
 }
