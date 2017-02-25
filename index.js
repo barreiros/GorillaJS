@@ -58,7 +58,7 @@ var logsName = 'logging';
 var logsPort = 3001;
 var env = argv.e ? argv.e : 'local';
 var verbose = argv.d ? argv.d : false;
-var templateOptions = ['blank', 'django', 'nodejs', 'wordpress', 'other'];
+var templateOptions = ['blank', 'django', 'nodejs', 'opencart', 'wordpress', 'other'];
 
 events.subscribe('ERROR', showError);
 events.subscribe('VERBOSE', showVerbose);
