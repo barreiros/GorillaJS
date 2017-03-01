@@ -113,6 +113,8 @@ function dbReplace(data, file){
 
     if(data.hasOwnProperty('project') && data.hasOwnProperty('database')){
 
+        console.log('docker exec -i ' + data.project.domain + '_mysql mysql -u' + data.database.username + ' -p' + data.database.password + ' -e "CREATE DATABASE ' + data.database.dbname + '"');
+        console.log('docker exec -i ' + data.project.domain + '_mysql mysql --force -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' < "' + file + '"');
 
         cross.exec('docker exec -i ' + data.project.domain + '_mysql mysql -u' + data.database.username + ' -p' + data.database.password + ' -e "DROP DATABASE ' + data.database.dbname + '"', function(err, stdout, stderr){
 

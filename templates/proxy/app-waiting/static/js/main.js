@@ -1,5 +1,7 @@
-var xhrServer, xhrMessages, messagesInterval, serverInterval, isStatus;
+var xhrServer, xhrMessages, messagesInterval, serverInterval, isStatus, serverOkTimes;
 
+serverTimes = 0;
+messagesTimes = 0;
 
 function checkServer(){
 
@@ -21,22 +23,31 @@ function checkServer(){
 
     if(checkIt){
 
-        xhrServer = $.ajax({url: '/',
+        xhrServer = $.ajax({url: '/?cache=' + (Math.random() * 10),
             type: 'HEAD',
-            statusCode: {
-                200: function (response) {
+            success: function(data, code, xhr){
+                
+                if(xhr.status === 200 || xhr.status === 302){
 
-                    if(!isStatus){
+                    if(!isStatus && messagesTimes > 0){
 
-                        clearInterval(serverInterval);
-                        clearInterval(messagesInterval);
+                        serverTimes += 1;
 
-                        window.open('/', '_top');
+                        if(serverTimes > 1){
+                            
+                            clearInterval(serverInterval);
+                            clearInterval(messagesInterval);
+
+                            window.open('/', '_top');
+
+                        }
 
                     }
 
                 }
+
             }
+
         });
 
     }
@@ -63,27 +74,23 @@ function checkMessages(){
 
     if(checkIt){
 
-        xhrMessages = $.ajax({url: '/gorilla_status.txt',
+        xhrMessages = $.ajax({url: '/gorilla_status.txt?cache=' + (Math.random() * 10),
             type: 'GET',
             timeout: 5000,
-            statusCode: {
-                200: function(response){
+            success: function(data, code, xhr){
 
-                    $('#message').text(response.toString().trim());
-                    isStatus = true;
+                messagesTimes += 1;
+                $('#message').text(data.toString().trim());
+                isStatus = true;
 
-                },
-                400: function(response){
+            },
+            error: function(error){
 
-                    isStatus = false;
+                messagesTimes += 1;
+                isStatus = false;
 
-                },
-                0: function(response){
-
-                    isStatus = false;
-
-                }
             }
+
         });
 
     }
@@ -94,7 +101,7 @@ messagesInterval = setInterval(function(){
 
     checkMessages();
 
-}, 1000);
+}, 3000);
 
 serverInterval = setInterval(function(){
 

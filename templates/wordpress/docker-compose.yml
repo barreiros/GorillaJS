@@ -9,6 +9,7 @@ services:
     volumes:
       - ../{{docker.templatefolder}}:/root/templates
       - ../../{{project.datafolder}}:/var/lib/mysql
+    container_name: {{project.domain}}_mysql
 
   web:
     image: gorillajs/apache-base
