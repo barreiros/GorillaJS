@@ -3,6 +3,8 @@ var xhrServer, xhrMessages, messagesInterval, serverInterval, isStatus, serverOk
 serverTimes = 0;
 messagesTimes = 0;
 
+history.pushState({}, null, "/");
+
 function checkServer(){
 
     var checkIt;
@@ -107,6 +109,6 @@ serverInterval = setInterval(function(){
 
     checkServer();
 
-}, 1000);
+}, 2000);
 
 // checkServer();
