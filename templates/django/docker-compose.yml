@@ -12,3 +12,8 @@ services:
       - ../../packages:/usr/local/lib/python2.7/dist-packages
     container_name: {{project.domain}}
 
+networks:
+  default:
+    external:
+      name: gorillajs
+

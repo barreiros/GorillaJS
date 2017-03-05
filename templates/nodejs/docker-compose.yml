@@ -9,3 +9,8 @@ services:
       - ../../.:/var/www/{{project.domain}}/
     container_name: {{project.domain}}
 
+networks:
+  default:
+    external:
+      name: gorillajs
+

@@ -13,3 +13,7 @@ services:
       - {{proxy.userpath}}/template-logs/logs:/var/www/gorillajslogging/logs
     container_name: gorillajslogging
 
+networks:
+  default:
+    external:
+      name: gorillajs

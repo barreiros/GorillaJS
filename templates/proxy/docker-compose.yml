@@ -14,3 +14,8 @@ services:
       - {{proxy.userpath}}/letsencrypt:/etc/letsencrypt
       - {{proxy.userpath}}/varnish:/etc/varnish
     container_name: gorillajsproxy
+
+networks:
+  default:
+    external:
+      name: gorillajs

@@ -255,11 +255,7 @@ function init(){
         [m_docker.loggingBase, [paths.join(homeUserPath, proxyName, 'template-logs', composeFile), logsName]],
         [m_docker.logging, [paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{domain}}', paths.join(homeUserPath, proxyName, 'logs'), paths.join(templatesPath, 'logging')]],
         [m_docker.logging, [paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile), proxyName, paths.join(homeUserPath, proxyName, 'logs'), paths.join(templatesPath, 'logging')]],
-
         [m_docker.network],
-        [m_docker.networking, paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile)],
-        [m_docker.networking, paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile)],
-        [m_docker.networking, paths.join(homeUserPath, proxyName, 'template-logs', composeFile)],
 
         [promises.cond, '{{islocal}}::yes', [
 
