@@ -62,7 +62,7 @@ function modifyComposeFileBefore(gorillaFile, templatePath){
 
         [tools.param, ['database', 'engine', ['SQLite', 'PostgreSQL', 'MySQL']], 'engine'],
         [tools.param, ['cache', 'engine', ['No, thanks!', 'Redis', 'Memcached']], 'cache'],
-        [tools.param, ['messages', 'engine', ['yes', 'no']], 'messages'],
+        [tools.param, ['messages', 'engine', ['no', 'yes']], 'messages'],
         [configureEngine, [templatePath, '{{engine}}']],
         [configureCache, [templatePath, '{{cache}}']],
         [configureMessages, templatePath]

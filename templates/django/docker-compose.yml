@@ -10,6 +10,7 @@ services:
       - ../{{docker.templatefolder}}:/root/templates
       - ../../src:/var/www/{{project.domain}}
       - ../../packages:/usr/local/lib/python2.7/dist-packages
+      - ../../logs:/var/log/django
     container_name: {{project.domain}}
 
 networks:
