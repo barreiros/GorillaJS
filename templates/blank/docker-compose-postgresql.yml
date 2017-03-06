@@ -8,4 +8,4 @@ services:
       - 5432
     volumes:
       - ../{{docker.templatefolder}}:/root/templates
-      - ../../{{project.datafolder}}:/var/lib/postgresql_{{project.slug}}
+      - ../../data:/var/lib/postgresql_{{project.slug}}

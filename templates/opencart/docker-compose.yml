@@ -8,7 +8,7 @@ services:
       - 3306
     volumes:
       - ../{{docker.templatefolder}}:/root/templates
-      - ../../{{project.datafolder}}:/var/lib/mysql
+      - ../../data:/var/lib/mysql
 
   web:
     image: gorillajs/apache-base
@@ -16,7 +16,7 @@ services:
       - "{{docker.port}}:80"
     volumes:
       - ../{{docker.templatefolder}}:/root/templates
-      - ../../{{project.srcout}}:/var/www/{{project.domain}}/{{project.srcout}}
+      - ../../src:/var/www/{{project.domain}}/src
     container_name: {{project.domain}}
 
 networks:

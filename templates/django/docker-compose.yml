@@ -8,7 +8,7 @@ services:
       - "{{docker.port}}:80"
     volumes:
       - ../{{docker.templatefolder}}:/root/templates
-      - ../../{{project.srcout}}:/var/www/{{project.domain}}
+      - ../../src:/var/www/{{project.domain}}
       - ../../packages:/usr/local/lib/python2.7/dist-packages
     container_name: {{project.domain}}
 

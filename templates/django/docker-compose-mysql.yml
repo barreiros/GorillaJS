@@ -8,4 +8,4 @@ services:
       - 3306
     volumes:
       - ../{{docker.templatefolder}}:/root/templates
-      - ../../{{project.datafolder}}:/var/lib/mysql
+      - ../../data:/var/lib/mysql

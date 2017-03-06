@@ -6,7 +6,7 @@ services:
     image: gorillajs/apache-base
     volumes:
       - ../{{docker.templatefolder}}:/root/templates
-      - ../../{{project.srcout}}:/var/www/{{project.domain}}/{{project.srcout}}
+      - ../../src:/var/www/{{project.domain}}/src
     container_name: {{project.domain}}
 
 networks:

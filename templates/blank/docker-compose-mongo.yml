@@ -8,4 +8,4 @@ services:
       - 27017
     volumes:
       - ../{{docker.templatefolder}}:/root/templates
-      - ../../{{project.datafolder}}:/data/db
+      - ../../data:/data/db
