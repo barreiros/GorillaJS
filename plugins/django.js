@@ -38,6 +38,20 @@ function init(gorillaFile){
 
                     }
 
+                }else if(argv._[0] === 'pip'){
+
+                    if(argv._[1] === 'save'){
+
+                        saveRequirements(data.local);
+
+                    }else{
+
+                        argTail = process.argv.slice(3).join(' ');
+
+                        managePip(data.local, argTail);
+
+                    }
+
                 }
 
             }
@@ -49,6 +63,87 @@ function init(gorillaFile){
         events.publish('ERROR', ['030']);
 
     }
+
+}
+
+function saveRequirements(data){
+
+    cross.exec('docker exec -i ' + data.project.domain + ' pip freeze > src/requirements.txt', function(err, stdout, stderr){
+
+        if (err) console.log(stderr, err, stdout);
+        events.publish('STEP', ['pip-save']);
+
+    });
+
+}
+
+function managePip(data, args){
+
+    var stdin, term, command;
+
+    command = ['exec', '-it', data.project.domain, 'pip'].concat(args.split(" "));
+    stdin = process.openStdin();
+
+    term = pty.spawn('docker', command, {
+        name: 'xterm-color',
+        cols: 80,
+        rows: 30,
+        cwd: process.env.HOME,
+        env: process.env
+    });
+
+    term.on('data', function(data) {
+
+        process.stdout.write(data);
+
+    });
+
+    term.on('close', function(code) {
+        
+        process.exit();
+        process.stdin.destroy();
+
+    });
+
+    stdin.addListener('data', function(data){
+
+        term.write(data.toString());
+
+    });
+
+}
+
+function manageDjango(data, command){
+
+    var stdin, term;
+
+    stdin = process.openStdin();
+    term = pty.spawn('docker', ['exec', '-it', data.project.domain, './var/www/' + data.project.domain + '/manage.py', command], {
+        name: 'xterm-color',
+        cols: 80,
+        rows: 30,
+        cwd: process.env.HOME,
+        env: process.env
+    });
+
+    term.on('data', function(data) {
+
+        process.stdout.write(data);
+
+    });
+
+    term.on('close', function(code) {
+        
+        process.exit();
+        process.stdin.destroy();
+
+    });
+
+    stdin.addListener('data', function(data){
+
+        term.write(data.toString());
+
+    });
 
 }
 
@@ -247,40 +342,6 @@ function checkMessageEngine(gorillaFile, templatePath){
             events.publish('PROMISEME');
 
         }
-
-    });
-
-}
-
-function manageDjango(data, command){
-
-    var stdin, term;
-
-    stdin = process.openStdin();
-    term = pty.spawn('docker', ['exec', '-it', data.project.domain, './var/www/' + data.project.domain + '/manage.py', command], {
-        name: 'xterm-color',
-        cols: 80,
-        rows: 30,
-        cwd: process.env.HOME,
-        env: process.env
-    });
-
-    term.on('data', function(data) {
-
-        process.stdout.write(data);
-
-    });
-
-    term.on('close', function(code) {
-        
-        process.exit();
-        process.stdin.destroy();
-
-    });
-
-    stdin.addListener('data', function(data){
-
-        term.write(data.toString());
 
     });
 

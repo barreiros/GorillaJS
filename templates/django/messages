@@ -1,5 +1,6 @@
 {
     "questions": {
+
         "database": {
             "dbname": "The data base name. Just letters and numbers, no special characters",
             "username": "The data base user name",
@@ -26,5 +27,7 @@
         "messages": {
             "engine": "Do you want to use RabbitMQ (with Celery)?"
         }
+
     }
+
 }

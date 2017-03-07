@@ -77,7 +77,8 @@
         "hosts-createproxy": "Configuring proxy in your remote server",
         "ssh-connect": "Connecting with your server...",
         "ssh-interactive": "Innitiating interactive shell session...",
-        "ssh-sftp": "Working with remote server..."
+        "ssh-sftp": "Working with remote server...",
+        "pip-save": "Packages saved to src/requirements.txt file"
     },
 
     "questions": {

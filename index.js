@@ -80,11 +80,11 @@ function checkUserInput(){
 
     var promisesPack = [];
 
-    if(argv.hasOwnProperty('v')){
+    if((argv.hasOwnProperty('v') || argv.hasOwnProperty('version')) && argv._.length === 0){
 
         console.log(tools.printVersion());
 
-    }else if(argv.hasOwnProperty('help')){
+    }else if((argv.hasOwnProperty('h') || argv.hasOwnProperty('help')) && argv._.length === 0){
 
         var text;
 
