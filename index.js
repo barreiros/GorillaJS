@@ -45,6 +45,7 @@ var gorillaFile = 'gorillafile';
 var messagesFile = 'messages';
 var projectPath = process.cwd();
 var homeUserPath = (process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library' : '/var/local'));
+var templatesRepo = 'https://github.com/barreiros/GorillaJS-Templates';
 var hostsFile = process.platform === 'win32' ? 'C:\\Windows\\System32\\drivers\\etc\\hosts' : '/etc/hosts';
 var commonPath = paths.join(projectPath, gorillaFolder, 'common');
 var workingPath = projectPath;
@@ -67,13 +68,6 @@ events.subscribe('MESSAGE', tools.showMessage);
 events.subscribe('ANSWER', tools.answer);
 
 checkUserInput();
-
-module.exports = {
-    
-    init: initFromApp,
-    events: events
-
-}
 
 function checkUserInput(){
 
@@ -157,22 +151,6 @@ function checkUserInput(){
 
 }
 
-function initFromApp(path){
-
-    var promisesPack = [];
-
-    promisesPack.push(
-        [tools.printLogo],
-        [tools.config, [env]],
-        [tools.createBaseEnvironment, [projectPath, templatesPath, gorillaPath, gorillaFile, gorillaFolder, messagesFile]],
-        [init]
-    );
-
-    promises.add(promisesPack);
-    promises.start();
-
-}
-
 function init(){
 
     var promisesPack = [];
@@ -183,7 +161,8 @@ function init(){
         [tools.paramForced, ['docker', 'templatefolder', gorillaTemplateFolder]],
         [tools.param, ['docker', 'template', templateOptions], 'template'],
 
-        // Inicio un contenedor para gestionar los repositorios.
+        [m_docker.gorigit, [paths.join(homeUserPath, proxyName)]],
+        [m_docker.templates, ['{{template}}', templatesRepo]],
 
         [tools.checkTemplatePath, [templateOptions, '{{template}}', templatesPath], 'template-path'],
         [cross.moveFiles, [paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store'], '{{template-path}}']],
