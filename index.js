@@ -54,7 +54,6 @@ var proxyName = 'gorillajs';
 var proxyHost = 'localhost';
 var proxyPort = 80;
 var proxySslPort = 443;
-var logsName = 'logging';
 var logsPort = 3001;
 var env = argv.e ? argv.e : 'local';
 var verbose = argv.d ? argv.d : false;
@@ -184,6 +183,7 @@ function init(){
         [tools.paramForced, ['docker', 'templatefolder', gorillaTemplateFolder]],
         [tools.param, ['docker', 'template', templateOptions], 'template'],
 
+        // Inicio un contenedor para gestionar los repositorios.
 
         [tools.checkTemplatePath, [templateOptions, '{{template}}', templatesPath], 'template-path'],
         [cross.moveFiles, [paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store'], '{{template-path}}']],
@@ -229,7 +229,6 @@ function init(){
         [tools.paramForced, ['system', 'hostsfile', hostsFile], 'hosts-file'],
 
         [cross.moveFiles, [paths.join(homeUserPath, proxyName, 'template'), false, ['.DS_Store'], paths.join(templatesPath, 'proxy')]],
-        [cross.moveFiles, [paths.join(homeUserPath, proxyName, 'template-logs'), false, ['.DS_Store'], paths.join(templatesPath, 'logging')]],
 
         [events.publish, ['MODIFY_BEFORE_SET_VARIABLES_{{template}}_PLUGIN', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
         [events.publish, ['CONFIGURE_PROXY', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(workingPath, gorillaFolder), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), paths.join(templatesPath, 'proxy'), paths.join(homeUserPath, proxyName)]], true],
@@ -254,9 +253,8 @@ function init(){
         [m_docker.network],
         [m_docker.start, ['{{machine-name}}', paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}', '{{ssh-enabled}}']],
         [m_docker.base, [paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile), proxyName, '{{proxyport}}']],
-        [m_docker.loggingBase, [paths.join(homeUserPath, proxyName, 'template-logs', composeFile), logsName]],
-        [m_docker.logging, [paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{domain}}', paths.join(homeUserPath, proxyName, 'logs'), paths.join(templatesPath, 'logging')]],
-        [m_docker.logging, [paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile), proxyName, paths.join(homeUserPath, proxyName, 'logs'), paths.join(templatesPath, 'logging')]],
+        [m_docker.logging, [paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{domain}}', paths.join(homeUserPath, proxyName, 'logs'), paths.join(templatesPath, 'proxy')]],
+        [m_docker.logging, [paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile), proxyName, paths.join(homeUserPath, proxyName, 'logs'), paths.join(templatesPath, 'proxy')]],
 
         [promises.cond, '{{islocal}}::yes', [
 
@@ -283,141 +281,9 @@ function init(){
 
 }
 
-function deploy(){
-
-    var promisesPack = [];
-
-    promisesPack.push(
-        [tools.param, ['git', 'branchdevel'], 'branch-devel'],
-        [tools.param, ['git', 'branchdeploy'], 'branch-deploy'],
-        [tools.param, ['project', 'srcin'], 'srcin'],
-
-        [tools.runFileCommands, commonPath + '/' + env + '-before.sh'],
-        [cross.config, projectPath],
-        [git.config, projectPath],
-        [git.initRepo, gorillaFolder],
-        [git.currentBranch, null, 'current-branch'],
-        [git.add, '.'],
-        git.stash
-    );
-
-    if (argv.all) {
-        promisesPack.push(
-            [git.createBranch, ['{{branch-deploy}}', true]],
-            [git.listCommits, ['{{branch-deploy}}', '']],
-            [tools.selectArrayValue, 'last'], // last param autofilled
-            [git.commitDate, '{{branch-deploy}}', 'last-commit-date'], // last param autofilled
-            [git.listFiles, ['{{last-commit-date}}', null, '{{branch-deploy}}'], 'list'],
-            [tools.fusionObjectNodes, ['deleted', null]], // last param autofilled
-            [cross.removeFiles, [workingPath, true, null]], // last param autofilled
-            [tools.fusionObjectNodes, ['added', 'modified', '{{list}}']],
-            [cross.moveFiles, [workingPath, true]] // last param autofilled
-        );
-    }else if (argv.n) {
-        promisesPack.push(
-            // Los archivos eliminados los tengo que recuperar de la rama de desarrollo y contar desde la fecha del último commit de la rama deploy.
-            [git.createBranch, ['{{branch-deploy}}', true]],
-            [git.commitDate, ['{{branch-deploy}}'], 'last-commit-date'],
-            [git.listFiles, ['{{last-commit-date}}', null, '{{branch-devel}}']],
-            [tools.fusionObjectNodes, ['deleted', null]], // last param autofilled
-            [tools.filterPaths, '{{srcin}}', 'list-devel-filtered'], // last param autofilled
-            [cross.removeFiles, [workingPath, true, null, '{{list-devel-filtered}}']],
-            [cross.removeFiles, [projectPath + '/', false, null, '{{list-devel-filtered}}']],
-
-            [git.commit, ['GorillaJS rollback ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
-            [git.clone, ['file://' + projectPath, '{{branch-devel}}', projectPath + '/temp_repo/']],
-            [cross.moveFiles, [projectPath + '/', false, ['.git'], projectPath + '/temp_repo/' + '{{srcin}}']],
-            [tools.removeDir, projectPath + '/temp_repo/'],
-
-            //Los archivos añadidos o modificados los recupero de la rama deploy.
-            [git.add, '.'],
-            [git.commit, ['GorillaJS deploy ' + datef(new Date(), 'yyyy-mm-dd HH:MM:ss'), true]],
-            [git.listFiles, ['{{last-commit-date}}', null, '{{branch-deploy}}']],
-            [tools.fusionObjectNodes, ['added', 'modified']], // last param autofilled
-            [cross.moveFiles, [workingPath, true]] // last param autofilled
-        );
-    }else{
-        promisesPack.push(
-            // Los archivos eliminados, añadido y modificados los recupero del último commit de la rama deploy.
-            [git.createBranch, ['{{branch-deploy}}', true]],
-            [git.commitDate, ['{{branch-deploy}}', null], 'last-commit-date'],
-            [git.listFiles, ['{{last-commit-date}}', null, '{{branch-deploy}}'], 'list'],
-            [tools.fusionObjectNodes, ['deleted', null]], // last param autofilled
-            [cross.removeFiles, [workingPath, true, null]], // last param autofilled
-            [tools.fusionObjectNodes, ['added', 'modified', '{{list}}']],
-            [cross.moveFiles, [workingPath, true]] // last param autofilled
-        );
-    }
-
-    promisesPack.push(
-        [git.createBranch, '{{current-branch}}'],
-        [git.stash, 'pop'],
-        [tools.runFileCommands, commonPath + '/' + env + '-after.sh'],
-        ssh.close
-    );
-
-    promises.add(promisesPack);
-    promises.start();
-}
-
-function rollback(){
-
-    var promisesPack = [];
-
-    promisesPack = [
-        [tools.param, ['git', 'branchdeploy'], 'branch-deploy'],
-
-        [git.config, projectPath],
-        [git.initRepo, gorillaFolder],
-        [git.currentBranch, null, 'current-branch'],
-        [git.add, '.'],
-        git.stash,
-
-        [git.createBranch, '{{branch-deploy}}'],
-        [git.listCommits, ['{{branch-deploy}}', 'rollback'], 'commits'],
-        [tools.param, ['git', 'rollbackdate', '{{commits}}', null, false], 'rollback-point'],
-        [git.commitDate, '{{branch-deploy}}', 'commit-date'], // last param autofilled
-        [git.listFiles, ['{{commit-date}}', datef(new Date(), 'yyyy-mm-dd HH:MM:ss o'), '{{branch-deploy}}', true], 'list'],
-
-        // [Aquí hago un reset --hard al commit inicial para recuperar todos los archivos],
-        [git.reset, ['{{branch-deploy}}', '{{rollback-point}}']],
-        [tools.fusionObjectNodes, ['deleted', 'modified', '{{list}}']],
-        [cross.moveFiles, [workingPath, true]], // last param autofilled
-
-        // Como voy hacia atrás en el tiempo, los archivos eliminados ahora son añadidos y a la inversa.
-        [tools.fusionObjectNodes, ['added', null, '{{list}}'], 'list-deleted'],
-        [cross.removeFiles, [workingPath, true, null, '{{list-deleted}}']],
-        [cross.removeFiles, [projectPath + '/', false, null, '{{list-deleted}}']],
-
-        [git.listCommits, ['{{branch-deploy}}', 'deploy']],
-        [tools.selectArrayValue, 0], // last param autofilled
-        [git.reset, '{{branch-deploy}}'], // last param autofilled
-
-        [git.createBranch, '{{current-branch}}'],
-        [git.stash, 'pop'],
-        ssh.close
-    ];
-
-    promises.add(promisesPack);
-    promises.start();
-}
-
 function exit(text){
     console.log(text);
     events.publish('PROMISEME');
-}
-
-function provision(){
-    
-    var promisesPack;
-
-    promisesPack.push(
-        [tools.provision, [projectPath + '/' + gorillaFolder + '/remote-provision.sh']],
-        // ssh.interactive,
-        [ssh.close]
-    );
-    promises.add(promisesPack);
-    promises.start();
 }
 
 function showVerbose(systemMessage, force){
