@@ -27,7 +27,7 @@
         "025" : "Last rollback point. Is not possible rollback again.",
         "026" : "Unable to check current branch.",
         "027" : "Problems to complete your file commands",
-        "028" : "Unable to start base proxy. Check if your base port (default, 80) is used by others. i.e. Apache. (+info: gorillajs.com/getting-started/)",
+        "028" : "Unable to start base proxy. +info: gorillajs.com/getting-started",
         "029" : "Unable to start logging server.",
         "030" : "Please, init the project.",
         "031" : "No file specified",
@@ -35,7 +35,10 @@
         "033" : "Unable to check your public project ip",
         "034" : "Something is wrong with Django",
         "035" : "Unable to create a network",
-        "036" : "Unable to connect the container to the network"
+        "036" : "Unable to connect the container to the network",
+        "037" : "Is Docker installed and running?. +info: https://gorillajs.com/install-gorillajs",
+        "038" : "Is docker-compose installed?. +info: https://gorillajs.com/install-gorillajs",
+        "039" : "Port already in use. Please, release it or select another one"
     },
 
     "warnings": {
@@ -70,7 +73,7 @@
         "tools-setvariables" : "Setting Docker variables...",
         "tools-provision": "Provisioning the machine...",
         "tools-filecommands": "Running your file commands...",
-        "docker-checkplatform" : "Configuring your docker machine...",
+        "docker-check" : "Checking environment...",
         "docker-start" : "Starting Docker...",
         "tools-createtemplate" : "Checking for gorillafile template...",
         "hosts-adddomain": "Adding your new domain to hosts file (maybe you must enter your root password)",

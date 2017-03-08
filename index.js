@@ -241,6 +241,7 @@ function init(){
 
         [events.publish, ['MODIFY_AFTER_SET_VARIABLES_{{template}}_PLUGIN', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
 
+        [m_docker.check, '{{port}}'],
         [m_docker.ip, '{{machine-name}}', 'ip'],
 
         [promises.cond, '{{old-domain}}!:""', [
@@ -252,7 +253,7 @@ function init(){
 
         [m_docker.network],
         [m_docker.start, ['{{machine-name}}', paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}', '{{ssh-enabled}}']],
-        [m_docker.base, [paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile), proxyName]],
+        [m_docker.base, [paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile), proxyName, '{{proxyport}}']],
         [m_docker.loggingBase, [paths.join(homeUserPath, proxyName, 'template-logs', composeFile), logsName]],
         [m_docker.logging, [paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{domain}}', paths.join(homeUserPath, proxyName, 'logs'), paths.join(templatesPath, 'logging')]],
         [m_docker.logging, [paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile), proxyName, paths.join(homeUserPath, proxyName, 'logs'), paths.join(templatesPath, 'logging')]],
@@ -426,31 +427,17 @@ function showVerbose(systemMessage, force){
 }
 
 function showError(number){
+
     tools.showError(number);
     tools.showStep('gorilla-cleaner');
+
     events.unsubscribe('VERBOSE', showVerbose);
     events.unsubscribe('WARNING', tools.showWarning);
     events.unsubscribe('STEP', tools.showStep);
     events.unsubscribe('MESSAGE', tools.showMessage);
-    cleanBeforeForceExit();
-}
 
-function cleanBeforeForceExit(){
+    process.exit();
 
-    var promisesPack = [];
-
-    if(argv._[0] === 'rollback' || argv._[0] === 'deploy'){
-        promisesPack.push(
-            [git.config, projectPath],
-            [git.initRepo, gorillaFolder],
-            [git.createBranch, '{{current-branch}}'],
-            [git.stash, 'pop']
-        );
-    }
-
-    promises.add(promisesPack);
-    promises.add(process.exit);
-    promises.start();
 }
 
 function setWorkingPath(path){
