@@ -4,3 +4,6 @@
 [submodule "templates/django"]
 	path = templates/django
 	url = https://github.com/barreiros/GorillaJS-Django
+[submodule "templates/proxy"]
+	path = templates/proxy
+	url = https://github.com/barreiros/GorillaJS-Proxy

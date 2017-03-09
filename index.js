@@ -48,7 +48,6 @@ var homeUserPath = (process.env.APPDATA || (process.platform == 'darwin' ? proce
 var hostsFile = process.platform === 'win32' ? 'C:\\Windows\\System32\\drivers\\etc\\hosts' : '/etc/hosts';
 var commonPath = paths.join(projectPath, gorillaFolder, 'common');
 var workingPath = projectPath;
-var templatesPath = paths.join(gorillaPath, 'templates');
 var composeFile = 'docker-compose.yml';
 var proxyName = 'gorillajs';
 var proxyHost = 'localhost';
@@ -60,6 +59,7 @@ var verbose = argv.d ? argv.d : false;
 var templateOptions = ['Blank', 'Django', 'NodeJS', 'Opencart', 'Wordpress', 'External repository', 'Local folder'];
 var templateRepos = {
     'django': 'https://github.com/barreiros/GorillaJS-Django.git',
+    'proxy': 'https://github.com/barreiros/GorillaJS-Proxy',
     'wordpress': 'https://github.com/barreiros/GorillaJS-Wordpress'
 };
 
@@ -135,7 +135,7 @@ function checkUserInput(){
         promisesPack.push(
             [tools.printLogo],
             [tools.config, env],
-            [tools.createBaseEnvironment, [projectPath, templatesPath, gorillaPath, paths.join(homeUserPath, proxyName), gorillaFile, gorillaFolder, messagesFile]],
+            [tools.createBaseEnvironment, [projectPath, paths.join(homeUserPath, proxyName, 'templates'), gorillaPath, paths.join(homeUserPath, proxyName), gorillaFile, gorillaFolder, messagesFile]],
             [events.publish, ['INIT_PLUGINS', paths.join(projectPath, gorillaFolder, gorillaFile)], true]
         );
 
@@ -175,6 +175,7 @@ function init(){
 
             ], [
 
+                [tools.sanitize, ['{{template-type}}', ''], 'template-type'],
                 [tools.selectObjectValue, [templateRepos, '{{template-type}}'], 'template']
             
             ]],
@@ -188,19 +189,21 @@ function init(){
         [tools.paramForced, ['docker', 'template', '{{template}}']],
 
         [m_docker.check],
+        [m_docker.config],
+        [m_docker.gorigit, [paths.join(homeUserPath, proxyName, 'templates')]],
+        [m_docker.templates, [templateRepos.proxy, '/var/gorillajs/templates/gorillajs-proxy']],
 
         [promises.cond, '{{template-type}}::Local folder', [
 
-            [cross.moveFiles, ['{{template-path}}', false, ['.DS_Store'], '{{template}}']]
+            [cross.moveFiles, ['{{template-path}}', false, ['.DS_Store', '.git'], '{{template}}']]
 
         ], [
 
-            [m_docker.gorigit, [paths.join(homeUserPath, proxyName)]],
             [m_docker.templates, ['{{template}}', '/var/gorillajs/templates/{{template-slug}}']]
 
         ]],
 
-        [cross.moveFiles, [paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project'], '{{template-path}}']],
+        [cross.moveFiles, [paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], '{{template-path}}']],
         [tools.createTemplateEnvironment, [projectPath, gorillaFolder, gorillaFile, messagesFile, gorillaTemplateFolder]],
 
         [tools.param, ['docker', 'port'], 'port'],
@@ -232,8 +235,6 @@ function init(){
 
         ]],
 
-        [m_docker.config],
-
         [tools.paramForced, ['proxy', 'userpath', homeUserPath + '/' +  proxyName]],
         [tools.paramForced, ['proxy', 'port', proxyPort], 'proxyport'],
         [tools.paramForced, ['proxy', 'sslport', proxySslPort], 'proxysslport'],
@@ -241,17 +242,16 @@ function init(){
         [tools.paramForced, ['logs', 'port', logsPort], 'logsPort'],
         [tools.paramForced, ['system', 'hostsfile', hostsFile], 'hosts-file'],
 
-        [cross.moveFiles, [paths.join(homeUserPath, proxyName, 'template'), false, ['.DS_Store'], paths.join(templatesPath, 'proxy')]],
+        [cross.moveFiles, [paths.join(homeUserPath, proxyName, 'proxy'), false, ['.DS_Store', '.git'], paths.join(homeUserPath, proxyName, 'templates', 'gorillajs-proxy')]],
 
-        [events.publish, ['MODIFY_BEFORE_SET_VARIABLES_{{template}}_PLUGIN', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
-        [events.publish, ['CONFIGURE_PROXY', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(workingPath, gorillaFolder), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), paths.join(templatesPath, 'proxy'), paths.join(homeUserPath, proxyName)]], true],
+        [events.publish, ['MODIFY_BEFORE_SET_VARIABLES_{{template-type}}_PLUGIN', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
+        [events.publish, ['CONFIGURE_PROXY', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(workingPath, gorillaFolder), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), paths.join(homeUserPath, proxyName, 'templates', 'proxy'), paths.join(homeUserPath, proxyName)]], true],
 
         [host.createSSHKeys, paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)],
-        [tools.setEnvVariables, paths.join(homeUserPath, proxyName, 'template', '*')],
-        [tools.setEnvVariables, paths.join(homeUserPath, proxyName, 'template-logs', '*')],
+        [tools.setEnvVariables, paths.join(homeUserPath, proxyName, 'proxy', '*')],
         [tools.setEnvVariables, paths.join(projectPath, gorillaFolder, gorillaTemplateFolder, '*')],
 
-        [events.publish, ['MODIFY_AFTER_SET_VARIABLES_{{template}}_PLUGIN', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
+        [events.publish, ['MODIFY_AFTER_SET_VARIABLES_{{template-type}}_PLUGIN', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
 
         [m_docker.ip, '{{machine-name}}', 'ip'],
 
@@ -264,9 +264,9 @@ function init(){
 
         [m_docker.network],
         [m_docker.start, ['{{machine-name}}', paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}', '{{ssh-enabled}}']],
-        [m_docker.base, [paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile), proxyName, '{{proxyport}}']],
-        [m_docker.logging, [paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{domain}}', paths.join(homeUserPath, proxyName, 'logs'), paths.join(templatesPath, 'proxy')]],
-        [m_docker.logging, [paths.join(homeUserPath, proxyName, gorillaTemplateFolder, composeFile), proxyName, paths.join(homeUserPath, proxyName, 'logs'), paths.join(templatesPath, 'proxy')]],
+        [m_docker.base, [paths.join(homeUserPath, proxyName, 'proxy', composeFile), proxyName, '{{proxyport}}']],
+        [m_docker.logging, [paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{domain}}', paths.join(homeUserPath, proxyName, 'logs'), paths.join(homeUserPath, proxyName, 'templates', 'proxy')]],
+        [m_docker.logging, [paths.join(homeUserPath, proxyName, 'proxy', composeFile), proxyName, paths.join(homeUserPath, proxyName, 'logs'), paths.join(homeUserPath, proxyName, 'templates', 'proxy')]],
 
         [promises.cond, '{{islocal}}::yes', [
 
