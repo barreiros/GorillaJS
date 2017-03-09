@@ -1,0 +1,6 @@
+[submodule "templates/wordpress"]
+	path = templates/wordpress
+	url = https://github.com/barreiros/GorillaJS-Wordpress
+[submodule "templates/django"]
+	path = templates/django
+	url = https://github.com/barreiros/GorillaJS-Django

@@ -45,7 +45,6 @@ var gorillaFile = 'gorillafile';
 var messagesFile = 'messages';
 var projectPath = process.cwd();
 var homeUserPath = (process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library' : '/var/local'));
-var templatesRepo = 'https://github.com/barreiros/GorillaJS-Templates';
 var hostsFile = process.platform === 'win32' ? 'C:\\Windows\\System32\\drivers\\etc\\hosts' : '/etc/hosts';
 var commonPath = paths.join(projectPath, gorillaFolder, 'common');
 var workingPath = projectPath;
@@ -58,7 +57,11 @@ var proxySslPort = 443;
 var logsPort = 3001;
 var env = argv.e ? argv.e : 'local';
 var verbose = argv.d ? argv.d : false;
-var templateOptions = ['blank', 'django', 'nodejs', 'opencart', 'wordpress', 'other'];
+var templateOptions = ['Blank', 'Django', 'NodeJS', 'Opencart', 'Wordpress', 'External repository', 'Local folder'];
+var templateRepos = {
+    'django': 'https://github.com/barreiros/GorillaJS-Django.git',
+    'wordpress': 'https://github.com/barreiros/GorillaJS-Wordpress'
+};
 
 events.subscribe('ERROR', showError);
 events.subscribe('VERBOSE', showVerbose);
@@ -158,20 +161,51 @@ function init(){
     promisesPack = [
 
         [tools.paramForced, ['docker', 'gorillafolder', gorillaFolder]],
-        [tools.paramForced, ['docker', 'templatefolder', gorillaTemplateFolder]],
-        [tools.param, ['docker', 'template', templateOptions], 'template'],
+        [tools.param, ['docker', 'template-type', templateOptions], 'template-type'],
 
-        [m_docker.gorigit, [paths.join(homeUserPath, proxyName)]],
-        [m_docker.templates, ['{{template}}', templatesRepo]],
+        [promises.cond, '{{template-type}}::Local folder', [
+        
+            [tools.param, ['docker', 'template-folder'], 'template']
 
-        [tools.checkTemplatePath, [templateOptions, '{{template}}', templatesPath], 'template-path'],
-        [cross.moveFiles, [paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store'], '{{template-path}}']],
+        ], [
+        
+            [promises.cond, '{{template-type}}::External repository', [
+
+                [tools.param, ['docker', 'template-repository'], 'template']
+
+            ], [
+
+                [tools.selectObjectValue, [templateRepos, '{{template-type}}'], 'template']
+            
+            ]],
+
+        ]],
+
+        [tools.basename, ['{{template}}'], 'template-basename'],
+        [tools.sanitize, ['{{template-basename}}', '-'], 'template-slug'],
+        [tools.paramForced, ['docker', 'template-path', paths.join(homeUserPath, proxyName, 'templates', '{{template-slug}}')], 'template-path'],
+        [tools.paramForced, ['docker', 'template-slug', '{{template-slug}}']],
+        [tools.paramForced, ['docker', 'template', '{{template}}']],
+
+        [m_docker.check],
+
+        [promises.cond, '{{template-type}}::Local folder', [
+
+            [cross.moveFiles, ['{{template-path}}', false, ['.DS_Store'], '{{template}}']]
+
+        ], [
+
+            [m_docker.gorigit, [paths.join(homeUserPath, proxyName)]],
+            [m_docker.templates, ['{{template}}', '/var/gorillajs/templates/{{template-slug}}']]
+
+        ]],
+
+        [cross.moveFiles, [paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project'], '{{template-path}}']],
         [tools.createTemplateEnvironment, [projectPath, gorillaFolder, gorillaFile, messagesFile, gorillaTemplateFolder]],
+
         [tools.param, ['docker', 'port'], 'port'],
-
-
         [tools.param, ['project', 'domain'], 'domain'],
-        [tools.sanitize, '{{domain}}', 'slug'],
+        [tools.sanitize, ['{{domain}}', ''], 'slug'],
         [tools.isLocalProject, '{{domain}}', 'islocal'],
         [tools.paramForced, ['project', 'islocal', '{{islocal}}']],
         [tools.paramForced, ['project', 'slug', '{{slug}}']],
@@ -219,12 +253,11 @@ function init(){
 
         [events.publish, ['MODIFY_AFTER_SET_VARIABLES_{{template}}_PLUGIN', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
 
-        [m_docker.check, '{{port}}'],
         [m_docker.ip, '{{machine-name}}', 'ip'],
 
         [promises.cond, '{{old-domain}}!:""', [
 
-            [tools.sanitize, '{{old-domain}}', 'old-slug'],
+            [tools.sanitize, ['{{old-domain}}', ''], 'old-slug'],
             [m_docker.removeSite, [paths.join(homeUserPath, proxyName, ''), '{{old-domain}}', '{{old-slug}}']]
 
         ]],
