@@ -1,9 +1,12 @@
 [submodule "templates/wordpress"]
 	path = templates/wordpress
 	url = https://github.com/barreiros/GorillaJS-Wordpress
+    branch = master
 [submodule "templates/django"]
 	path = templates/django
 	url = https://github.com/barreiros/GorillaJS-Django
+    branch = master
 [submodule "templates/proxy"]
 	path = templates/proxy
 	url = https://github.com/barreiros/GorillaJS-Proxy
+    branch = master

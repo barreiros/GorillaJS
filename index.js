@@ -213,7 +213,7 @@ function init(){
         [tools.paramForced, ['project', 'islocal', '{{islocal}}']],
         [tools.paramForced, ['project', 'slug', '{{slug}}']],
 
-        [tools.param, ['project', 'sslenable', ['yes', 'no']], 'sslenable'],
+        [tools.param, ['project', 'sslenable', ['no', 'yes']], 'sslenable'],
 
         [promises.cond, '{{sslenable}}::yes', [
 
@@ -245,7 +245,7 @@ function init(){
         [cross.moveFiles, [paths.join(homeUserPath, proxyName, 'proxy'), false, ['.DS_Store', '.git'], paths.join(homeUserPath, proxyName, 'templates', 'gorillajs-proxy')]],
 
         [events.publish, ['MODIFY_BEFORE_SET_VARIABLES_{{template-type}}_PLUGIN', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
-        [events.publish, ['CONFIGURE_PROXY', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(workingPath, gorillaFolder), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), paths.join(homeUserPath, proxyName, 'templates', 'proxy'), paths.join(homeUserPath, proxyName)]], true],
+        [events.publish, ['CONFIGURE_PROXY', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(workingPath, gorillaFolder), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), paths.join(homeUserPath, proxyName, 'templates', 'gorillajs-proxy'), paths.join(homeUserPath, proxyName)]], true],
 
         [host.createSSHKeys, paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)],
         [tools.setEnvVariables, paths.join(homeUserPath, proxyName, 'proxy', '*')],
