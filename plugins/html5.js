@@ -12,8 +12,8 @@ var tools = require(__dirname + '/../lib/tools.js');
 var promises = require(__dirname + '/../lib/promises.js');
 
 events.subscribe('INIT_PLUGINS', init);
-events.subscribe('MODIFY_BEFORE_SET_VARIABLES_blank_PLUGIN', modifyComposeFileBefore);
-events.subscribe('MODIFY_AFTER_SET_VARIABLES_blank_PLUGIN', modifyComposeFileAfter);
+events.subscribe('MODIFY_BEFORE_SET_VARIABLES_html5_PLUGIN', modifyComposeFileBefore);
+events.subscribe('MODIFY_AFTER_SET_VARIABLES_html5_PLUGIN', modifyComposeFileAfter);
 
 function init(gorillaFile){
 

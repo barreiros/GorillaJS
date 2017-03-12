@@ -26,7 +26,7 @@ function init(gorillaFile){
 
         if(data.local.hasOwnProperty('docker')){
 
-            if(data.local.docker.template === 'django'){
+            if(data.local.docker.template_type === 'Django'){
 
                 if(argv._[0] === 'django'){
 
