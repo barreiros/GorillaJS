@@ -175,12 +175,28 @@ function configureEngine(templatePath, engine){
         fsx.removeSync(templatePath + '/mysql-init.conf');
         fsx.removeSync(templatePath + '/mysql-debian.cnf');
         fsx.removeSync(templatePath + '/docker-compose-mysql.yml');
+        fsx.removeSync(templatePath + '/settings-mysql');
+        fsx.removeSync(templatePath + '/settings-sqlite');
 
     }else if(engine === 'MySQL'){
 
         fsx.removeSync(templatePath + '/postgresql-init.conf');
         fsx.removeSync(templatePath + '/postgresql.conf');
         fsx.removeSync(templatePath + '/docker-compose-postgresql.yml');
+        fsx.removeSync(templatePath + '/settings-postgresql');
+        fsx.removeSync(templatePath + '/settings-sqlite');
+
+    }else{
+
+        fsx.removeSync(templatePath + '/mysql-init.conf');
+        fsx.removeSync(templatePath + '/mysql-debian.cnf');
+        fsx.removeSync(templatePath + '/docker-compose-mysql.yml');
+        fsx.removeSync(templatePath + '/settings-postgresql');
+        
+        fsx.removeSync(templatePath + '/postgresql-init.conf');
+        fsx.removeSync(templatePath + '/postgresql.conf');
+        fsx.removeSync(templatePath + '/docker-compose-postgresql.yml');
+        fsx.removeSync(templatePath + '/settings-mysql');
 
     }
 
@@ -218,6 +234,7 @@ function configureMessages(templatePath, response){
     if(response === 'no'){
 
         fsx.removeSync(templatePath + '/docker-compose-rabbitmq.yml');
+        fsx.removeSync(templatePath + '/settings-rabbitmq');
 
     }
 
