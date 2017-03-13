@@ -71,7 +71,6 @@ function saveRequirements(data){
     cross.exec('docker exec -i ' + data.project.domain + ' pip freeze > src/requirements.txt', function(err, stdout, stderr){
 
         if (err) console.log(stderr, err, stdout);
-        events.publish('STEP', ['pip-save']);
 
     });
 
@@ -158,7 +157,9 @@ function modifyComposeFileBefore(gorillaFile, templatePath){
         [tools.param, ['database', 'engine', ['SQLite', 'PostgreSQL', 'MySQL']], 'engine'],
         [tools.param, ['cache', 'engine', ['No, thanks!', 'Redis', 'Memcached']], 'cache'],
         [tools.param, ['messages', 'engine', ['no', 'yes']], 'messages'],
+        [events.publish, ['STEP', ['django_database_config']]],
         [configureEngine, [templatePath, '{{engine}}']],
+        [events.publish, ['STEP', ['django_cache_config']]],
         [configureCache, [templatePath, '{{cache}}']],
         [configureMessages, templatePath]
 

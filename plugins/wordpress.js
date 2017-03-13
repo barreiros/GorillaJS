@@ -93,11 +93,14 @@ function dbImport(data, file){
 
     if(data.hasOwnProperty('project') && data.hasOwnProperty('database')){
 
+        events.publish('STEP', ['wordpress_database_import']);
 
         cross.exec('docker exec -i ' + data.project.domain + '_mysql mysql --force -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' < "' + file + '"', function(err, stdout, stderr){
 
             events.publish('VERBOSE', [stderr + err + stdout]);
             if (err) events.publish('ERROR', ['032']);
+
+            events.publish('STEP', ['wordpress_finish']);
 
         });
 
@@ -122,6 +125,8 @@ function dbReplace(data, file){
 
             }else{
 
+                events.publish('STEP', ['wordpress_database_replace']);
+
                 cross.exec('docker exec -i ' + data.project.domain + '_mysql mysql -u' + data.database.username + ' -p' + data.database.password + ' -e "CREATE DATABASE ' + data.database.dbname + '"', function(err, stdout, stderr){
 
                     if (err) {
@@ -135,6 +140,8 @@ function dbReplace(data, file){
 
                             events.publish('VERBOSE', [stderr + err + stdout]);
                             if (err) events.publish('ERROR', ['032']);
+
+                            events.publish('STEP', ['wordpress_finish']);
 
                         });
 
@@ -164,10 +171,14 @@ function dbExport(data, destiny){
 
         }
 
+        events.publish('STEP', ['wordpress_database_export']);
+
         cross.exec('docker exec -i ' + data.project.domain + '_mysql mysqldump -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' > ' + destiny, function(err, stdout, stderr){
 
             events.publish('VERBOSE', [stderr + err + stdout]);
             if (err) events.publish('ERROR', ['032']);
+
+            events.publish('STEP', ['wordpress_finish']);
 
         });
 

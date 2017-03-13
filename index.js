@@ -51,9 +51,6 @@ var workingPath = projectPath;
 var composeFile = 'docker-compose.yml';
 var proxyName = 'gorillajs';
 var proxyHost = 'localhost';
-var proxyPort = 80;
-var proxySslPort = 443;
-var logsPort = 3001;
 var env = argv.e ? argv.e : 'local';
 var verbose = argv.d ? argv.d : false;
 var templateOptions = ['Django', 'HTML5', 'NodeJS', 'Opencart', 'Wordpress', 'External repository', 'Local folder'];
@@ -79,82 +76,92 @@ function checkUserInput(){
 
     var promisesPack = [];
 
-    if((argv.hasOwnProperty('v') || argv.hasOwnProperty('version')) && argv._.length === 0){
+    if(projectPath === gorillaPath){
 
-        console.log(tools.printVersion());
-
-    }else if((argv.hasOwnProperty('h') || argv.hasOwnProperty('help')) && argv._.length === 0){
-
-        var text;
-
-        text = '';
-        text += 'Usage:';
-        text += '\n';
-        text += '\tgorilla init [parameters](optional)\n';
-        text += '\n';
-        text += 'Parameters:';
-        text += '\n';
-        text += '\t-d Enable debug / verbose mode';
-        text += '\n';
-        text += '\t-f Force to recreate the project (This action don\'t remove your current project files)';
-        text += '\n';
-        text += '\t-p Select a custom port for the GorillaJS proxy. By default it use 80. If this port is used by other application i.e Apache, GorillaJS will return error.';
-        text += '\n';
-        text += '\t-v Get the GorillaJS version';
-        text += '\n';
-
-        console.log(text);
+        events.publish('ERROR', ['000']);
 
     }else{
 
-        if(argv._[0] === 'init'){
+        if((argv.hasOwnProperty('v') || argv.hasOwnProperty('version')) && argv._.length === 0){
 
-            if(argv._[0] && argv._[1]){
+            console.log(tools.printVersion());
 
-                mkdirp.sync(argv._[1]);
-                projectPath = argv._[1];
-                commonPath = paths.join(projectPath, gorillaFolder, 'common');
-                workingPath = projectPath;
+        }else if((argv.hasOwnProperty('h') || argv.hasOwnProperty('help')) && argv._.length === 0){
+
+            var text;
+
+            text = '';
+            text += 'Usage:';
+            text += '\n';
+            text += '\tgorilla init [parameters](optional)\n';
+            text += '\n';
+            text += 'Parameters:';
+            text += '\n';
+            text += '\t-d Enable debug / verbose mode';
+            text += '\n';
+            text += '\t-f Force to recreate the project (This action don\'t remove your current project files)';
+            text += '\n';
+            text += '\t-p Select a custom port for the GorillaJS proxy. By default it use 80. If this port is used by other application i.e Apache, GorillaJS will return error.';
+            text += '\n';
+            text += '\t-v Get the GorillaJS version';
+            text += '\n';
+
+            console.log(text);
+
+        }else{
+
+            if(argv._[0] === 'init'){
+
+                if(argv._[0] && argv._[1]){
+
+                    mkdirp.sync(argv._[1]);
+                    projectPath = argv._[1];
+                    commonPath = paths.join(projectPath, gorillaFolder, 'common');
+                    workingPath = projectPath;
+
+                }
+
+                if(argv.hasOwnProperty('f')){
+
+                    promisesPack.push(
+                        [tools.force, [paths.join(projectPath, gorillaFolder, gorillaFile)], 'old-domain'],
+                        [tools.removeDir, paths.join(projectPath, gorillaFolder)]
+                    );
+
+                }
+
+                if(argv.hasOwnProperty('p')){
+
+                    proxyPort = argv.p;
+
+                }
 
             }
 
-            if(argv.hasOwnProperty('f')){
+            promisesPack.push(
+                [tools.printLogo],
+                [tools.config, env],
+                [tools.isNewProject, paths.join(workingPath, gorillaFolder, gorillaFile), 'new-project'],
+                [tools.createGorillaFile, [paths.join(projectPath, gorillaFolder, gorillaFile), gorillaFolder]],
+                [tools.retrieveConfigData, [paths.join(homeUserPath, proxyName), 'gorillajs-proxy']],
+                [tools.retrieveConfigData, [paths.join(homeUserPath, proxyName), 'overwrite']],
+                [events.publish, ['INIT_PLUGINS', paths.join(projectPath, gorillaFolder, gorillaFile)], true]
+            );
+
+            if(argv._[0] === 'init'){
 
                 promisesPack.push(
-                    [tools.force, [paths.join(projectPath, gorillaFolder, gorillaFile)], 'old-domain'],
-                    [tools.removeDir, paths.join(projectPath, gorillaFolder)]
+                    eval(argv._[0])
                 );
 
             }
 
-            if(argv.hasOwnProperty('p')){
-
-                proxyPort = argv.p;
-
-            }
-
         }
 
-        promisesPack.push(
-            [tools.printLogo],
-            [tools.config, env],
-            [tools.isNewProject, paths.join(workingPath, gorillaFolder, gorillaFile), 'new-project'],
-            [tools.createBaseEnvironment, [projectPath, paths.join(homeUserPath, proxyName, 'templates'), gorillaPath, paths.join(homeUserPath, proxyName), gorillaFile, gorillaFolder, messagesFile]],
-            [events.publish, ['INIT_PLUGINS', paths.join(projectPath, gorillaFolder, gorillaFile)], true]
-        );
-
-        if(argv._[0] === 'init'){
-
-            promisesPack.push(
-                eval(argv._[0])
-            );
-
-        }
+        promises.add(promisesPack);
+        promises.start();
 
     }
-
-    promises.add(promisesPack);
-    promises.start();
 
 }
 
@@ -164,9 +171,11 @@ function init(){
 
     promisesPack = [
 
+        [events.publish, ['STEP', ['starting']]],
         [tools.paramForced, ['docker', 'gorillafolder', gorillaFolder]],
         [tools.param, ['docker', 'template_type', templateOptions], 'template_type'],
 
+        [events.publish, ['STEP', ['check_repo']]],
         [promises.cond, '{{template_type}}::Local folder', [
         
             [tools.param, ['docker', 'template-folder'], 'template']
@@ -209,14 +218,15 @@ function init(){
 
         [promises.cond, '{{new-project}}::yes', [
 
-            [cross.moveFiles, [projectPath, false, ['.DS_Store', '.git'], paths.join('{{template_path}}', 'project')]]
+            [cross.moveFiles, [projectPath, false, ['.DS_Store', '.git'], paths.join('{{template_path}}', 'project')]],
+            [tools.paramForced, ['docker', 'port', Math.floor(Math.random() * (4999 - 4700)) + 4700]]
 
         ]],
 
         [cross.moveFiles, [paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], '{{template_path}}']],
-        [tools.createTemplateEnvironment, [projectPath, gorillaFolder, gorillaFile, messagesFile, gorillaTemplateFolder]],
+        [tools.retrieveConfigData, [paths.join(homeUserPath, proxyName), '{{template_slug}}']],
 
-        [tools.param, ['docker', 'port'], 'port'],
+        [events.publish, ['STEP', ['check_domain']]],
         [tools.param, ['project', 'domain'], 'domain'],
         [tools.sanitize, ['{{domain}}', ''], 'slug'],
         [tools.isLocalProject, '{{domain}}', 'islocal'],
@@ -245,15 +255,16 @@ function init(){
 
         ]],
 
-        [tools.paramForced, ['proxy', 'userpath', homeUserPath + '/' +  proxyName]],
-        [tools.paramForced, ['proxy', 'port', proxyPort], 'proxyport'],
-        [tools.paramForced, ['proxy', 'sslport', proxySslPort], 'proxysslport'],
-        [tools.paramForced, ['proxy', 'host', proxyHost]],
-        [tools.paramForced, ['logs', 'port', logsPort], 'logsPort'],
+        [tools.param, ['proxy', 'port'], 'proxyport'],
+        [tools.param, ['proxy', 'sslport'], 'proxysslport'],
+        [tools.param, ['proxy', 'host'], 'proxyhost'],
         [tools.paramForced, ['system', 'hostsfile', hostsFile], 'hosts-file'],
+        [tools.paramForced, ['proxy', 'userpath', homeUserPath + '/' +  proxyName]],
 
+        [events.publish, ['STEP', ['move_files']]],
         [cross.moveFiles, [paths.join(homeUserPath, proxyName, 'proxy'), false, ['.DS_Store', '.git'], paths.join(homeUserPath, proxyName, 'templates', 'gorillajs-proxy')]],
 
+        [events.publish, ['STEP', ['config_plugins']]],
         [events.publish, ['MODIFY_BEFORE_SET_VARIABLES_{{template_type}}_PLUGIN', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
         [events.publish, ['CONFIGURE_PROXY', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(workingPath, gorillaFolder), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), paths.join(homeUserPath, proxyName, 'templates', 'gorillajs-proxy'), paths.join(homeUserPath, proxyName)]], true],
 
@@ -272,12 +283,15 @@ function init(){
 
         ]],
 
+        [events.publish, ['STEP', ['docker_start']]],
         [m_docker.network],
         [m_docker.start, ['{{machine-name}}', paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}', '{{ssh-enabled}}']],
         [m_docker.base, [paths.join(homeUserPath, proxyName, 'proxy', composeFile), proxyName, '{{proxyport}}']],
         [m_docker.logging, [paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{domain}}', paths.join(homeUserPath, proxyName, 'logs'), paths.join(homeUserPath, proxyName, 'templates', 'proxy')]],
         [m_docker.logging, [paths.join(homeUserPath, proxyName, 'proxy', composeFile), proxyName, paths.join(homeUserPath, proxyName, 'logs'), paths.join(homeUserPath, proxyName, 'templates', 'proxy')]],
 
+        [events.publish, ['STEP', ['build_project']]],
+        [events.publish, ['STEP', ['open_project']]],
         [promises.cond, '{{islocal}}::yes', [
 
             [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']],

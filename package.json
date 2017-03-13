@@ -26,7 +26,6 @@
   "files": [
     "lib",
     "plugins",
-    "templates",
     "README.md",
     "index.js"
   ],
@@ -47,9 +46,9 @@
     "is-online": "^5.1.2",
     "jshint": "^2.9.1",
     "keypair": "^1.0.1",
+    "merge-json": "0.1.0-b.3",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
-    "object-merge": "^2.5.1",
     "open": "0.0.5",
     "openurl": "^1.1.1",
     "path": "^0.12.7",

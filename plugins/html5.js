@@ -35,6 +35,7 @@ function modifyComposeFileBefore(gorillaFile, templatePath){
 
     promisesPack = [
 
+        [events.publish, ['STEP', ['html5_database_config']]],
         [tools.param, ['database', 'engine', ['No, thanks!', 'MySQL', 'PostgreSQL', 'MongoDB']], 'engine'],
         [configureEngine, [templatePath, '{{engine}}']]
 
