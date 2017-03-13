@@ -142,6 +142,12 @@ function checkUserInput(){
                 [tools.printLogo],
                 [tools.config, env],
                 [tools.isNewProject, paths.join(workingPath, gorillaFolder, gorillaFile), 'new-project'],
+
+                [m_docker.check],
+                [m_docker.config],
+                [m_docker.gorigit, [paths.join(homeUserPath, proxyName, 'templates')]],
+                [m_docker.templates, [templateRepos.proxy, '/var/gorillajs/templates/gorillajs-proxy']],
+
                 [tools.createGorillaFile, [paths.join(projectPath, gorillaFolder, gorillaFile), gorillaFolder]],
                 [tools.retrieveConfigData, [paths.join(homeUserPath, proxyName), 'gorillajs-proxy']],
                 [tools.retrieveConfigData, [paths.join(homeUserPath, proxyName), 'overwrite']],
@@ -201,11 +207,6 @@ function init(){
         [tools.paramForced, ['docker', 'template_slug', '{{template_slug}}']],
         [tools.paramForced, ['docker', 'template', '{{template}}']],
 
-        [m_docker.check],
-        [m_docker.config],
-        [m_docker.gorigit, [paths.join(homeUserPath, proxyName, 'templates')]],
-        [m_docker.templates, [templateRepos.proxy, '/var/gorillajs/templates/gorillajs-proxy']],
-
         [promises.cond, '{{template_type}}::Local folder', [
 
             [cross.moveFiles, ['{{template_path}}', false, ['.DS_Store', '.git'], '{{template}}']]
@@ -224,7 +225,7 @@ function init(){
         ]],
 
         [cross.moveFiles, [paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], '{{template_path}}']],
-        // [tools.retrieveConfigData, [paths.join(homeUserPath, proxyName), '{{template_slug}}']],
+        [tools.retrieveConfigData, [paths.join(homeUserPath, proxyName), '{{template_slug}}']],
 
         [events.publish, ['STEP', ['check_domain']]],
         [tools.param, ['project', 'domain'], 'domain'],
