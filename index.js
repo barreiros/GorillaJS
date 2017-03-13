@@ -224,7 +224,7 @@ function init(){
         ]],
 
         [cross.moveFiles, [paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], '{{template_path}}']],
-        [tools.retrieveConfigData, [paths.join(homeUserPath, proxyName), '{{template_slug}}']],
+        // [tools.retrieveConfigData, [paths.join(homeUserPath, proxyName), '{{template_slug}}']],
 
         [events.publish, ['STEP', ['check_domain']]],
         [tools.param, ['project', 'domain'], 'domain'],
