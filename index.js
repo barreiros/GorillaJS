@@ -292,9 +292,9 @@ function init(){
         [m_docker.logging, [paths.join(homeUserPath, proxyName, 'proxy', composeFile), proxyName, paths.join(homeUserPath, proxyName, 'logs'), paths.join(homeUserPath, proxyName, 'templates', 'proxy')]],
 
         [events.publish, ['STEP', ['build_project']]],
-        [events.publish, ['STEP', ['open_project']]],
         [promises.cond, '{{islocal}}::yes', [
 
+            [events.publish, ['STEP', ['open_project']]],
             [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']],
 
             [promises.cond, '{{proxyport}}::80', [
