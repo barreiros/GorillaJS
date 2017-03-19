@@ -5,12 +5,12 @@ var fs = require('fs');
 var fsx = require('fs-extra');
 var path = require('path');
 var yaml = require('yamljs');
+var pty = require('pty.js');
 
 var events = require(__dirname + '/../lib/pubsub.js');
 var cross = require(__dirname + '/../lib/crossExec.js');
 var tools = require(__dirname + '/../lib/tools.js');
 var promises = require(__dirname + '/../lib/promises.js');
-var pty = require('pty.js');
 
 events.subscribe('INIT_PLUGINS', init);
 events.subscribe('MODIFY_BEFORE_SET_VARIABLES_django_PLUGIN', modifyComposeFileBefore);
