@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+
+  web:
+    # build: ./image
+    # image: lamp.test
+    image: gorillajs/lamp
+    ports:  
+      - "{{docker.port}}:80"
+    volumes:
+      - ../template:/root/templates
+    entrypoint:
+      - bin/sh
+      - /root/templates/entrypoint-web.sh
+    container_name: lamp.test
+
+networks:
+  default:
+    external:
+      name: gorillajs
+
