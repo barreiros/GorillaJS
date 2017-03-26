@@ -101,8 +101,6 @@ function checkUserInput(){
             text += '\n';
             text += '\t-f Force to recreate the project (This action don\'t remove your current project files)';
             text += '\n';
-            text += '\t-p Select a custom port for the GorillaJS proxy. By default it use 80. If this port is used by other application i.e Apache, GorillaJS will return error.';
-            text += '\n';
             text += '\t-v Get the GorillaJS version';
             text += '\n';
 
@@ -124,7 +122,7 @@ function checkUserInput(){
                 if(argv.hasOwnProperty('f')){
 
                     promisesPack.push(
-                        [tools.force, [paths.join(projectPath, gorillaFolder, gorillaFile)], 'old-domain'],
+                        [tools.force, [paths.join(projectPath, gorillaFolder, gorillaFile)], 'id'],
                         [tools.removeDir, paths.join(projectPath, gorillaFolder)]
                     );
 
@@ -148,7 +146,16 @@ function checkUserInput(){
                 [m_docker.gorigit, [paths.join(homeUserPath, proxyName, 'templates')]],
                 [m_docker.templates, [templateRepos.proxy, '/var/gorillajs/templates/gorillajs-proxy']],
 
-                [tools.createGorillaFile, [paths.join(projectPath, gorillaFolder, gorillaFile), gorillaFolder]],
+                [tools.createGorillaFile, [paths.join(projectPath, gorillaFolder, gorillaFile), gorillaFolder], 'id'],
+                [promises.cond, '{{id}}!:', [
+
+                    [tools.paramForced, ['project', 'id', (Math.floor(Math.random() * (9999 - 1000)) + 1000).toString()]]
+
+                ], [
+                
+                    [tools.paramForced, ['project', 'id', '{{id}}']]
+
+                ]],
                 [tools.retrieveConfigData, [paths.join(homeUserPath, proxyName), 'gorillajs-proxy']],
                 [tools.retrieveConfigData, [paths.join(homeUserPath, proxyName), 'overwrite']],
                 [events.publish, ['INIT_PLUGINS', paths.join(projectPath, gorillaFolder, gorillaFile)], true]
@@ -276,13 +283,6 @@ function init(){
         [events.publish, ['MODIFY_AFTER_SET_VARIABLES_{{template_type}}_PLUGIN', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
 
         [m_docker.ip, '{{machine-name}}', 'ip'],
-
-        [promises.cond, '{{old-domain}}!:""', [
-
-            [tools.sanitize, ['{{old-domain}}', ''], 'old-slug'],
-            [m_docker.removeSite, [paths.join(homeUserPath, proxyName, ''), '{{old-domain}}', '{{old-slug}}']]
-
-        ]],
 
         [events.publish, ['STEP', ['docker_start']]],
         [m_docker.network],
