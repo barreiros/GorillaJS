@@ -37,6 +37,7 @@ var pluginProxy = require(__dirname + '/plugins/proxy.js');
 var pluginBlank = require(__dirname + '/plugins/html5.js');
 var pluginDjango = require(__dirname + '/plugins/django.js');
 var pluginWordpress = require(__dirname + '/plugins/wordpress.js');
+var pluginAmazon = require(__dirname + '/plugins/amazon.js');
 
 var gorillaPath = __dirname;
 var gorillaFolder = '.gorilla';
