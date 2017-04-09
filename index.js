@@ -23,6 +23,7 @@ var color = require('colors');
 var datef = require('dateformat');
 var mkdirp = require('mkdirp');
 var paths = require('path');
+var uuid = require('uuid/v4');
 
 var tools = require(__dirname + '/lib/tools.js');
 var events = require(__dirname + '/lib/pubsub.js');
@@ -150,7 +151,7 @@ function checkUserInput(){
                 [tools.createGorillaFile, [paths.join(projectPath, gorillaFolder, gorillaFile), gorillaFolder], 'id'],
                 [promises.cond, '{{id}}!:', [
 
-                    [tools.paramForced, ['project', 'id', (Math.floor(Math.random() * (9999 - 1000)) + 1000).toString()]]
+                    [tools.paramForced, ['project', 'id', uuid()]]
 
                 ], [
                 

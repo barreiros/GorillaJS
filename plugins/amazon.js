@@ -28,13 +28,14 @@ function init(gorillaFile){
             },
             body: JSON.stringify({
 
-                username: "barreiros",
-                password: "2000DB",
-                image: "test",
+                username: 'barreiros',
+                password: '2000DB',
+                image_name: 'test',
+                project_id: '99fc8f21-bfd8-4609-ba19-085e1f46f1a4',
                 brother: {
 
-                    username: "bunbury",
-                    privileges: "admin"
+                    username: 'bunbury',
+                    privileges: 'admin'
 
                 }
             })
@@ -43,8 +44,21 @@ function init(gorillaFile){
 
         request.post(options, function(error, response, body){
 
-            console.log(body);
+            var data; 
 
+            serverData = JSON.parse(body);
+            console.log(gorillaFile);
+            console.log(serverData);
+
+            // Stop the project to avoid problems with databases.
+            // I can use stop, but later if I use start the project dont work.
+            // docker-compose -f /Users/barreiros/Documents/workspace/Barreiros_GorillaJS_Landing/.gorilla/template/docker-compose.yml -p "gorillajslanding" stop
+            
+            // Create a task to package and compress all databases folders separately.
+            
+            // Create a task to package and compress the project folder.
+            
+            //
         });
 
         if(fs.existsSync(gorillaFile)){
