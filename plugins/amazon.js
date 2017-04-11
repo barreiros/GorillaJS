@@ -28,8 +28,8 @@ function init(gorillaFile){
             },
             body: JSON.stringify({
 
-                username: 'barreiros',
-                password: '2000DB',
+                username: 'barri',
+                password: '02528',
                 image_name: 'test',
                 project_id: '99fc8f21-bfd8-4609-ba19-085e1f46f1a4',
                 brother: {
