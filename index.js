@@ -212,6 +212,7 @@ function init(){
 
         [tools.basename, ['{{template}}'], 'template_basename'],
         [tools.sanitize, ['{{template_basename}}', '-'], 'template_slug'],
+        [tools.paramForced, ['docker', 'data_path', paths.join(homeUserPath, proxyName, 'data')], 'data_path'],
         [tools.paramForced, ['docker', 'template_path', paths.join(homeUserPath, proxyName, 'templates', '{{template_slug}}')], 'template_path'],
         [tools.paramForced, ['docker', 'template_slug', '{{template_slug}}']],
         [tools.paramForced, ['docker', 'template', '{{template}}']],

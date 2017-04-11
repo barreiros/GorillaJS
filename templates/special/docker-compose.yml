@@ -14,6 +14,17 @@ services:
       - bin/sh
       - /root/templates/entrypoint-web.sh
     container_name: lamp.test
+  mariadb:
+    image: gorillajs/mariadb
+    expose: 
+      - 3306
+    volumes:
+      - ../template:/root/templates
+      - {{docker.data_path}}/mysql:/var/lib/mysql
+    entrypoint:
+      - bin/sh
+      - /root/templates/entrypoint-mariadb.sh
+    container_name: mariadb.test
 
 networks:
   default:
