@@ -17,7 +17,7 @@ services:
   web:
     # build: ./image
     # image: lamp.test
-    image: gorillajs/lamp
+    image: gorillajs/wordpress
     ports:  
       - "{{docker.port}}:80"
     volumes:
@@ -25,7 +25,7 @@ services:
       - ../../application:/var/www/{{project.domain}}/application
     entrypoint:
       - bin/sh
-      - /root/templates/entrypoint-web.sh
+      - /root/templates/entrypoint-web-wordpress.sh
     container_name: {{project.domain}}
 
 networks:
