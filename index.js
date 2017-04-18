@@ -33,12 +33,7 @@ var git = require(__dirname + '/lib/git.js');
 var host = require(__dirname + '/lib/host.js');
 var cross = require(__dirname + '/lib/crossExec.js');
 var promises = require(__dirname + '/lib/promises.js');
-
-var pluginProxy = require(__dirname + '/plugins/proxy.js');
-var pluginBlank = require(__dirname + '/plugins/html5.js');
-var pluginDjango = require(__dirname + '/plugins/django.js');
-var pluginWordpress = require(__dirname + '/plugins/wordpress.js');
-var pluginAmazon = require(__dirname + '/plugins/amazon.js');
+var plugins = require(__dirname + '/lib/plugins.js').init(__dirname + '/plugins');
 
 var gorillaPath = __dirname;
 var gorillaFolder = '.gorilla';
