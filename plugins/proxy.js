@@ -7,10 +7,10 @@ var path = require('path');
 var yaml = require('yamljs');
 var pty = require('pty.js');
 
-var events = require(__dirname + '/../lib/pubsub.js');
-var cross = require(__dirname + '/../lib/crossExec.js');
-var tools = require(__dirname + '/../lib/tools.js');
-var promises = require(__dirname + '/../lib/promises.js');
+var events = require(path.join(envPaths.libraries, 'pubsub.js'));
+var cross = require(path.join(envPaths.libraries, 'crossExec.js'));
+var tools = require(path.join(envPaths.libraries, 'tools.js'));
+var promises = require(path.join(envPaths.libraries, 'promises.js'));
 
 events.subscribe('INIT_PLUGINS', init);
 events.subscribe('CONFIGURE_PROXY', configure);

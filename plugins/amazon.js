@@ -12,7 +12,7 @@ var fsx = require('fs-extra');
 var path = require('path');
 var yaml = require('yamljs');
 
-var events = require(__dirname + '/../lib/pubsub.js');
+var events = require(path.join(envPaths.libraries, 'pubsub.js'));
 
 events.subscribe('INIT_PLUGINS', init);
 

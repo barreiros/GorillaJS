@@ -4,8 +4,8 @@ var argv = require('minimist')(process.argv.slice(2));
 var fs = require('fs');
 var path = require('path');
 
-var events = require(__dirname + '/../lib/pubsub.js');
-var cross = require(__dirname + '/../lib/crossExec.js');
+var events = require(path.join(envPaths.libraries, 'pubsub.js'));
+var cross = require(path.join(envPaths.libraries, 'crossExec.js'));
 
 events.subscribe('INIT_PLUGINS', init);
 

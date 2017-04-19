@@ -22,43 +22,45 @@ var prompt = require('readline-sync');
 var color = require('colors');
 var datef = require('dateformat');
 var mkdirp = require('mkdirp');
-var paths = require('path');
+var path = require('path');
 var uuid = require('uuid/v4');
 
-var tools = require(__dirname + '/lib/tools.js');
-var events = require(__dirname + '/lib/pubsub.js');
-var ssh = require(__dirname + '/lib/ssh.js');
-var m_docker = require(__dirname + '/lib/docker.js');
-var git = require(__dirname + '/lib/git.js');
-var host = require(__dirname + '/lib/host.js');
-var cross = require(__dirname + '/lib/crossExec.js');
-var promises = require(__dirname + '/lib/promises.js');
-var plugins = require(__dirname + '/lib/plugins.js').init(__dirname + '/plugins');
+global.envPaths = {
 
-var gorillaPath = __dirname;
-var gorillaFolder = '.gorilla';
-var gorillaTemplateFolder = 'template';
-var gorillaFile = 'gorillafile';
-var messagesFile = 'messages';
-var projectPath = process.cwd();
-var homeUserPath = (process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library' : '/var/local'));
-var hostsFile = process.platform === 'win32' ? 'C:\\Windows\\System32\\drivers\\etc\\hosts' : '/etc/hosts';
-var commonPath = paths.join(projectPath, gorillaFolder, 'common');
-var workingPath = projectPath;
-var composeFile = 'docker-compose.yml';
-var proxyName = 'gorillajs';
-var proxyHost = 'localhost';
-var env = argv.e ? argv.e : 'local';
-var verbose = argv.d ? argv.d : false;
-var templateOptions = ['Django', 'HTML5', 'NodeJS', 'Opencart', 'Wordpress', 'External repository', 'Local folder'];
-var templateRepos = {
-    'django': 'https://github.com/barreiros/GorillaJS-Django.git',
-    'html5': 'https://github.com/barreiros/GorillaJS-HTML5',
-    'nodejs': 'https://github.com/barreiros/GorillaJS-NodeJS',
-    'opencart': 'https://github.com/barreiros/GorillaJS-Opencart',
-    'proxy': 'https://github.com/barreiros/GorillaJS-Proxy',
-    'wordpress': 'https://github.com/barreiros/GorillaJS-Wordpress'
-};
+    'base': __dirname,
+    'libraries': path.join(__dirname, 'lib'),
+    'plugins': path.join(__dirname, 'plugins')
+
+}
+
+var variables = require(path.join(envPaths.libraries, 'variables.js'));
+var tools = require(path.join(envPaths.libraries, 'tools.js'));
+var events = require(path.join(envPaths.libraries, 'pubsub.js'));
+var ssh = require(path.join(envPaths.libraries, 'ssh.js'));
+var m_docker = require(path.join(envPaths.libraries, 'docker.js'));
+var git = require(path.join(envPaths.libraries, 'git.js'));
+var host = require(path.join(envPaths.libraries, 'host.js'));
+var cross = require(path.join(envPaths.libraries, 'crossExec.js'));
+var promises = require(path.join(envPaths.libraries, 'promises.js'));
+var plugins = require(path.join(envPaths.libraries, 'plugins.js')).init();
+
+var gorillaPath = variables.gorillaPath;
+var gorillaFolder = variables.gorillaFolder;
+var gorillaTemplateFolder = variables.gorillaTemplateFolder;
+var gorillaFile = variables.gorillaFile;
+var messagesFile = variables.messagesFile;
+var projectPath = variables.projectPath;
+var homeUserPath = variables.homeUserPath;
+var hostsFile = variables.hostsFile;
+var commonPath = variables.commonPath;
+var workingPath = variables.workingPath;
+var composeFile = variables.composeFile;
+var proxyName = variables.proxyName;
+var proxyHost = variables.proxyHost;
+var env = variables.env;
+var verbose = variables.verbose;
+var templateOptions = variables.templateOptions;
+var templateRepos = variables.templateRepos;
 
 events.subscribe('ERROR', showError);
 events.subscribe('VERBOSE', showVerbose);
@@ -111,7 +113,7 @@ function checkUserInput(){
 
                     mkdirp.sync(argv._[1]);
                     projectPath = argv._[1];
-                    commonPath = paths.join(projectPath, gorillaFolder, 'common');
+                    commonPath = path.join(projectPath, gorillaFolder, 'common');
                     workingPath = projectPath;
 
                 }
@@ -119,8 +121,8 @@ function checkUserInput(){
                 if(argv.hasOwnProperty('f')){
 
                     promisesPack.push(
-                        [tools.force, [paths.join(projectPath, gorillaFolder, gorillaFile)], 'id'],
-                        [tools.removeDir, paths.join(projectPath, gorillaFolder)]
+                        [tools.force, [path.join(projectPath, gorillaFolder, gorillaFile)], 'id'],
+                        [tools.removeDir, path.join(projectPath, gorillaFolder)]
                     );
 
                 }
@@ -136,14 +138,14 @@ function checkUserInput(){
             promisesPack.push(
                 [tools.printLogo],
                 [tools.config, env],
-                [tools.isNewProject, paths.join(workingPath, gorillaFolder, gorillaFile), 'new-project'],
+                [tools.isNewProject, path.join(workingPath, gorillaFolder, gorillaFile), 'new-project'],
 
                 [m_docker.check],
                 [m_docker.config],
-                [m_docker.gorigit, [paths.join(homeUserPath, proxyName, 'templates')]],
+                [m_docker.gorigit, [path.join(homeUserPath, proxyName, 'templates')]],
                 [m_docker.templates, [templateRepos.proxy, '/var/gorillajs/templates/gorillajs-proxy']],
 
-                [tools.createGorillaFile, [paths.join(projectPath, gorillaFolder, gorillaFile), gorillaFolder], 'id'],
+                [tools.createGorillaFile, [path.join(projectPath, gorillaFolder, gorillaFile), gorillaFolder], 'id'],
                 [promises.cond, '{{id}}!:', [
 
                     [tools.paramForced, ['project', 'id', uuid()]]
@@ -153,9 +155,9 @@ function checkUserInput(){
                     [tools.paramForced, ['project', 'id', '{{id}}']]
 
                 ]],
-                [tools.retrieveConfigData, [paths.join(homeUserPath, proxyName), 'gorillajs-proxy']],
-                [tools.retrieveConfigData, [paths.join(homeUserPath, proxyName), 'overwrite']],
-                [events.publish, ['INIT_PLUGINS', paths.join(projectPath, gorillaFolder, gorillaFile)], true]
+                [tools.retrieveConfigData, [path.join(homeUserPath, proxyName), 'gorillajs-proxy']],
+                [tools.retrieveConfigData, [path.join(homeUserPath, proxyName), 'overwrite']],
+                [events.publish, ['INIT_PLUGINS', path.join(projectPath, gorillaFolder, gorillaFile)], true]
             );
 
             if(argv._[0] === 'init'){
@@ -207,8 +209,8 @@ function init(){
 
         [tools.basename, ['{{template}}'], 'template_basename'],
         [tools.sanitize, ['{{template_basename}}', '-'], 'template_slug'],
-        [tools.paramForced, ['docker', 'data_path', paths.join(homeUserPath, proxyName, 'data')], 'data_path'],
-        [tools.paramForced, ['docker', 'template_path', paths.join(homeUserPath, proxyName, 'templates', '{{template_slug}}')], 'template_path'],
+        [tools.paramForced, ['docker', 'data_path', path.join(homeUserPath, proxyName, 'data')], 'data_path'],
+        [tools.paramForced, ['docker', 'template_path', path.join(homeUserPath, proxyName, 'templates', '{{template_slug}}')], 'template_path'],
         [tools.paramForced, ['docker', 'template_slug', '{{template_slug}}']],
         [tools.paramForced, ['docker', 'template', '{{template}}']],
 
@@ -224,13 +226,14 @@ function init(){
 
         [promises.cond, '{{new-project}}::yes', [
 
-            [cross.moveFiles, [projectPath, false, ['.DS_Store', '.git'], paths.join('{{template_path}}', 'project')]],
+            [cross.moveFiles, [projectPath, false, ['.DS_Store', '.git'], path.join('{{template_path}}', 'project')]],
             [tools.paramForced, ['docker', 'port', Math.floor(Math.random() * (4999 - 4700)) + 4700]]
 
         ]],
 
-        [cross.moveFiles, [paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], '{{template_path}}']],
-        [tools.retrieveConfigData, [paths.join(homeUserPath, proxyName), '{{template_slug}}']],
+
+        [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], '{{template_path}}']],
+        [tools.retrieveConfigData, [path.join(homeUserPath, proxyName), '{{template_slug}}']],
 
         [events.publish, ['STEP', ['check_domain']]],
         [tools.param, ['project', 'domain'], 'domain'],
@@ -268,26 +271,27 @@ function init(){
         [tools.paramForced, ['proxy', 'userpath', homeUserPath + '/' +  proxyName]],
 
         [events.publish, ['STEP', ['move_files']]],
-        [cross.moveFiles, [paths.join(homeUserPath, proxyName, 'proxy'), false, ['.DS_Store', '.git'], paths.join(homeUserPath, proxyName, 'templates', 'gorillajs-proxy')]],
+        [cross.moveFiles, [path.join(homeUserPath, proxyName, 'proxy'), false, ['.DS_Store', '.git'], path.join(homeUserPath, proxyName, 'templates', 'gorillajs-proxy')]],
 
         [events.publish, ['STEP', ['config_plugins']]],
-        [events.publish, ['MODIFY_BEFORE_SET_VARIABLES_{{template_type}}_PLUGIN', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
-        [events.publish, ['CONFIGURE_PROXY', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(workingPath, gorillaFolder), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder), paths.join(homeUserPath, proxyName, 'templates', 'gorillajs-proxy'), paths.join(homeUserPath, proxyName)]], true],
+        [events.publish, ['MODIFY_BEFORE_SET_VARIABLES_{{template_type}}_PLUGIN', [path.join(projectPath, gorillaFolder, gorillaFile), path.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
+        [events.publish, ['CONFIGURE_PROXY', [path.join(projectPath, gorillaFolder, gorillaFile), path.join(workingPath, gorillaFolder), path.join(projectPath, gorillaFolder, gorillaTemplateFolder), path.join(homeUserPath, proxyName, 'templates', 'gorillajs-proxy'), path.join(homeUserPath, proxyName)]], true],
 
-        [host.createSSHKeys, paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)],
-        [tools.setEnvVariables, paths.join(homeUserPath, proxyName, 'proxy', '*')],
-        [tools.setEnvVariables, [paths.join(projectPath, gorillaFolder, gorillaTemplateFolder, '*'), ['image']]],
+        [host.createSSHKeys, path.join(projectPath, gorillaFolder, gorillaTemplateFolder)],
+        [tools.setEnvVariables, path.join(homeUserPath, proxyName, 'proxy', '*')],
+        [tools.setEnvVariables, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder, '*'), ['image']]],
 
-        [events.publish, ['MODIFY_AFTER_SET_VARIABLES_{{template_type}}_PLUGIN', [paths.join(projectPath, gorillaFolder, gorillaFile), paths.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
+        [events.publish, ['MODIFY_AFTER_SET_VARIABLES_{{template_type}}_PLUGIN', [path.join(projectPath, gorillaFolder, gorillaFile), path.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
 
         [m_docker.ip, '{{machine-name}}', 'ip'],
 
         [events.publish, ['STEP', ['docker_start']]],
         [m_docker.network],
-        [m_docker.start, ['{{machine-name}}', paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}', '{{ssh-enabled}}']],
-        [m_docker.base, [paths.join(homeUserPath, proxyName, 'proxy', composeFile), proxyName, '{{proxyport}}']],
-        // [m_docker.logging, [paths.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{domain}}', paths.join(homeUserPath, proxyName, 'logs'), paths.join(homeUserPath, proxyName, 'templates', 'proxy')]],
-        // [m_docker.logging, [paths.join(homeUserPath, proxyName, 'proxy', composeFile), proxyName, paths.join(homeUserPath, proxyName, 'logs'), paths.join(homeUserPath, proxyName, 'templates', 'proxy')]],
+        [m_docker.start, ['{{machine-name}}', path.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}', '{{ssh-enabled}}']],
+        [m_docker.base, [path.join(homeUserPath, proxyName, 'proxy', composeFile), proxyName, '{{proxyport}}']],
+        [events.publish, ['DOCKER_STARTED'], true],
+        // [m_docker.logging, [path.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{domain}}', path.join(homeUserPath, proxyName, 'logs'), path.join(homeUserPath, proxyName, 'templates', 'proxy')]],
+        // [m_docker.logging, [path.join(homeUserPath, proxyName, 'proxy', composeFile), proxyName, path.join(homeUserPath, proxyName, 'logs'), path.join(homeUserPath, proxyName, 'templates', 'proxy')]],
 
         [events.publish, ['STEP', ['build_project']]],
         [promises.cond, '{{islocal}}::yes', [
