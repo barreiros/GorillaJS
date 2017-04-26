@@ -1,3 +1,7 @@
 #!/bin/sh -l
 
-echo "Include /var/www/adminer/" >> /etc/apache2/httpd.conf
+echo "Include /etc/adminer/apache.conf" >> /etc/apache2/httpd.conf &&
+
+# Copio los módulos de php en el directorio "php-config --extension-dir"
+
+apachectl graceful

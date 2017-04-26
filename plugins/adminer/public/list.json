@@ -1,5 +1,6 @@
 {
 	"alpine.local": [
 		"mysql"
-	]
+	],
+	"caritas.local": []
 }

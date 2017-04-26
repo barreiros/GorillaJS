@@ -100,8 +100,12 @@ function addAdminer(){
         // Copio los contenidos en el contenedor: script bash y carpeta pública.
         cross.exec('docker cp ' + envPaths.plugins + '/adminer/public/. gorillajsproxy:/var/www/adminer && docker cp ' + envPaths.plugins + '/adminer/server/. gorillajsproxy:/etc/adminer', function(err, stdout, stderr){
 
-            console.log(err, stdout, stderr);
             // Ejecuto el script de bash.
+            cross.exec('docker exec gorillajsproxy bash /etc/adminer/adminer.sh', function(err, stdout, stderr){
+
+                console.log(err, stdout, stderr);
+
+            });
 
         });
 
