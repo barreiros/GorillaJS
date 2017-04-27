@@ -232,7 +232,9 @@ function init(){
         ]],
 
 
-        [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], '{{template_path}}']],
+
+        // [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], '{{template_path}}']],
+        [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], path.join(__dirname, 'templates', 'new_wordpress')]],
         [tools.retrieveConfigData, [path.join(homeUserPath, proxyName), '{{template_slug}}']],
 
         [events.publish, ['STEP', ['check_domain']]],
@@ -268,17 +270,19 @@ function init(){
         [tools.param, ['proxy', 'sslport'], 'proxysslport'],
         [tools.param, ['proxy', 'host'], 'proxyhost'],
         [tools.paramForced, ['system', 'hostsfile', hostsFile], 'hosts-file'],
-        [tools.paramForced, ['proxy', 'userpath', homeUserPath + '/' +  proxyName]],
+        [tools.paramForced, ['proxy', 'userpath', path.join(homeUserPath, proxyName, 'proxy')]],
 
         [events.publish, ['STEP', ['move_files']]],
-        [cross.moveFiles, [path.join(homeUserPath, proxyName, 'proxy'), false, ['.DS_Store', '.git'], path.join(homeUserPath, proxyName, 'templates', 'gorillajs-proxy')]],
+        // [cross.moveFiles, [path.join(homeUserPath, proxyName, 'proxy'), false, ['.DS_Store', '.git'], path.join(homeUserPath, proxyName, 'templates', 'gorillajs-proxy')]],
+        [cross.moveFiles, [path.join(homeUserPath, proxyName, 'template'), false, ['.DS_Store', '.git'], path.join(__dirname, 'templates', 'new_proxy')]],
 
         [events.publish, ['STEP', ['config_plugins']]],
         [events.publish, ['MODIFY_BEFORE_SET_VARIABLES_{{template_type}}_PLUGIN', [path.join(projectPath, gorillaFolder, gorillaFile), path.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
         [events.publish, ['CONFIGURE_PROXY', [path.join(projectPath, gorillaFolder, gorillaFile), path.join(workingPath, gorillaFolder), path.join(projectPath, gorillaFolder, gorillaTemplateFolder), path.join(homeUserPath, proxyName, 'templates', 'gorillajs-proxy'), path.join(homeUserPath, proxyName)]], true],
 
         [host.createSSHKeys, path.join(projectPath, gorillaFolder, gorillaTemplateFolder)],
-        [tools.setEnvVariables, path.join(homeUserPath, proxyName, 'proxy', '*')],
+        // [tools.setEnvVariables, path.join(homeUserPath, proxyName, 'proxy', '*')],
+        [tools.setEnvVariables, path.join(homeUserPath, proxyName, 'proxy', 'template', '*')],
         [tools.setEnvVariables, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder, '*'), ['image']]],
 
         [events.publish, ['MODIFY_AFTER_SET_VARIABLES_{{template_type}}_PLUGIN', [path.join(projectPath, gorillaFolder, gorillaFile), path.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
@@ -288,10 +292,9 @@ function init(){
         [events.publish, ['STEP', ['docker_start']]],
         [m_docker.network],
         [m_docker.start, ['{{machine-name}}', path.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}', '{{ssh-enabled}}']],
-        [m_docker.base, [path.join(homeUserPath, proxyName, 'proxy', composeFile), proxyName, '{{proxyport}}']],
+        // [m_docker.base, [path.join(homeUserPath, proxyName, 'proxy', composeFile), proxyName, '{{proxyport}}']],
+        [m_docker.base, [path.join(homeUserPath, proxyName, 'proxy', 'template', composeFile), proxyName, '{{proxyport}}']],
         [events.publish, ['DOCKER_STARTED'], true],
-        // [m_docker.logging, [path.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{domain}}', path.join(homeUserPath, proxyName, 'logs'), path.join(homeUserPath, proxyName, 'templates', 'proxy')]],
-        // [m_docker.logging, [path.join(homeUserPath, proxyName, 'proxy', composeFile), proxyName, path.join(homeUserPath, proxyName, 'logs'), path.join(homeUserPath, proxyName, 'templates', 'proxy')]],
 
         [events.publish, ['STEP', ['build_project']]],
         [promises.cond, '{{islocal}}::yes', [

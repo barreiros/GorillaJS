@@ -1,0 +1,23 @@
+version: '3'
+
+services: 
+
+  proxy:
+    image: gorillajs/proxy
+    ports:  
+      - "{{proxy.port}}:80"
+      - "{{proxy.sslport}}:443"
+    volumes:
+      - {{proxy.userpath}}/template:/root/templates
+      - {{proxy.userpath}}/sites-enabled:/etc/apache2/sites-enabled
+      - {{proxy.userpath}}/sites-available:/etc/apache2/sites-available
+      - {{proxy.userpath}}/letsencrypt:/etc/letsencrypt
+    entrypoint:
+      - bin/sh
+      - /root/templates/entrypoint-proxy.sh
+    container_name: gorillajsproxy
+
+networks:
+  default:
+    external:
+      name: gorillajs
