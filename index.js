@@ -113,8 +113,10 @@ function checkUserInput(){
 
                     mkdirp.sync(argv._[1]);
                     projectPath = argv._[1];
+                    variables.projectPath = projectPath;
                     commonPath = path.join(projectPath, gorillaFolder, 'common');
                     workingPath = projectPath;
+                    variables.workingPath = workingPath;
 
                 }
 
@@ -186,6 +188,7 @@ function init(){
         [events.publish, ['STEP', ['starting']]],
         [tools.paramForced, ['docker', 'gorillafolder', gorillaFolder]],
         [tools.param, ['docker', 'template_type', templateOptions], 'template_type'],
+        [events.publish, ['TEMPLATE_SELECTED', '{{template_type}}'], true],
 
         [events.publish, ['STEP', ['check_repo']]],
         [promises.cond, '{{template_type}}::Local folder', [
@@ -231,9 +234,6 @@ function init(){
 
         ]],
 
-
-
-        // [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], '{{template_path}}']],
         [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], path.join(__dirname, 'templates', 'new_wordpress')]],
         [tools.retrieveConfigData, [path.join(homeUserPath, proxyName), '{{template_slug}}']],
 
@@ -244,55 +244,33 @@ function init(){
         [tools.paramForced, ['project', 'islocal', '{{islocal}}']],
         [tools.paramForced, ['project', 'slug', '{{slug}}']],
 
-        [tools.param, ['project', 'sslenable', ['no', 'yes']], 'sslenable'],
-
-        [promises.cond, '{{sslenable}}::yes', [
-
-            [tools.paramForced, ['project', 'protocol', 'https'], 'protocol'],
-            [promises.cond, '{{islocal}}::yes', [
-
-                [tools.paramForced, ['project', 'sslemail', false]]
-
-            ], [
-
-                [tools.param, ['project', 'sslemail'], 'sslemail']
-
-            ]]
-
-        ], [
-
-            [tools.paramForced, ['project', 'sslemail', false]],
-            [tools.paramForced, ['project', 'protocol', 'http'], 'protocol']
-
-        ]],
+        [events.publish, ['DOMAIN_SELECTED', '{{domain}}'], true],
 
         [tools.param, ['proxy', 'port'], 'proxyport'],
-        [tools.param, ['proxy', 'sslport'], 'proxysslport'],
         [tools.param, ['proxy', 'host'], 'proxyhost'],
         [tools.paramForced, ['system', 'hostsfile', hostsFile], 'hosts-file'],
         [tools.paramForced, ['proxy', 'userpath', path.join(homeUserPath, proxyName, 'proxy')]],
 
         [events.publish, ['STEP', ['move_files']]],
-        // [cross.moveFiles, [path.join(homeUserPath, proxyName, 'proxy'), false, ['.DS_Store', '.git'], path.join(homeUserPath, proxyName, 'templates', 'gorillajs-proxy')]],
-        [cross.moveFiles, [path.join(homeUserPath, proxyName, 'template'), false, ['.DS_Store', '.git'], path.join(__dirname, 'templates', 'new_proxy')]],
+
+        [cross.moveFiles, [path.join(homeUserPath, proxyName, 'proxy', 'template'), false, ['.DS_Store', '.git'], path.join(__dirname, 'templates', 'new_proxy')]],
 
         [events.publish, ['STEP', ['config_plugins']]],
-        [events.publish, ['MODIFY_BEFORE_SET_VARIABLES_{{template_type}}_PLUGIN', [path.join(projectPath, gorillaFolder, gorillaFile), path.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
-        [events.publish, ['CONFIGURE_PROXY', [path.join(projectPath, gorillaFolder, gorillaFile), path.join(workingPath, gorillaFolder), path.join(projectPath, gorillaFolder, gorillaTemplateFolder), path.join(homeUserPath, proxyName, 'templates', 'gorillajs-proxy'), path.join(homeUserPath, proxyName)]], true],
 
-        [host.createSSHKeys, path.join(projectPath, gorillaFolder, gorillaTemplateFolder)],
-        // [tools.setEnvVariables, path.join(homeUserPath, proxyName, 'proxy', '*')],
+        [events.publish, ['BEFORE_SET_PROXY_VARIABLES', [path.join(projectPath, gorillaFolder, gorillaFile), path.join(homeUserPath, proxyName, 'proxy', 'template')]], true],
         [tools.setEnvVariables, path.join(homeUserPath, proxyName, 'proxy', 'template', '*')],
-        [tools.setEnvVariables, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder, '*'), ['image']]],
+        [events.publish, ['AFTER_SET_PROXY_VARIABLES', [path.join(projectPath, gorillaFolder, gorillaFile), path.join(homeUserPath, proxyName, 'proxy', 'template')]], true],
 
-        [events.publish, ['MODIFY_AFTER_SET_VARIABLES_{{template_type}}_PLUGIN', [path.join(projectPath, gorillaFolder, gorillaFile), path.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
+        [events.publish, ['BEFORE_SET_TEMPLATE_VARIABLES', [path.join(projectPath, gorillaFolder, gorillaFile), path.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
+        [host.createSSHKeys, path.join(projectPath, gorillaFolder, gorillaTemplateFolder)],
+        [tools.setEnvVariables, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder, '*'), ['image']]],
+        [events.publish, ['AFTER_SET_TEMPLATE_VARIABLES', [path.join(projectPath, gorillaFolder, gorillaFile), path.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
 
         [m_docker.ip, '{{machine-name}}', 'ip'],
 
         [events.publish, ['STEP', ['docker_start']]],
         [m_docker.network],
         [m_docker.start, ['{{machine-name}}', path.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}', '{{ssh-enabled}}']],
-        // [m_docker.base, [path.join(homeUserPath, proxyName, 'proxy', composeFile), proxyName, '{{proxyport}}']],
         [m_docker.base, [path.join(homeUserPath, proxyName, 'proxy', 'template', composeFile), proxyName, '{{proxyport}}']],
         [events.publish, ['DOCKER_STARTED'], true],
 
@@ -346,10 +324,4 @@ function showError(number){
 
     process.exit();
 
-}
-
-function setWorkingPath(path){
-    workingPath = path;
-       
-    return path;
 }

@@ -12,7 +12,6 @@ services:
     entrypoint:
       - bin/sh
       - /root/templates/entrypoint-mariadb.sh
-    container_name: mariadb.test
 
   web:
     image: gorillajs/wordpress

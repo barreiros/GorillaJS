@@ -1,3 +1,8 @@
+/**
+ * Plugin name: HTML5
+ * 
+ */
+
 'use strict';
 
 var argv = require('minimist')(process.argv.slice(2));
@@ -11,9 +16,12 @@ var cross = require(path.join(envPaths.libraries, 'crossExec.js'));
 var tools = require(path.join(envPaths.libraries, 'tools.js'));
 var promises = require(path.join(envPaths.libraries, 'promises.js'));
 
+var template = '';
+
 events.subscribe('INIT_PLUGINS', init);
-events.subscribe('MODIFY_BEFORE_SET_VARIABLES_html5_PLUGIN', modifyComposeFileBefore);
-events.subscribe('MODIFY_AFTER_SET_VARIABLES_html5_PLUGIN', modifyComposeFileAfter);
+events.subscribe('TEMPLATE_SELECTED', setTemplate);
+events.subscribe('BEFORE_SET_TEMPLATE_VARIABLES', modifyComposeFileBefore);
+events.subscribe('AFTER_SET_TEMPLATE_VARIABLES', modifyComposeFileAfter);
 
 function init(gorillaFile){
 
@@ -27,26 +35,40 @@ function init(gorillaFile){
 
 }
 
+function setTemplate(name){
+
+    template = name;
+
+}
+
 function modifyComposeFileBefore(gorillaFile, templatePath){
 
     var settings, folder, promisesPack;
 
-    settings = JSON.parse(fs.readFileSync(gorillaFile));
+    if(template === 'HTML5'){
 
-    promisesPack = [
+        settings = JSON.parse(fs.readFileSync(gorillaFile));
 
-        [events.publish, ['STEP', ['html5_database_config']]],
-        [tools.param, ['database', 'engine', ['No, thanks!', 'MySQL', 'PostgreSQL', 'MongoDB']], 'engine'],
-        [configureEngine, [templatePath, '{{engine}}']]
+        promisesPack = [
 
-    ];
-    promises.sandwich(promisesPack);
+            [events.publish, ['STEP', ['html5_database_config']]],
+            [tools.param, ['database', 'engine', ['No, thanks!', 'MySQL', 'PostgreSQL', 'MongoDB']], 'engine'],
+            [configureEngine, [templatePath, '{{engine}}']]
 
+        ];
+        promises.sandwich(promisesPack);
+
+    }
+    
 }
 
 function modifyComposeFileAfter(gorillaFile, templatePath){
 
-    appendEngine(gorillaFile, templatePath);
+    if(template === 'HTML5'){
+
+        appendEngine(gorillaFile, templatePath);
+
+    }
 
 }
 

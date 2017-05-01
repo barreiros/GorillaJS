@@ -17,9 +17,12 @@ var cross = require(path.join(envPaths.libraries, 'crossExec.js'));
 var tools = require(path.join(envPaths.libraries, 'tools.js'));
 var promises = require(path.join(envPaths.libraries, 'promises.js'));
 
+var template = '';
+
 events.subscribe('INIT_PLUGINS', init);
-events.subscribe('MODIFY_BEFORE_SET_VARIABLES_django_PLUGIN', modifyComposeFileBefore);
-events.subscribe('MODIFY_AFTER_SET_VARIABLES_django_PLUGIN', modifyComposeFileAfter);
+events.subscribe('TEMPLATE_SELECTED', setTemplate);
+events.subscribe('BEFORE_SET_TEMPLATE_VARIABLES', modifyComposeFileBefore);
+events.subscribe('AFTER_SET_TEMPLATE_VARIABLES', modifyComposeFileAfter);
 
 function init(gorillaFile){
 
@@ -68,6 +71,13 @@ function init(gorillaFile){
         events.publish('ERROR', ['030']);
 
     }
+
+}
+
+
+function setTemplate(name){
+
+    template = name;
 
 }
 
@@ -155,21 +165,25 @@ function modifyComposeFileBefore(gorillaFile, templatePath){
 
     var settings, folder, promisesPack;
 
-    settings = JSON.parse(fs.readFileSync(gorillaFile));
+    if(template == 'Django'){
 
-    promisesPack = [
+        settings = JSON.parse(fs.readFileSync(gorillaFile));
 
-        [tools.param, ['database', 'engine', ['SQLite', 'PostgreSQL', 'MySQL']], 'engine'],
-        [tools.param, ['cache', 'engine', ['No, thanks!', 'Redis', 'Memcached']], 'cache'],
-        [tools.param, ['messages', 'engine', ['no', 'yes']], 'messages'],
-        [events.publish, ['STEP', ['django_database_config']]],
-        [configureEngine, [templatePath, '{{engine}}']],
-        [events.publish, ['STEP', ['django_cache_config']]],
-        [configureCache, [templatePath, '{{cache}}']],
-        [configureMessages, templatePath]
+        promisesPack = [
 
-    ];
-    promises.sandwich(promisesPack);
+            [tools.param, ['database', 'engine', ['SQLite', 'PostgreSQL', 'MySQL']], 'engine'],
+            [tools.param, ['cache', 'engine', ['No, thanks!', 'Redis', 'Memcached']], 'cache'],
+            [tools.param, ['messages', 'engine', ['no', 'yes']], 'messages'],
+            [events.publish, ['STEP', ['django_database_config']]],
+            [configureEngine, [templatePath, '{{engine}}']],
+            [events.publish, ['STEP', ['django_cache_config']]],
+            [configureCache, [templatePath, '{{cache}}']],
+            [configureMessages, templatePath]
+
+        ];
+        promises.sandwich(promisesPack);
+
+    }
 
 }
 
@@ -252,16 +266,20 @@ function modifyComposeFileAfter(gorillaFile, templatePath){
 
     var settings, promisesPack;
 
-    settings = JSON.parse(fs.readFileSync(gorillaFile));
+    if(template == 'Django'){
 
-    promisesPack = [
+        settings = JSON.parse(fs.readFileSync(gorillaFile));
 
-        [checkDatabaseEngine, [gorillaFile, templatePath]],
-        [checkCacheEngine, [gorillaFile, templatePath]],
-        [checkMessageEngine, [gorillaFile, templatePath]]
+        promisesPack = [
 
-    ];
-    promises.sandwich(promisesPack);
+            [checkDatabaseEngine, [gorillaFile, templatePath]],
+            [checkCacheEngine, [gorillaFile, templatePath]],
+            [checkMessageEngine, [gorillaFile, templatePath]]
+
+        ];
+        promises.sandwich(promisesPack);
+
+    }
 
 }
 

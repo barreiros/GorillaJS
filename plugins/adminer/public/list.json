@@ -2,5 +2,8 @@
 	"alpine.local": [
 		"mysql"
 	],
-	"caritas.local": []
+	"caritas.local": [],
+	"test.local": [
+		"mysql"
+	]
 }

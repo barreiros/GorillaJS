@@ -5,7 +5,7 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 
     # Install database.
     mysql_install_db --user=mysql --ldata=/var/lib/mysql/ &&
-    /usr/bin/mysqld_safe --user mysql --datadir='/var/lib/mysql/' &
+    /usr/bin/mysqld_safe --user mysql --datadir='/var/lib/mysql/' &&
 
     while !(mysqladmin -uroot ping)
     do
@@ -21,7 +21,7 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 
 else
 
-    /usr/bin/mysqld_safe --user mysql --datadir='/var/lib/mysql/' &
+    /usr/bin/mysqld_safe --user mysql --datadir='/var/lib/mysql/' &&
 
     while !(mysqladmin -uroot -proot_{{database.password}} ping)
     do
