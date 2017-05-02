@@ -241,6 +241,7 @@ function init(){
         [tools.param, ['project', 'domain'], 'domain'],
         [tools.sanitize, ['{{domain}}', ''], 'slug'],
         [tools.isLocalProject, '{{domain}}', 'islocal'],
+        [tools.paramForced, ['project', 'protocol', 'http'], 'protocol'],
         [tools.paramForced, ['project', 'islocal', '{{islocal}}']],
         [tools.paramForced, ['project', 'slug', '{{slug}}']],
 

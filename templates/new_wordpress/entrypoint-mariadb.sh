@@ -5,7 +5,7 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 
     # Install database.
     mysql_install_db --user=mysql --ldata=/var/lib/mysql/ &&
-    /usr/bin/mysqld_safe --user mysql --datadir='/var/lib/mysql/' &&
+    /usr/bin/mysqld_safe --user mysql --datadir='/var/lib/mysql/' &
 
     while !(mysqladmin -uroot ping)
     do
@@ -21,7 +21,7 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 
 else
 
-    /usr/bin/mysqld_safe --user mysql --datadir='/var/lib/mysql/' &&
+    /usr/bin/mysqld_safe --user mysql --datadir='/var/lib/mysql/' &
 
     while !(mysqladmin -uroot -proot_{{database.password}} ping)
     do
@@ -37,7 +37,5 @@ mysql -uroot -proot_{{database.password}} -e "CREATE DATABASE IF NOT EXISTS {{da
 mysql -uroot -proot_{{database.password}} -e "GRANT ALL PRIVILEGES ON *.* TO '{{database.username}}'@'%' IDENTIFIED BY '{{database.password}}';"
 mysql -uroot -proot_{{database.password}} -e "FLUSH PRIVILEGES;"
 
-
 mysqladmin -uroot -proot_{{database.password}} shutdown &&
 /usr/bin/mysqld_safe --user mysql --datadir='/var/lib/mysql/'
-

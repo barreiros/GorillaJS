@@ -18,10 +18,10 @@ var cross = require(path.join(envPaths.libraries, 'crossExec.js'));
 
 var sslEnabled = false;
 
-events.subscribe('DOMAIN_SELECTED', init);
-events.subscribe('BEFORE_SET_PROXY_VARIABLES', modifyProxyBefore);
-events.subscribe('AFTER_SET_PROXY_VARIABLES', modifyProxyAfter);
-events.subscribe('DOCKER_STARTED', configureDocker);
+// events.subscribe('DOMAIN_SELECTED', init);
+// events.subscribe('BEFORE_SET_PROXY_VARIABLES', modifyProxyBefore);
+// events.subscribe('AFTER_SET_PROXY_VARIABLES', modifyProxyAfter);
+// events.subscribe('DOCKER_STARTED', configureDocker);
 
 function init(domain){
 
@@ -48,7 +48,6 @@ function init(domain){
         ], [
 
             [tools.paramForced, ['project', 'sslemail', false]],
-            [tools.paramForced, ['project', 'protocol', 'http'], 'protocol']
 
         ]]
 
