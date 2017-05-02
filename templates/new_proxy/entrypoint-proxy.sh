@@ -14,6 +14,5 @@ mkdir /var/log/mod_evasive &&
 
 ln -s /etc/apache2/sites-available/{{project.domain}}.conf /etc/apache2/sites-enabled/{{project.domain}}.conf || true &&
 
-
 # Reinicio apache y lo ejecuto en primer plano.
-apachectl stop && sleep 1 && apachectl start -D FOREGROUND
+apachectl stop && apachectl start -D FOREGROUND

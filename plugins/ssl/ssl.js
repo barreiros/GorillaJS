@@ -18,10 +18,10 @@ var cross = require(path.join(envPaths.libraries, 'crossExec.js'));
 
 var sslEnabled = false;
 
-// events.subscribe('DOMAIN_SELECTED', init);
-// events.subscribe('BEFORE_SET_PROXY_VARIABLES', modifyProxyBefore);
-// events.subscribe('AFTER_SET_PROXY_VARIABLES', modifyProxyAfter);
-// events.subscribe('DOCKER_STARTED', configureDocker);
+events.subscribe('DOMAIN_SELECTED', init);
+events.subscribe('BEFORE_SET_PROXY_VARIABLES', modifyProxyBefore);
+events.subscribe('AFTER_SET_PROXY_VARIABLES', modifyProxyAfter);
+events.subscribe('DOCKER_STARTED', configureDocker);
 
 function init(domain){
 
@@ -62,11 +62,7 @@ function modifyProxyBefore(gorillaFile, proxyPath){
 
     promisesPack = [
 
-        [promises.cond, '{{sslenable}}::yes', [
-
-            [copySSLFiles, proxyPath]
-
-        ]]
+        [copySSLFiles, proxyPath]
 
     ];
 
@@ -82,12 +78,7 @@ function modifyProxyAfter(gorillaFile, proxyPath){
 
         [tools.param, ['proxy', 'sslport'], 'proxysslport'],
         [tools.param, ['project', 'sslenable', ['no', 'yes']], 'sslenable'],
-
-        [promises.cond, '{{sslenable}}::yes', [
-
-            [addSSL, [gorillaFile, proxyPath, '{{proxysslport}}']]
-
-        ]]
+        [addSSL, [gorillaFile, proxyPath, '{{proxysslport}}']]
 
     ];
 
@@ -107,7 +98,6 @@ function addSSL(gorillaFile, proxyPath, port){
 
     var data, composeFile;
 
-    sslEnabled = true;
     data = JSON.parse(fs.readFileSync(gorillaFile));
     composeFile = proxyPath + '/docker-compose.yml';
 
@@ -126,16 +116,18 @@ function addSSL(gorillaFile, proxyPath, port){
 
 function configureDocker(){
 
-    if(sslEnabled){
+    // Ejecuto el script de bash de configuración.
+    cross.exec('docker exec gorillajsproxy /bin/sh /root/templates/ssl.sh', function(err, stdout, stderr){
 
-        // Ejecuto el script de bash de configuración.
-        cross.exec('docker exec gorillajsproxy /bin/sh /root/templates/ssl.sh', function(err, stdout, stderr){
+        events.publish('VERBOSE', [err, stderr, stdout]);
 
-            console.log(err, stdout, stderr);
+        cross.exec('docker commit -p=false gorillajsproxy gorillajs/proxy', function(err, stdout, stderr){
+
+            events.publish('VERBOSE', [err, stderr, stdout]);
 
         });
 
-    }
+    });
 
 }
 

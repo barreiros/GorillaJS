@@ -135,40 +135,61 @@ function checkUserInput(){
 
                 }
 
-            }
+                promisesPack.push(
 
-            promisesPack.push(
-                [tools.printLogo],
-                [tools.config, env],
-                [tools.isNewProject, path.join(workingPath, gorillaFolder, gorillaFile), 'new-project'],
+                    [tools.printLogo],
+                    [tools.config, env],
+                    [tools.isNewProject, path.join(workingPath, gorillaFolder, gorillaFile), 'new-project'],
 
-                [m_docker.check],
-                [m_docker.config],
-                [m_docker.gorigit, [path.join(homeUserPath, proxyName, 'templates')]],
-                [m_docker.templates, [templateRepos.proxy, '/var/gorillajs/templates/gorillajs-proxy']],
+                    [m_docker.check],
+                    [m_docker.config],
+                    [m_docker.gorigit, [path.join(homeUserPath, proxyName, 'templates')]],
+                    [m_docker.templates, [templateRepos.proxy, '/var/gorillajs/templates/gorillajs-proxy']],
 
-                [tools.createGorillaFile, [path.join(projectPath, gorillaFolder, gorillaFile), gorillaFolder], 'id'],
-                [promises.cond, '{{id}}!:', [
+                    [tools.createGorillaFile, [path.join(projectPath, gorillaFolder, gorillaFile), gorillaFolder], 'id'],
+                    [promises.cond, '{{id}}!:', [
 
-                    [tools.paramForced, ['project', 'id', uuid()]]
+                        [tools.paramForced, ['project', 'id', uuid()]]
 
-                ], [
-                
-                    [tools.paramForced, ['project', 'id', '{{id}}']]
+                    ], [
+                    
+                        [tools.paramForced, ['project', 'id', '{{id}}']]
 
-                ]],
-                [tools.retrieveConfigData, [path.join(homeUserPath, proxyName), 'gorillajs-proxy']],
-                [tools.retrieveConfigData, [path.join(homeUserPath, proxyName), 'overwrite']],
-                [events.publish, ['INIT_PLUGINS', path.join(projectPath, gorillaFolder, gorillaFile)], true]
-            );
+                    ]],
+                    [tools.retrieveConfigData, [path.join(homeUserPath, proxyName), 'gorillajs-proxy']],
+                    [tools.retrieveConfigData, [path.join(homeUserPath, proxyName), 'overwrite']],
+                    [init]
 
-            if(argv._[0] === 'init'){
+                );
+
+            }else if(argv._[0] === 'run'){
+
+                if(argv._[0] && argv._[1]){
+
+                    projectPath = argv._[1];
+                    variables.projectPath = projectPath;
+                    workingPath = projectPath;
+                    variables.workingPath = workingPath;
+
+                }
 
                 promisesPack.push(
-                    eval(argv._[0])
+
+                    [tools.config, env],
+                    [tools.createGorillaFile, [path.join(projectPath, gorillaFolder, gorillaFile), gorillaFolder], 'id'],
+                    [tools.printLogo],
+                    [run]
+
                 );
 
             }
+
+
+            promisesPack.push(
+
+                [events.publish, ['INIT_PLUGINS', path.join(projectPath, gorillaFolder, gorillaFile)], true]
+
+            );
 
         }
 
@@ -176,6 +197,27 @@ function checkUserInput(){
         promises.start();
 
     }
+
+}
+
+function run(){
+
+    var promisesPack = [];
+
+    promisesPack = [
+
+        [tools.param, ['project', 'domain'], 'domain'],
+        [tools.sanitize, ['{{domain}}', ''], 'slug'],
+
+        [m_docker.startSimple, [path.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}']],
+        [m_docker.startSimple, [path.join(homeUserPath, proxyName, 'proxy', 'template', composeFile), proxyName]],
+
+        [events.publish, ['STEP', ['Your project is ready!']]]
+
+    ];
+
+    promises.add(promisesPack);
+    promises.start();
 
 }
 
