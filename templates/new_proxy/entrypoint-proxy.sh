@@ -8,7 +8,7 @@ cp -r /root/templates/app-waiting /var/www/localhost &&
 
 ## Configuración del firewall
 cat /root/templates/evasive >> /etc/apache2/httpd.conf &&
-mkdir /var/log/mod_evasive && 
+mkdir -p /var/log/mod_evasive && 
 
 # a2enmod evasive proxy proxy_http proxy_wstunnel ssl headers mcrypt &&
 
