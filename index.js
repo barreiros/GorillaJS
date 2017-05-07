@@ -36,12 +36,11 @@ global.envPaths = {
 var variables = require(path.join(envPaths.libraries, 'variables.js'));
 var tools = require(path.join(envPaths.libraries, 'tools.js'));
 var events = require(path.join(envPaths.libraries, 'pubsub.js'));
-var ssh = require(path.join(envPaths.libraries, 'ssh.js'));
 var m_docker = require(path.join(envPaths.libraries, 'docker.js'));
-var git = require(path.join(envPaths.libraries, 'git.js'));
 var host = require(path.join(envPaths.libraries, 'host.js'));
 var cross = require(path.join(envPaths.libraries, 'crossExec.js'));
 var promises = require(path.join(envPaths.libraries, 'promises.js'));
+var commit = require(path.join(envPaths.libraries, 'commit.js'));
 var plugins = require(path.join(envPaths.libraries, 'plugins.js')).init();
 
 var gorillaPath = variables.gorillaPath;
@@ -209,6 +208,7 @@ function run(){
         [tools.param, ['project', 'domain'], 'domain'],
         [tools.sanitize, ['{{domain}}', ''], 'slug'],
 
+        [commit.replace],
         [m_docker.startSimple, [path.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}']],
         [m_docker.startSimple, [path.join(homeUserPath, proxyName, 'proxy', 'template', composeFile), proxyName]],
 
@@ -313,6 +313,7 @@ function init(){
 
         [events.publish, ['STEP', ['docker_start']]],
         [m_docker.network],
+        [commit.replace],
         [m_docker.start, ['{{machine-name}}', path.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}', '{{ssh-enabled}}']],
         [m_docker.base, [path.join(homeUserPath, proxyName, 'proxy', 'template', composeFile), proxyName, '{{proxyport}}']],
         [events.publish, ['DOCKER_STARTED'], true],

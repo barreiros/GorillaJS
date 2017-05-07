@@ -15,6 +15,7 @@ var events = require(path.join(envPaths.libraries, 'pubsub.js'));
 var tools = require(path.join(envPaths.libraries, 'tools.js'));
 var promises = require(path.join(envPaths.libraries, 'promises.js'));
 var cross = require(path.join(envPaths.libraries, 'crossExec.js'));
+var commit = require(path.join(envPaths.libraries, 'commit.js'));
 
 var sslEnabled = false;
 
@@ -121,11 +122,7 @@ function configureDocker(){
 
         events.publish('VERBOSE', [err, stderr, stdout]);
 
-        cross.exec('docker commit -p=false gorillajsproxy gorillajs/proxy', function(err, stdout, stderr){
-
-            events.publish('VERBOSE', [err, stderr, stdout]);
-
-        });
+        commit.create('gorillajsproxy');
 
     });
 
