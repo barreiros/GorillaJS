@@ -41,7 +41,7 @@ var host = require(path.join(envPaths.libraries, 'host.js'));
 var cross = require(path.join(envPaths.libraries, 'crossExec.js'));
 var promises = require(path.join(envPaths.libraries, 'promises.js'));
 var commit = require(path.join(envPaths.libraries, 'commit.js'));
-var plugins = require(path.join(envPaths.libraries, 'plugins.js')).init();
+var plugins = require(path.join(envPaths.libraries, 'plugins.js'));
 
 var gorillaPath = variables.gorillaPath;
 var gorillaFolder = variables.gorillaFolder;
@@ -105,6 +105,12 @@ function checkUserInput(){
             console.log(text);
 
         }else{
+
+            promisesPack.push(
+
+                [plugins.include]
+
+            );
 
             if(argv._[0] === 'init'){
 
@@ -183,12 +189,12 @@ function checkUserInput(){
 
             }
 
-
             promisesPack.push(
 
                 [events.publish, ['INIT_PLUGINS', path.join(projectPath, gorillaFolder, gorillaFile)], true]
 
             );
+
 
         }
 
