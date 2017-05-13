@@ -42,6 +42,7 @@ var cross = require(path.join(envPaths.libraries, 'crossExec.js'));
 var promises = require(path.join(envPaths.libraries, 'promises.js'));
 var commit = require(path.join(envPaths.libraries, 'commit.js'));
 var plugins = require(path.join(envPaths.libraries, 'plugins.js'));
+var credentials = require(path.join(envPaths.libraries, 'login.js'));
 
 var gorillaPath = variables.gorillaPath;
 var gorillaFolder = variables.gorillaFolder;
@@ -184,6 +185,22 @@ function checkUserInput(){
                     [tools.createGorillaFile, [path.join(projectPath, gorillaFolder, gorillaFile), gorillaFolder], 'id'],
                     [tools.printLogo],
                     [run]
+
+                );
+
+            }else if(argv._[0] === 'login'){
+
+                promisesPack.push(
+
+                    [credentials.login, [argv._[1], argv._[2]]]
+
+                );
+
+            }else if(argv._[0] === 'logout'){
+
+                promisesPack.push(
+
+                    credentials.logout
 
                 );
 
