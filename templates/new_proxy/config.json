@@ -92,7 +92,8 @@
             "038" : "Is docker-compose installed?. +info: https://gorillajs.com/install-gorillajs",
             "039" : "Port already in use. Please, release it or select another one",
             "040" : "Unable to start configuration server.",
-            "041" : "Unable to download the templates from repository."
+            "041" : "Unable to download the templates from repository.",
+            "042" : "Unable to login. Server problems."
 
         },
 
