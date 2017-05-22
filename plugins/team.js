@@ -76,6 +76,8 @@ function getPolicy(gorillaFile, token){
 
         request.post(options, function(error, response, body){
 
+            // Aquí siempre tengo un error que no inicia esta parte solo la primera vez que ejecuto el comando push. No estoy seguro de si solo pasa si no está creada la carpeta de exportación.
+
             var serverData, exportPath, dataPath, projectPath, key, directory, command, output, s3;
 
             if(!error){
@@ -89,11 +91,13 @@ function getPolicy(gorillaFile, token){
                         exportPath = path.join(variables.homeUserPath, variables.proxyName, 'export', data.local.project.id);
 
                         // Stop the project to avoid problems with databases.???
+
+                        console.log('Bases de datos');
                 
                         // Comprimo las bases de datos del proyecto.
-                        if(!argv.hasOwnProperty('exclude-data')){
+                        if(!argv.hasOwnProperty('exclude-data')){ // Si el usuario no ha excluido esta opción.
 
-                            dataPath = path.join(variables.homeUserPath, variables.proxyName, 'data', data.local.project.domain);
+                            dataPath = path.join(variables.homeUserPath, variables.proxyName, 'data', data.local.project.id);
                             directory = fs.readdirSync(dataPath);
 
                             fsx.ensureDirSync(path.join(exportPath, 'data'));
@@ -102,8 +106,9 @@ function getPolicy(gorillaFile, token){
 
                                 if(fs.lstatSync(path.join(dataPath, directory[key])).isDirectory()){
 
-                                    // command = 'docker run -v ' + path.join(exportPath, 'data') + ':/etc/export -v ' + path.join(dataPath, directory[key]) + ':/etc/data busybox /bin/sh -c "cd /etc/data && tar -zcf /etc/export/' + directory[key] + '.tar.gz ."';
-                                    command = 'docker run -v ' + path.join(exportPath, 'data') + ':/etc/export -v ' + path.join(dataPath, directory[key]) + ':/etc/data busybox /bin/sh -c "cd /etc/data && cp -r . /etc/export/' + directory[key] + '"';
+                                    // Tengo que añadir de alguna manera un archivo con los directorios que quiero excluir.
+
+                                    command = 'docker run -v ' + path.join(exportPath, 'data') + ':/etc/export -v ' + path.join(dataPath, directory[key]) + ':/etc/data busybox /bin/sh -c "cd /etc/data && tar -cf /etc/export/' + directory[key] + '.tar ."';
                                     execSync(command);
 
                                 }
@@ -112,23 +117,26 @@ function getPolicy(gorillaFile, token){
 
                         }
 
-                        // Comprimo los archivos del proyecto.
-                        if(!argv.hasOwnProperty('exclude-files')){
+                        console.log('Proyecto');
 
-                            // command = 'docker run -v ' + exportPath + ':/etc/export -v ' + variables.workingPath + ':/etc/data busybox /bin/sh -c "cd /etc/data && tar -zcf /etc/export/project.tar.gz ."';
-                            command = 'docker run -v ' + exportPath + ':/etc/export -v ' + variables.workingPath + ':/etc/data busybox /bin/sh -c "cd /etc/data && cp -r . /etc/export/project"';
+                        // Comprimo los archivos del proyecto.
+                        if(!argv.hasOwnProperty('exclude-files')){ // Si el usuario no ha excluido esta opción.
+
+                            command = 'docker run -v ' + exportPath + ':/etc/export -v ' + variables.workingPath + ':/etc/data busybox /bin/sh -c "cd /etc/data && tar -cf /etc/export/project.tar ."';
                             execSync(command);
 
                         }else{
 
-                            command = 'docker run -v ' + exportPath + ':/etc/export -v ' + variables.workingPath + ':/etc/data busybox /bin/sh -c "cd /etc/data && tar -zcf /etc/export/project.tar.gz .gorilla"';
+                            command = 'docker run -v ' + exportPath + ':/etc/export -v ' + variables.workingPath + ':/etc/data busybox /bin/sh -c "cd /etc/data && tar -cf /etc/export/project.tar .gorilla"';
                             execSync(command);
 
                         }
 
 
+                        console.log('Imágenes');
+
                         // Comprimo las imágenes del proyecto
-                        if(!argv.hasOwnProperty('exclude-images')){
+                        if(!argv.hasOwnProperty('exclude-images')){ // Si el usuario no ha excluido esta opción.
 
                             if(data.local.hasOwnProperty('services')){
 
@@ -146,19 +154,16 @@ function getPolicy(gorillaFile, token){
 
                         }
 
+                        // rsync -az --progress ~/Library/gorillajs/export/99fc8f21-bfd8-4609-ba19-085e1f46f1a4/project.tar ubuntu@gorillajs.com:/var/www/gorillajs
+
+
+
+
 
                         // Creo las variables globales para identificarme en AWS.
                         // process.env['AWS_ACCESS_KEY_ID'] = serverData.credentials.AccessKeyId;
                         // process.env['AWS_SECRET_ACCESS_KEY'] = serverData.credentials.SecretAccessKey;
                         // process.env['AWS_SESSION_TOKEN'] = serverData.credentials.SessionToken;
-
-                        command = 'docker run -e AWS_ACCESS_KEY_ID=' + serverData.credentials.AccessKeyId + ' -e AWS_SECRET_ACCESS_KEY=' + serverData.credentials.SecretAccessKey + ' -e AWS_SESSION_TOKEN=' + serverData.credentials.SessionToken + ' -v ' + exportPath + ':/etc/export gorillajs/tools /bin/sh -c "./root/.local/bin/aws s3 sync --size-only --exact-timestamps /etc/export s3://' + path.join(serverData.bucket, serverData.path) + '"';
-
-                        console.log(command);
-
-                        output = execSync(command);
-
-                        console.log(output.toString());
 
                         // // Subo el contenido de la carpeta export al bucket.
                         // glob(path.join(exportPath, '**', '*.{tar,tar.gz}'), function(err, files){
