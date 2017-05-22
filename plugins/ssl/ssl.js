@@ -22,7 +22,7 @@ var sslEnabled = false;
 events.subscribe('DOMAIN_SELECTED', init);
 events.subscribe('BEFORE_SET_PROXY_VARIABLES', modifyProxyBefore);
 events.subscribe('AFTER_SET_PROXY_VARIABLES', modifyProxyAfter);
-events.subscribe('DOCKER_STARTED', configureDocker);
+// events.subscribe('DOCKER_STARTED', configureDocker);
 
 function init(domain){
 

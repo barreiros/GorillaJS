@@ -34,7 +34,7 @@ echo 'init' > /var/www/{{project.domain}}/application/gorilla-status.txt &&
 
 if [ -e ./wp-config.php ]; then
 
-    sed -i '/DB_HOST/c\define("DB_HOST", "mysql");' wp-config.php && 
+    sed -i '/DB_HOST/c\define("DB_HOST", "{{project.domain}}_mysql");' wp-config.php && 
     sed -i '/DB_NAME/c\define("DB_NAME", "{{database.dbname}}");' wp-config.php &&
     sed -i '/DB_USER/c\define("DB_USER", "{{database.username}}");' wp-config.php &&
     sed -i '/DB_PASSWORD/c\define("DB_PASSWORD", "{{database.password}}");' wp-config.php
@@ -55,7 +55,7 @@ else
     echo 'downloading' > /var/www/{{project.domain}}/application/gorilla-status.txt &&
 
     wp core download --allow-root || true && 
-    wp core config --dbname={{database.dbname}} --dbuser={{database.username}} --dbpass={{database.password}} --dbhost=mysql --dbprefix="${RANDOM}_" --allow-root --skip-check || true
+    wp core config --dbname="{{database.dbname}}" --dbuser="{{database.username}}" --dbpass="{{database.password}}" --dbhost="{{project.domain}}_mysql" --dbprefix="${RANDOM}_" --allow-root --skip-check || true
 
 fi
 
@@ -81,13 +81,14 @@ fi
 
 echo 'database' > /var/www/{{project.domain}}/application/gorilla-status.txt &&
 
+while !(mysqladmin -h{{project.domain}}_mysql -u{{database.username}} -p{{database.password}} ping > /var/log/mysqlconnection.txt)
+do
+   sleep 1
+done
 
-php /root/templates/apache-checkdb.php &&
 replace_domain || true &&
 
-
 rm /var/www/{{project.domain}}/application/gorilla-status.txt &&
-
 
 apachectl stop && sleep 1 && apachectl start -D FOREGROUND
 

@@ -328,7 +328,6 @@ function init(){
         [events.publish, ['AFTER_SET_PROXY_VARIABLES', [path.join(projectPath, gorillaFolder, gorillaFile), path.join(homeUserPath, proxyName, 'proxy', 'template')]], true],
 
         [events.publish, ['BEFORE_SET_TEMPLATE_VARIABLES', [path.join(projectPath, gorillaFolder, gorillaFile), path.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
-        [host.createSSHKeys, path.join(projectPath, gorillaFolder, gorillaTemplateFolder)],
         [tools.setEnvVariables, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder, '*'), ['image']]],
         [events.publish, ['AFTER_SET_TEMPLATE_VARIABLES', [path.join(projectPath, gorillaFolder, gorillaFile), path.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
 
