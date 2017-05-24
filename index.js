@@ -234,6 +234,7 @@ function run(){
         [commit.replace],
         [m_docker.startSimple, [path.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}']],
         [m_docker.startSimple, [path.join(homeUserPath, proxyName, 'proxy', 'template', composeFile), proxyName]],
+        [commit.create, '{{domain}}'],
 
         [events.publish, ['STEP', ['Your project is ready!']]]
 

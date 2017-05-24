@@ -78,7 +78,7 @@ function getPolicy(gorillaFile, token){
 
             // Aquí siempre tengo un error que no inicia esta parte solo la primera vez que ejecuto el comando push. No estoy seguro de si solo pasa si no está creada la carpeta de exportación.
 
-            var serverData, exportPath, dataPath, projectPath, key, directory, command, output, s3;
+            var serverData, exportPath, dataPath, projectPath, key, directory, command, output, readStream, s3;
 
             if(!error){
 
@@ -92,8 +92,7 @@ function getPolicy(gorillaFile, token){
 
                         // Stop the project to avoid problems with databases.???
 
-                        console.log('Bases de datos');
-                
+
                         // Comprimo las bases de datos del proyecto.
                         if(!argv.hasOwnProperty('exclude-data')){ // Si el usuario no ha excluido esta opción.
 
@@ -109,7 +108,7 @@ function getPolicy(gorillaFile, token){
                                     // Tengo que añadir de alguna manera un archivo con los directorios que quiero excluir.
 
                                     command = 'docker run -v ' + path.join(exportPath, 'data') + ':/etc/export -v ' + path.join(dataPath, directory[key]) + ':/etc/data busybox /bin/sh -c "cd /etc/data && tar -cf /etc/export/' + directory[key] + '.tar ."';
-                                    execSync(command);
+                                    // execSync(command);
 
                                 }
 
@@ -117,23 +116,40 @@ function getPolicy(gorillaFile, token){
 
                         }
 
-                        console.log('Proyecto');
 
                         // Comprimo los archivos del proyecto.
                         if(!argv.hasOwnProperty('exclude-files')){ // Si el usuario no ha excluido esta opción.
 
+                            // Recupero el archivo .teamignore y genero un string con los archivos que quiero necesito excluir para pasárselo al comando sync de aws cli.
+                            fsx.ensureFileSync(path.join(variables.workingPath, '.teamignore'));
+
+                            // Leo las líneas.
+                            var excludes = fs.readFileSync(path.join(variables.workingPath, '.teamignore')).toString().split('\n').filter(function(line){;
+
+                                if(line !== ''){
+
+                                    return true;
+
+                                }
+
+                            }).map(function(line){
+                                
+                                return '--exclude ' + line;
+
+                            });
+
+                            excludes = excludes.join(' ');
+
                             command = 'docker run -v ' + exportPath + ':/etc/export -v ' + variables.workingPath + ':/etc/data busybox /bin/sh -c "cd /etc/data && tar -cf /etc/export/project.tar ."';
-                            execSync(command);
+                            // execSync(command);
 
                         }else{
 
                             command = 'docker run -v ' + exportPath + ':/etc/export -v ' + variables.workingPath + ':/etc/data busybox /bin/sh -c "cd /etc/data && tar -cf /etc/export/project.tar .gorilla"';
-                            execSync(command);
+                            // execSync(command);
 
                         }
 
-
-                        console.log('Imágenes');
 
                         // Comprimo las imágenes del proyecto
                         if(!argv.hasOwnProperty('exclude-images')){ // Si el usuario no ha excluido esta opción.
@@ -146,7 +162,7 @@ function getPolicy(gorillaFile, token){
                                 for(key in data.local.services){
 
                                     command = 'docker save -o ' + path.join(exportPath, 'images', key) + '.tar ' + data.local.services[key];
-                                    output = execSync(command);
+                                    // output = execSync(command);
 
                                 }
 
@@ -154,19 +170,17 @@ function getPolicy(gorillaFile, token){
 
                         }
 
-                        // rsync -az --progress ~/Library/gorillajs/export/99fc8f21-bfd8-4609-ba19-085e1f46f1a4/project.tar ubuntu@gorillajs.com:/var/www/gorillajs
-
-
-
 
 
                         // Creo las variables globales para identificarme en AWS.
                         // process.env['AWS_ACCESS_KEY_ID'] = serverData.credentials.AccessKeyId;
                         // process.env['AWS_SECRET_ACCESS_KEY'] = serverData.credentials.SecretAccessKey;
                         // process.env['AWS_SESSION_TOKEN'] = serverData.credentials.SessionToken;
+                
 
-                        // // Subo el contenido de la carpeta export al bucket.
+                        // Subo el contenido de la carpeta export al bucket.
                         // glob(path.join(exportPath, '**', '*.{tar,tar.gz}'), function(err, files){
+                        // glob(path.join(variables.workingPath, '**', '*'), function(err, files){
                         //
                         //     console.log(files);
                         //
@@ -181,21 +195,25 @@ function getPolicy(gorillaFile, token){
                         //
                         //     for(key in files){
                         //
-                        //         console.log(path.join(serverData.path, files[key].replace(exportPath + '/', '')));
+                        //         if(fs.lstatSync(files[key]).isFile()){
                         //
-                        //         s3.upload({
-                        //             Key: path.join(serverData.path, files[key].replace(exportPath + '/', '')),
-                        //             Body: fs.readFileSync(files[key])
-                        //         }).on('httpUploadProgress', function(e){
+                        //             console.log(path.join(serverData.path, files[key].replace(exportPath + '/', '')));
                         //
-                        //             console.log('Uploaded :: ' + parseInt((evt.loaded * 100) / evt.total) + '%');
-                        //                 
-                        //         }).send(function(err, data){
-                        //             
-                        //             // console.log(err, data);
-                        //             console.log('File ' + files[key] + ' uploaded');
+                        //             s3.upload({
+                        //                 Key: path.join(serverData.path, files[key].replace(exportPath + '/', '')),
+                        //                 Body: fs.readFileSync(files[key])
+                        //             }).on('httpUploadProgress', function(e){
                         //
-                        //         });
+                        //                 console.log('Uploaded :: ' + parseInt((evt.loaded * 100) / evt.total) + '%');
+                        //
+                        //             }).send(function(err, data){
+                        //
+                        //                 // console.log(err, data);
+                        //                 console.log('File ' + files[key] + ' uploaded');
+                        //
+                        //             });
+                        //
+                        //         }
                         //
                         //     }
                         //
