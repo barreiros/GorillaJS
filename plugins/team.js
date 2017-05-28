@@ -85,6 +85,8 @@ function getPolicy(gorillaFile, token){
 
                 serverData = JSON.parse(body);
 
+                console.log(serverData.query);
+
                 if(serverData){
 
                     if(!serverData.hasOwnProperty('error')){
@@ -135,25 +137,19 @@ function getPolicy(gorillaFile, token){
 
                             }).map(function(line){
                                 
-                                return '--exclude "/etc/export/project/' + line + '"';
+                                return '--exclude \'/etc/export/project/' + line + '\'';
 
                             });
 
                             excludes = excludes.join(' ');
 
-                            serverData.credentials.AccessKeyId = 'AKIAIHISGZXOIPZDBC4A';
-                            serverData.credentials.SecretAccessKey = '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';
-                            serverData.bucket = 'gorillajs-backup';
-                            variables.workingPath = '/Users/barreiros/Desktop/Barreiros_GorillaJS_Landing';
-
-                            // command = 'docker run -e AWS_ACCESS_KEY_ID=' + serverData.credentials.AccessKeyId + ' -e AWS_SECRET_ACCESS_KEY=' + serverData.credentials.SecretAccessKey + ' -e AWS_SESSION_TOKEN=' + serverData.credentials.SessionToken + ' -v ' + variables.workingPath + ':/etc/export/project gorillajs/tools /bin/sh -c "./root/.local/bin/aws s3 sync ' + excludes + ' --size-only --exact-timestamps /etc/export/project s3://' + path.join(serverData.bucket, serverData.path, 'project') + '"';
-                            // command = 'docker run -e AWS_ACCESS_KEY_ID=' + serverData.credentials.AccessKeyId + ' -e AWS_SECRET_ACCESS_KEY=' + serverData.credentials.SecretAccessKey + ' -e AWS_SESSION_TOKEN=' + serverData.credentials.SessionToken + ' -v ' + variables.workingPath + ':/etc/export/project gorillajs/tools /bin/sh -c "duplicity --verbosity debug --no-encryption /etc/export/project s3+http://' + path.join(serverData.bucket, serverData.path, 'project') + '"';
-                            command = 'docker run -e AWS_DEFAULT_REGION="eu-west-1" -e AWS_ACCESS_KEY_ID="' + serverData.credentials.AccessKeyId + '" -e AWS_SECRET_ACCESS_KEY="' + serverData.credentials.SecretAccessKey + '" -e AWS_SESSION_TOKEN="' + serverData.credentials.SessionToken + '" -v ' + variables.workingPath + ':/etc/export/project gorillajs/tools /bin/sh -c "duplicity ' + excludes + ' --allow-source-mismatch --no-encryption /etc/export/project s3+http://' + path.join(serverData.bucket, serverData.path, 'project') + '"';
-                            // command = 'docker run -e AWS_ACCESS_KEY_ID=' + serverData.credentials.AccessKeyId + ' -e AWS_SECRET_ACCESS_KEY=' + serverData.credentials.SecretAccessKey + ' -e AWS_SESSION_TOKEN=' + serverData.credentials.SessionToken + ' -v ' + variables.workingPath + ':/etc/export/project -v /Users/barreiros/Desktop/backup:/etc/backup gorillajs/tools /bin/sh -c "ls -la /etc/export/project && duplicity --no-encryption /etc/export/project /etc/backup"';
+                            command = 'docker run -e AWS_DEFAULT_REGION="eu-west-1" -e AWS_ACCESS_KEY_ID="' + serverData.credentials.AccessKeyId + '" -e AWS_SECRET_ACCESS_KEY="' + serverData.credentials.SecretAccessKey + '" -e AWS_SECURITY_TOKEN="' + serverData.credentials.SessionToken + '" -v ' + variables.workingPath + ':/etc/export/project gorillajs/tools /bin/sh -c "duplicity ' + excludes + ' --progress --s3-use-new-style --s3-european-buckets --s3-unencrypted-connection --allow-source-mismatch --no-encryption /etc/export/project s3+http://' + path.join(serverData.bucket, serverData.path, 'project') + '"';
                             
                             // console.log(command);
 
                             // execSync(command);
+
+                            console.log(command);
 
                             cross.exec(command, function(err, stdout, stderr){
 
