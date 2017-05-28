@@ -14,6 +14,7 @@ var yaml = require('yamljs');
 var AWS = require('aws-sdk');
 var glob = require('glob');
 var spawn = require('child_process').spawn;
+var execSync = require('child_process').execSync;
 
 var variables = require(path.join(envPaths.libraries, 'variables.js'));
 var events = require(path.join(envPaths.libraries, 'pubsub.js'));
@@ -98,6 +99,23 @@ function runBackup(gorillaFile, token){
 
                             events.publish('VERBOSE', [err, stderr, stdout]);
 
+                            // Comprimo las imágenes del proyecto
+                            exportPath = path.join(variables.homeUserPath, variables.proxyName, 'export', data.local.project.id);
+
+                            if(data.local.hasOwnProperty('services')){
+
+                                // Recupero las imágenes que se han modificado del nodo "services" que tengo en el archivo gorillafile.
+                                fsx.ensureDirSync(path.join(exportPath, 'images'));
+
+                                for(key in data.local.services){
+
+                                    command = 'docker save -o ' + path.join(exportPath, 'images', key) + '.tar ' + data.local.services[key];
+                                    execSync(command);
+
+                                }
+
+                            }
+
                             // Recupero el archivo .teamignore y genero un string con los archivos que quiero necesito excluir para pasárselo al comando sync de aws cli.
                             fsx.ensureFileSync(path.join(variables.workingPath, '.teamignore'));
 
@@ -120,23 +138,25 @@ function runBackup(gorillaFile, token){
                             
                             // Ejecuto el comando en el contenedor "gorillajs/tools", que es donde tengo instalado Duplicity.
                             command = spawn('docker', [
-                                    'run',
-                                    '-e',
-                                    'AWS_DEFAULT_REGION=eu-west-1',
-                                    '-e',
-                                    'AWS_ACCESS_KEY_ID=' + serverData.credentials.AccessKeyId,
-                                    '-e',
-                                    'AWS_SECRET_ACCESS_KEY=' + serverData.credentials.SecretAccessKey,
-                                    '-e',
-                                    'AWS_SECURITY_TOKEN=' + serverData.credentials.SessionToken,
-                                    '-v',
-                                    variables.workingPath + ':/etc/export/project',
-                                    '-v',
-                                    path.join(variables.homeUserPath, variables.proxyName, 'data', data.local.project.id) + ':/etc/export/data',
-                                    'gorillajs/tools',
-                                    '/bin/sh',
-                                    '-c',
-                                    'duplicity ' + excludes + ' --progress --s3-use-new-style --s3-european-buckets --s3-unencrypted-connection --allow-source-mismatch --no-encryption /etc/export s3+http://' + path.join(serverData.bucket, serverData.path)
+                                'run',
+                                '-e',
+                                'AWS_DEFAULT_REGION=eu-west-1',
+                                '-e',
+                                'AWS_ACCESS_KEY_ID=' + serverData.credentials.AccessKeyId,
+                                '-e',
+                                'AWS_SECRET_ACCESS_KEY=' + serverData.credentials.SecretAccessKey,
+                                '-e',
+                                'AWS_SECURITY_TOKEN=' + serverData.credentials.SessionToken,
+                                '-v',
+                                path.join(exportPath, 'images') + ':/etc/export/images',
+                                '-v',
+                                variables.workingPath + ':/etc/export/project',
+                                '-v',
+                                path.join(variables.homeUserPath, variables.proxyName, 'data', data.local.project.id) + ':/etc/export/data',
+                                'gorillajs/tools',
+                                '/bin/sh',
+                                '-c',
+                                'duplicity ' + excludes + ' --progress --s3-use-new-style --s3-european-buckets --s3-unencrypted-connection --allow-source-mismatch --no-encryption /etc/export s3+http://' + path.join(serverData.bucket, serverData.path)
                             ]);
 
                             command.stdout.on('data', function (data) {
@@ -161,26 +181,6 @@ function runBackup(gorillaFile, token){
                         });
 
 
-                        // // Comprimo las imágenes del proyecto
-                        // if(!argv.hasOwnProperty('exclude-images')){ // Si el usuario no ha excluido esta opción.
-                        //
-                        //     if(data.local.hasOwnProperty('services')){
-                        //
-                        //         exportPath = path.join(variables.homeUserPath, variables.proxyName, 'export', data.local.project.id);
-                        //
-                        //         // Recupero las imágenes que se han modificado del nodo "services" que tengo en el archivo gorillafile.
-                        //         fsx.ensureDirSync(path.join(exportPath, 'images'));
-                        //
-                        //         for(key in data.local.services){
-                        //
-                        //             command = 'docker save -o ' + path.join(exportPath, 'images', key) + '.tar ' + data.local.services[key];
-                        //             // output = execSync(command);
-                        //
-                        //         }
-                        //
-                        //     }
-                        //
-                        // }
 
                     }else{
 
