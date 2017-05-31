@@ -117,8 +117,8 @@ function checkUserInput(){
 
                 if(argv._[0] && argv._[1]){
 
-                    mkdirp.sync(argv._[1]);
-                    projectPath = argv._[1];
+                    projectPath = path.resolve(argv._[1]);
+                    mkdirp.sync(projectPath);
                     variables.projectPath = projectPath;
                     commonPath = path.join(projectPath, gorillaFolder, 'common');
                     workingPath = projectPath;
@@ -172,7 +172,7 @@ function checkUserInput(){
 
                 if(argv._[0] && argv._[1]){
 
-                    projectPath = argv._[1];
+                    projectPath = path.resolve(argv._[1]);
                     variables.projectPath = projectPath;
                     workingPath = projectPath;
                     variables.workingPath = workingPath;

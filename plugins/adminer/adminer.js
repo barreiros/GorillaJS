@@ -21,7 +21,15 @@ var gorillaData;
 
 function init(gorillaFile){
 
-    gorillaData = JSON.parse(fs.readFileSync(gorillaFile));
+    if(fs.existsSync(gorillaFile)){
+
+        gorillaData = JSON.parse(fs.readFileSync(gorillaFile));
+
+    }else{
+
+        gorillaData = {};
+
+    }
 
 }
 

@@ -66,10 +66,6 @@ function init(gorillaFile){
 
         }
 
-    }else{
-
-        events.publish('ERROR', ['030']);
-
     }
 
 }

@@ -27,10 +27,6 @@ function init(gorillaFile){
 
     if(fs.existsSync(gorillaFile)){
 
-    }else{
-
-        events.publish('ERROR', ['030']);
-
     }
 
 }
