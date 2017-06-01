@@ -101,11 +101,11 @@ function extractBackup(gorillaFile, token, uuid){
 
     if(!id && !uuid){ // Si no existe un identificador de proyecto válido.
 
-        console.log('Error: Es necesario un proyecto para descargar.');
+        events.publish('ERROR', ['You need a valid project id.']);
         
     }else if(id && uuid && id !== uuid){ // Si el proyecto existe, pero es distinto del que quiere descargar el usuario. 
 
-        console.log('Error: La carpeta ya contiene un proyecto.');
+        events.publish('ERROR', ['Folder already contains a project.']);
 
     }else{ // Si no hay error, descargo el proyecto.
 
@@ -197,8 +197,6 @@ function extractBackup(gorillaFile, token, uuid){
 
                 command.on('exit', function (code) {
 
-                    console.log('El backup ha terminado');
-
                     var key;
 
                     // Si he parado el proyecto, lo vuelvo a arrancar.
@@ -215,7 +213,6 @@ function extractBackup(gorillaFile, token, uuid){
                     // Monto las imágenes que se han modificado del nodo "services" que tengo en el archivo gorillafile.
                     for(key in data.local.services){
 
-                        console.log('Hola, Bar');
                         command = 'docker load -i ' + path.join(exportPath, 'images', key) + '.tar ';
                         execSync(command);
 
@@ -225,8 +222,7 @@ function extractBackup(gorillaFile, token, uuid){
 
             }else{
 
-                console.log(error);
-                // Error: error de conexión con el servidor.
+                events.publish('ERROR', ['Unable to connect with the server. Please, try again later.']);
 
             }
 
@@ -359,7 +355,7 @@ function runBackup(gorillaFile, token){
                         });
 
                         command.stderr.on('data', function (data) {
-                            console.log(data.toString());
+                            events.publish('ERROR', ['Problem with the backup engine. Please, try again.']);
                         });
 
                         command.on('exit', function (code) {
@@ -376,19 +372,19 @@ function runBackup(gorillaFile, token){
 
                     }else{
 
-                        // Error. Muestro el mensaje del servidor.
+                        events.publish('ERROR', ['Unable to connect with the server. Please, try again later.']);
 
                     }
 
                 }else{
 
-                    // Error desconocido.
+                    events.publish('ERROR', ['Unknow error. Please, try again later.']);
 
                 }
                 
             }else{
 
-                // Error de servidor.
+                events.publish('ERROR', ['Unable to connect with the server. Please, try again later.']);
 
             }
 
@@ -396,7 +392,7 @@ function runBackup(gorillaFile, token){
 
     }else{
 
-        events.publish('ERROR', ['030']);
+        events.publish('ERROR', ['Missing project. Please, use a valid project folder.']);
 
     }
 
