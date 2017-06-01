@@ -30,11 +30,11 @@
     "index.js"
   ],
   "dependencies": {
-    "ascii-art": "^1.0.3",
     "aws-sdk": "^2.52.0",
     "colors": "^1.1.2",
     "dateformat": "^1.0.11",
     "escape-string-regexp": "^1.0.4",
+    "figlet": "^1.2.0",
     "fs-extra": "^0.26.2",
     "gulp": "^3.9.0",
     "gulp-batch-replace": "0.0.0",
@@ -55,7 +55,7 @@
     "portscanner": "^2.1.1",
     "pty.js": "^0.3.1",
     "readline-sync": "^1.2.21",
-    "request": "^2.79.0",
+    "request": "^2.81.0",
     "run-sequence": "^1.1.4",
     "split": "^1.0.0",
     "ssh2": "^0.4.13",

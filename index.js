@@ -87,23 +87,7 @@ function checkUserInput(){
 
         }else if((argv.hasOwnProperty('h') || argv.hasOwnProperty('help')) && argv._.length === 0){
 
-            var text;
-
-            text = '';
-            text += 'Usage:';
-            text += '\n';
-            text += '\tgorilla init [parameters](optional)\n';
-            text += '\n';
-            text += 'Parameters:';
-            text += '\n';
-            text += '\t-d Enable debug / verbose mode';
-            text += '\n';
-            text += '\t-f Force to recreate the project (This action don\'t remove your current project files)';
-            text += '\n';
-            text += '\t-v Get the GorillaJS version';
-            text += '\n';
-
-            console.log(text);
+            console.log('Please, visit https://gorillajs.com');
 
         }else{
 
@@ -234,7 +218,6 @@ function run(){
         [commit.replace],
         [m_docker.startSimple, [path.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}']],
         [m_docker.startSimple, [path.join(homeUserPath, proxyName, 'proxy', 'template', composeFile), proxyName]],
-        [commit.create, '{{domain}}'],
 
         [events.publish, ['STEP', ['Your project is ready!']]]
 
