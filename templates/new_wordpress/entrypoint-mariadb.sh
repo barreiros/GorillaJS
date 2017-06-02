@@ -21,14 +21,14 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 
 else
 
-    /usr/bin/mysqld_safe --user mysql --datadir='/var/lib/mysql/' &
+    /usr/bin/mysqld_safe --skip-grant-tables --skip-networking --datadir='/var/lib/mysql/' &
 
-    while !(mysqladmin -uroot -proot_{{database.password}} ping)
+    while !(mysqladmin -uroot ping)
     do
        sleep 1
     done
 
-    mysql -uroot -proot_{{database.password}} -e "UPDATE mysql.user SET Password=PASSWORD('root_{{database.password}}') WHERE User='root';"
+    mysql -uroot -e "UPDATE mysql.user SET Password=PASSWORD('root_{{database.password}}') WHERE User='root';"
 
 fi
 

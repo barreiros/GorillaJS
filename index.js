@@ -97,7 +97,7 @@ function checkUserInput(){
 
             );
 
-            if(argv._[0] === 'init'){
+            if(argv._[0] === 'build'){
 
                 if(argv._[0] && argv._[1]){
 
@@ -113,8 +113,8 @@ function checkUserInput(){
                 if(argv.hasOwnProperty('f')){
 
                     promisesPack.push(
-                        [tools.force, [path.join(projectPath, gorillaFolder, gorillaFile)], 'id'],
-                        [tools.removeDir, path.join(projectPath, gorillaFolder)]
+                        [m_docker.stop, [path.join(projectPath, gorillaFolder, gorillaFile)]],
+                        [tools.force, [path.join(projectPath, gorillaFolder, gorillaFile)]]
                     );
 
                 }
@@ -148,7 +148,7 @@ function checkUserInput(){
                     ]],
                     [tools.retrieveConfigData, [path.join(homeUserPath, proxyName), 'gorillajs-proxy']],
                     [tools.retrieveConfigData, [path.join(homeUserPath, proxyName), 'overwrite']],
-                    [init]
+                    [build]
 
                 );
 
@@ -218,6 +218,7 @@ function run(){
         [commit.replace],
         [m_docker.startSimple, [path.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}']],
         [m_docker.startSimple, [path.join(homeUserPath, proxyName, 'proxy', 'template', composeFile), proxyName]],
+        [commit.create, ['{{domain}}']],
 
         [events.publish, ['STEP', ['Your project is ready!']]]
 
@@ -228,7 +229,7 @@ function run(){
 
 }
 
-function init(){
+function build(){
 
     var promisesPack = [];
 
@@ -278,11 +279,11 @@ function init(){
 
         [promises.cond, '{{new-project}}::yes', [
 
-            [cross.moveFiles, [projectPath, false, ['.DS_Store', '.git'], path.join('{{template_path}}', 'project')]],
-            [tools.paramForced, ['docker', 'port', Math.floor(Math.random() * (4999 - 4700)) + 4700]]
+            [cross.moveFiles, [projectPath, false, ['.DS_Store', '.git'], path.join('{{template_path}}', 'project')]]
 
         ]],
 
+        [tools.paramForced, ['docker', 'port', Math.floor(Math.random() * (4999 - 4700)) + 4700]],
         [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], path.join(__dirname, 'templates', 'new_wordpress')]],
         [tools.retrieveConfigData, [path.join(homeUserPath, proxyName), '{{template_slug}}']],
 
@@ -323,6 +324,7 @@ function init(){
         [m_docker.start, ['{{machine-name}}', path.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}', '{{ssh-enabled}}']],
         [m_docker.base, [path.join(homeUserPath, proxyName, 'proxy', 'template', composeFile), proxyName, '{{proxyport}}']],
         [events.publish, ['DOCKER_STARTED'], true],
+        [tools.fusion, [path.join(projectPath, gorillaFolder, gorillaFile)]],
 
         [events.publish, ['STEP', ['build_project']]],
         [promises.cond, '{{islocal}}::yes', [
