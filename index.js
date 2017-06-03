@@ -81,6 +81,8 @@ function checkUserInput(){
 
     }else{
 
+        promisesPack.push([tools.printLogo]);
+
         if((argv.hasOwnProperty('v') || argv.hasOwnProperty('version')) && argv._.length === 0){
 
             console.log(tools.printVersion());
@@ -110,7 +112,6 @@ function checkUserInput(){
 
                 }
 
-                promisesPack.push([tools.printLogo]);
 
                 if(argv.hasOwnProperty('f')){
 
@@ -167,7 +168,6 @@ function checkUserInput(){
 
                     [tools.config, env],
                     [tools.createGorillaFile, [path.join(projectPath, gorillaFolder, gorillaFile), gorillaFolder], 'id'],
-                    [tools.printLogo],
                     [run]
 
                 );

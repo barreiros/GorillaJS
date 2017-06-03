@@ -218,6 +218,13 @@ function extractBackup(gorillaFile, token, uuid){
 
                     }
 
+                    // Si el proyecto es nuevo, o lleva el parámetro -f, le digo al usuario que lo compile para terminar la instalación.
+                    if(!id){
+
+                        events.publish('STEP', ['Your files are ready. Please, run "gorilla build" or "gorilla build -f" to finish the installation.']);
+
+                    }
+
                 });
 
             }else{

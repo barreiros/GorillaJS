@@ -8,5 +8,8 @@
 	],
 	"wp.dev": {
 		"wp.dev_mysql": "mysql"
+	},
+	"gorillajs.landing": {
+		"gorillajs.landing_mysql": "mysql"
 	}
 }
