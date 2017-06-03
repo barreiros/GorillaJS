@@ -11,11 +11,12 @@ var fsx = require('fs-extra');
 var yaml = require('yamljs');
 
 var variables = require(path.join(envPaths.libraries, 'variables.js'));
+var promises = require(path.join(envPaths.libraries, 'promises.js'));
 var events = require(path.join(envPaths.libraries, 'pubsub.js'));
 var cross = require(path.join(envPaths.libraries, 'crossExec.js'));
 
 events.subscribe('INIT_PLUGINS', init);
-// events.subscribe('DOCKER_STARTED', addAdminer);
+events.subscribe('DOCKER_STARTED', addAdminer);
 
 var gorillaData;
 
@@ -30,6 +31,16 @@ function init(gorillaFile){
         gorillaData = {};
 
     }
+
+}
+
+function addAdminer(){
+
+    var promisesPack;
+
+    promisesPack = [addAdminer];
+
+    promises.sandwich(promisesPack);
 
 }
 
@@ -86,11 +97,15 @@ function addAdminer(){
         // Copio los contenidos en el contenedor: script bash y carpeta pública.
         cross.exec('docker cp ' + envPaths.plugins + '/adminer/public/. gorillajsproxy:/var/www/adminer && docker cp ' + envPaths.plugins + '/adminer/server/. gorillajsproxy:/etc/adminer', function(err, stdout, stderr){
 
+            if (err) events.publish('ERROR', ['Problem with Adminer Plugin instalation.']);
+            events.publish('VERBOSE', [err, stderr, stdout]);
+
             // Ejecuto el script de bash.
-            // cross.exec('docker exec gorillajsproxy bash /etc/adminer/adminer.sh', function(err, stdout, stderr){
             cross.exec('docker exec gorillajsproxy /bin/sh /etc/adminer/adminer.sh', function(err, stdout, stderr){
 
-                console.log(err, stdout, stderr);
+                if (err) events.publish('ERROR', ['Problem with Adminer Plugin instalation.']);
+                events.publish('VERBOSE', [err, stderr, stdout]);
+                events.publish('PROMISEME');
 
             });
 

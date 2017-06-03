@@ -4,7 +4,7 @@ SSL={{project.sslenable}}
 
 function replace_domain {
 
-    SITE_URL=$(wp option get siteurl --allow-root)
+    SITE_URL=$(wp --path="/var/www/{{project.domain}}/application" option get siteurl --allow-root)
 
     if [ "$SSL" = "yes" ]; then
 
@@ -16,7 +16,7 @@ function replace_domain {
 
     fi
 
-    wp search-replace $SITE_URL $NEW_SITE_URL --allow-root
+    wp --path="/var/www/{{project.domain}}/application" search-replace $SITE_URL $NEW_SITE_URL --allow-root
 
 }
 
@@ -25,26 +25,21 @@ ln -s /etc/apache2/sites-available/{{project.domain}}.conf /etc/apache2/sites-en
 
 apachectl stop && apachectl start &&
 
-
-cd /var/www/{{project.domain}}/application &&
-
-
 echo 'init' > /var/www/{{project.domain}}/application/gorilla-status.txt &&
 
+if [ -e /var/www/{{project.domain}}/application/wp-config.php ]; then
 
-if [ -e ./wp-config.php ]; then
-
-    sed -i '/DB_HOST/c\define("DB_HOST", "{{project.domain}}_mysql");' wp-config.php && 
-    sed -i '/DB_NAME/c\define("DB_NAME", "{{database.dbname}}");' wp-config.php &&
-    sed -i '/DB_USER/c\define("DB_USER", "{{database.username}}");' wp-config.php &&
-    sed -i '/DB_PASSWORD/c\define("DB_PASSWORD", "{{database.password}}");' wp-config.php
+    sed -i '/DB_HOST/c\define("DB_HOST", "{{project.domain}}_mysql");' /var/www/{{project.domain}}/application/wp-config.php && 
+    sed -i '/DB_NAME/c\define("DB_NAME", "{{database.dbname}}");' /var/www/{{project.domain}}/application/wp-config.php &&
+    sed -i '/DB_USER/c\define("DB_USER", "{{database.username}}");' /var/www/{{project.domain}}/application/wp-config.php &&
+    sed -i '/DB_PASSWORD/c\define("DB_PASSWORD", "{{database.password}}");' /var/www/{{project.domain}}/application/wp-config.php
 
     # Si uso HTTP_HOST necesito pasarle la variable a wp-cli.
-    if grep -q "HTTP_HOST" wp-config.php; then
+    if grep -q "HTTP_HOST" /var/www/{{project.domain}}/application/wp-config.php; then
 
-        if ! grep -q "wp-cli.org" wp-config.php; then
+        if ! grep -q "wp-cli.org" /var/www/{{project.domain}}/application/wp-config.php; then
 
-            sed -i '/<?php/a if ( defined( "WP_CLI" ) && WP_CLI && ! isset( $_SERVER["HTTP_HOST"] ) ) { $_SERVER["HTTP_HOST"] = "wp-cli.org";}' wp-config.php
+            sed -i '/<?php/a if ( defined( "WP_CLI" ) && WP_CLI && ! isset( $_SERVER["HTTP_HOST"] ) ) { $_SERVER["HTTP_HOST"] = "wp-cli.org";}' /var/www/{{project.domain}}/application/wp-config.php
 
         fi
 
@@ -54,27 +49,27 @@ else
 
     echo 'downloading' > /var/www/{{project.domain}}/application/gorilla-status.txt &&
 
-    wp core download --allow-root || true && 
-    wp core config --dbname="{{database.dbname}}" --dbuser="{{database.username}}" --dbpass="{{database.password}}" --dbhost="{{project.domain}}_mysql" --dbprefix="${RANDOM}_" --allow-root --skip-check || true
+    wp --path="/var/www/{{project.domain}}/application/" core download --allow-root || true && 
+    wp --path="/var/www/{{project.domain}}/application/" core config --dbname="{{database.dbname}}" --dbuser="{{database.username}}" --dbpass="{{database.password}}" --dbhost="{{project.domain}}_mysql" --dbprefix="${RANDOM}_" --allow-root --skip-check || true
 
 fi
 
 
 if [ "$SSL" = "yes" ]; then
 
-    if ! grep -q "FORCE_SSL_ADMIN" wp-config.php; then
+    if ! grep -q "FORCE_SSL_ADMIN" /var/www/{{project.domain}}/application/wp-config.php; then
 
-        sed -i '1s/^/<?php \nif($_SERVER["HTTP_X_FORWARDED_PROTO"] === "https") $_SERVER["HTTPS"] = "on";\ndefine("FORCE_SSL_ADMIN", true);\n?>\n /' wp-config.php
+        sed -i '1s/^/<?php \nif($_SERVER["HTTP_X_FORWARDED_PROTO"] === "https") $_SERVER["HTTPS"] = "on";\ndefine("FORCE_SSL_ADMIN", true);\n?>\n /' /var/www/{{project.domain}}/application/wp-config.php
 
     else
 
-        sed -i '/FORCE_SSL_ADMIN/c\define("FORCE_SSL_ADMIN", true);' wp-config.php
+        sed -i '/FORCE_SSL_ADMIN/c\define("FORCE_SSL_ADMIN", true);' /var/www/{{project.domain}}/application/wp-config.php
 
     fi
 
 else
 
-    sed -i '/FORCE_SSL_ADMIN/c\define("FORCE_SSL_ADMIN", false);' wp-config.php
+    sed -i '/FORCE_SSL_ADMIN/c\define("FORCE_SSL_ADMIN", false);' /var/www/{{project.domain}}/application/wp-config.php
 
 fi
 

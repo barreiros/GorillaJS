@@ -22,7 +22,7 @@ var sslEnabled = false;
 events.subscribe('DOMAIN_SELECTED', init);
 events.subscribe('BEFORE_SET_PROXY_VARIABLES', modifyProxyBefore);
 events.subscribe('AFTER_SET_PROXY_VARIABLES', modifyProxyAfter);
-// events.subscribe('DOCKER_STARTED', configureDocker);
+events.subscribe('DOCKER_STARTED', setConfiguration);
 
 function init(domain){
 
@@ -115,6 +115,21 @@ function addSSL(gorillaFile, proxyPath, port){
 
 }
 
+function setConfiguration(){
+
+    var promisesPack;
+
+    promisesPack = [
+
+        configureDocker,
+        [commit.create, 'gorillajsproxy']
+
+    ];
+
+    promises.sandwich(promisesPack);
+
+}
+
 function configureDocker(){
 
     // Ejecuto el script de bash de configuración.
@@ -122,7 +137,7 @@ function configureDocker(){
 
         events.publish('VERBOSE', [err, stderr, stdout]);
 
-        commit.create('gorillajsproxy');
+        events.publish('PROMISEME');
 
     });
 

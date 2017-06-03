@@ -5,5 +5,8 @@
 	"caritas.local": [],
 	"test.local": [
 		"mysql"
+	],
+	"wp.dev": [
+		"mysql"
 	]
 }

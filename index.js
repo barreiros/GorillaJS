@@ -110,6 +110,8 @@ function checkUserInput(){
 
                 }
 
+                promisesPack.push([tools.printLogo]);
+
                 if(argv.hasOwnProperty('f')){
 
                     promisesPack.push(
@@ -127,14 +129,12 @@ function checkUserInput(){
 
                 promisesPack.push(
 
-                    [tools.printLogo],
                     [tools.config, env],
                     [tools.isNewProject, path.join(workingPath, gorillaFolder, gorillaFile), 'new-project'],
 
                     [m_docker.check],
                     [m_docker.config],
-                    [m_docker.gorigit, [path.join(homeUserPath, proxyName, 'templates')]],
-                    [m_docker.templates, [templateRepos.proxy, '/var/gorillajs/templates/gorillajs-proxy']],
+                    [m_docker.getTemplateSource, [path.join(homeUserPath, proxyName, 'templates'), templateRepos.proxy, 'gorillajs-proxy']],
 
                     [tools.createGorillaFile, [path.join(projectPath, gorillaFolder, gorillaFile), gorillaFolder], 'id'],
                     [promises.cond, '{{id}}!:', [
@@ -273,7 +273,7 @@ function build(){
 
         ], [
 
-            [m_docker.templates, ['{{template}}', '/var/gorillajs/templates/{{template_slug}}']]
+            [m_docker.getTemplateSource, [path.join(homeUserPath, proxyName, 'templates'), '{{template}}', '{{template_slug}}']]
 
         ]],
 
