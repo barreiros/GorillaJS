@@ -323,7 +323,7 @@ function build(){
         [commit.replace],
         [m_docker.start, ['{{machine-name}}', path.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}', '{{ssh-enabled}}']],
         [m_docker.base, [path.join(homeUserPath, proxyName, 'proxy', 'template', composeFile), proxyName, '{{proxyport}}']],
-        [events.publish, ['DOCKER_STARTED'], true],
+        [events.publish, ['DOCKER_STARTED']],
         [tools.fusion, [path.join(projectPath, gorillaFolder, gorillaFile)]],
 
         [events.publish, ['STEP', ['build_project']]],

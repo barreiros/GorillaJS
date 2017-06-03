@@ -38,7 +38,12 @@ function addAdminer(){
 
     var promisesPack;
 
-    promisesPack = [addAdminer];
+    promisesPack = [
+
+        addAdminer,
+        [commit.create, 'gorillajsproxy']
+    
+    ];
 
     promises.sandwich(promisesPack);
 
@@ -56,6 +61,8 @@ function addAdminer(){
     // Recupero la ruta del archivo docker-compose.
     yaml.load(composePath, function(compose){
 
+        var engines = ['mysql', 'mariadb', 'sqlite', 'postgresql', 'mongodb', 'oracle', 'elasticsearch'];
+
         if(compose.hasOwnProperty('services')){
 
             // Cargo el archivo con la lista de containers con base de datos de los dominios.
@@ -71,19 +78,12 @@ function addAdminer(){
 
                         if(compose.services[service].volumes[volume].indexOf(dataPath) > -1){
 
-                            // Añado el contenedor al listado.
-                            
-                            // "alpine.local": [
-                            //     "alpine.local_mysql": "mysql"
-                            //     "alpine.local_mongodb": "mongodb"
-                            // ]
-                            var engines = ['mysql', 'mariadb', 'sqlite', 'postgresql', 'mongodb', 'oracle', 'elasticsearch'];
-
                             // Busco el nombre del motor de base de datos. Para que funcione tiene que contener el nombre del motor en el nombre del contenedor.
                             for(var engine in engines){
 
                                 if(compose.services[service].container_name.search(engines[engine]) !== -1){
 
+                                    // Añado el contenedor al listado.
                                     list[domain][compose.services[service].container_name] = engines[engine];
 
                                 }
