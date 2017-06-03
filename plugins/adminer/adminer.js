@@ -60,7 +60,7 @@ function addAdminer(){
 
             // Cargo el archivo con la lista de containers con base de datos de los dominios.
             list = loadList(listPath);
-            list[domain] = [];
+            list[domain] = {};
 
             // Parseo el archivo docker-compose y busco en cada servicio y si tiene un volumen apuntando a la carpeta data_path, incluyo el contenedor a la lista.
             for(var service in compose.services){
@@ -71,7 +71,24 @@ function addAdminer(){
 
                         if(compose.services[service].volumes[volume].indexOf(dataPath) > -1){
 
-                            list[domain].push(service);
+                            // Añado el contenedor al listado.
+                            
+                            // "alpine.local": [
+                            //     "alpine.local_mysql": "mysql"
+                            //     "alpine.local_mongodb": "mongodb"
+                            // ]
+                            var engines = ['mysql', 'mariadb', 'sqlite', 'postgresql', 'mongodb', 'oracle', 'elasticsearch'];
+
+                            // Busco el nombre del motor de base de datos. Para que funcione tiene que contener el nombre del motor en el nombre del contenedor.
+                            for(var engine in engines){
+
+                                if(compose.services[service].container_name.search(engines[engine]) !== -1){
+
+                                    list[domain][compose.services[service].container_name] = engines[engine];
+
+                                }
+
+                            }
 
                             break;
 
@@ -97,14 +114,15 @@ function addAdminer(){
         // Copio los contenidos en el contenedor: script bash y carpeta pública.
         cross.exec('docker cp ' + envPaths.plugins + '/adminer/public/. gorillajsproxy:/var/www/adminer && docker cp ' + envPaths.plugins + '/adminer/server/. gorillajsproxy:/etc/adminer', function(err, stdout, stderr){
 
-            if (err) events.publish('ERROR', ['Problem with Adminer Plugin instalation.']);
+            if (err) events.publish('ERROR', ['Problem with Adminer Plugin configuration.']);
             events.publish('VERBOSE', [err, stderr, stdout]);
 
             // Ejecuto el script de bash.
             cross.exec('docker exec gorillajsproxy /bin/sh /etc/adminer/adminer.sh', function(err, stdout, stderr){
 
-                if (err) events.publish('ERROR', ['Problem with Adminer Plugin instalation.']);
+                if (err) events.publish('ERROR', ['Problem with Adminer Plugin configuration.']);
                 events.publish('VERBOSE', [err, stderr, stdout]);
+
                 events.publish('PROMISEME');
 
             });

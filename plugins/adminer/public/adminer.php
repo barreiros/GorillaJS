@@ -1483,6 +1483,7 @@ page_header($yh,$n="",$Wa=array(),$zh=""){global$ca,$ia,$b,$Yb,$x;page_headers()
     var $j = jQuery.noConflict(true);
     var driverMatch = {
         'mysql': 'server',
+        'mariadb': 'server',
         'sqlite': 'sqlite',
         'postgresql': 'pgsql',
         'mongodb': 'mongo',
@@ -1498,9 +1499,44 @@ page_header($yh,$n="",$Wa=array(),$zh=""){global$ca,$ia,$b,$Yb,$x;page_headers()
 
         $j.getJSON('list.json', function(data){
 
+            var keyFormatted, exit;
+
             if(data.hasOwnProperty(window.location.hostname)){
 
                 data = data[window.location.hostname];
+                exit = false;
+
+                // Configuro el campo host para que por defecto aparezca la primera opci.n del json y que cuando cambie lo vuelva a rellenar con la opci.n correcta.
+                $j('select[name*=drive]').on('change', function(){
+
+                    for(var key in driverMatch){
+
+                        if(exit){
+
+                            break;
+
+                        }
+
+                        if(driverMatch[key] === $j(this).val()){
+
+                            for(var host in data){
+
+                                if(data[host] === key){
+
+                                    $j('input[name*=server]').val(host);
+                                    exit = true;
+
+                                    break;
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                });
 
                 // Configuro el campo host para que por defecto aparezca la primera opción del json y que cuando cambie lo vuelva a rellenar con la opción correcta.
                 $j('select[name*=drive]').on('change', function(){
@@ -1524,8 +1560,8 @@ page_header($yh,$n="",$Wa=array(),$zh=""){global$ca,$ia,$b,$Yb,$x;page_headers()
 
                 }
 
-                $j('select[name*=driver] option[value="' + driverMatch[data[0]] + '"').attr('selected', 'selected');
-                $j('input[name*=server]').val(data[0]);
+                $j('select[name*=driver] option[value="' + driverMatch[data[Object.keys(data)[0]]] + '"').attr('selected', 'selected');
+                $j('input[name*=server]').val(Object.keys(data)[0]);
 
             }
 

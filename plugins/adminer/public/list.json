@@ -6,7 +6,7 @@
 	"test.local": [
 		"mysql"
 	],
-	"wp.dev": [
-		"mysql"
-	]
+	"wp.dev": {
+		"wp.dev_mysql": "mysql"
+	}
 }
