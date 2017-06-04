@@ -22,3 +22,6 @@
 [submodule "templates/nodejs"]
 	path = templates/nodejs
 	url = https://github.com/barreiros/GorillaJS-NodeJS
+[submodule "plugins"]
+	path = plugins
+	url = https://github.com/barreiros/GorillaJS-Plugins
