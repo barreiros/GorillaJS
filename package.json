@@ -25,7 +25,6 @@
   },
   "files": [
     "lib",
-    "plugins",
     "README.md",
     "index.js"
   ],
@@ -53,7 +52,6 @@
     "openurl": "^1.1.1",
     "path": "^0.12.7",
     "portscanner": "^2.1.1",
-    "pty.js": "^0.3.1",
     "readline-sync": "^1.2.21",
     "request": "^2.81.0",
     "run-sequence": "^1.1.4",
