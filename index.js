@@ -284,7 +284,7 @@ function build(){
         ]],
 
         [tools.paramForced, ['docker', 'port', Math.floor(Math.random() * (4999 - 4700)) + 4700]],
-        [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], path.join(__dirname, 'templates', 'new_wordpress')]],
+        [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], path.join(__dirname, 'templates', 'new_django')]],
         [tools.retrieveConfigData, [path.join(homeUserPath, proxyName), '{{template_slug}}']],
 
         [events.publish, ['STEP', ['check_domain']]],
@@ -321,7 +321,9 @@ function build(){
         [events.publish, ['STEP', ['docker_start']]],
         [m_docker.network],
         [commit.replace],
+        [m_docker.stop, [path.join(projectPath, gorillaFolder, gorillaFile)]],
         [m_docker.start, ['{{machine-name}}', path.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}', '{{ssh-enabled}}']],
+        [m_docker.stop, [null, 'gorillajsproxy']],
         [m_docker.base, [path.join(homeUserPath, proxyName, 'proxy', 'template', composeFile), proxyName, '{{proxyport}}']],
         [events.publish, ['DOCKER_STARTED']],
         [tools.fusion, [path.join(projectPath, gorillaFolder, gorillaFile)]],
