@@ -283,7 +283,7 @@ function build(){
 
         ]],
 
-        [tools.paramForced, ['docker', 'port', Math.floor(Math.random() * (4999 - 4700)) + 4700]],
+        [tools.paramForced, ['docker', 'port', Math.floor(Math.random() * (4999 - 4700)) + 4700], 'dockerport'],
         [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], path.join(__dirname, 'templates', 'new_django')]],
         [tools.retrieveConfigData, [path.join(homeUserPath, proxyName), '{{template_slug}}']],
 
@@ -331,22 +331,28 @@ function build(){
         [events.publish, ['STEP', ['build_project']]],
         [promises.cond, '{{islocal}}::yes', [
 
-            [events.publish, ['STEP', ['open_project']]],
             [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']],
 
             [promises.cond, '{{proxyport}}::80', [
 
                 [host.check, ['{{protocol}}://{{domain}}']],
-                [host.open, ['{{protocol}}://{{domain}}', 'Your project is ready!']]
+                [host.open, '{{protocol}}://{{domain}}'],
+                [events.publish, ['MESSAGE', ['Server ready!!!']], true]
 
             ], [
 
                 [host.check, ['{{protocol}}://{{domain}}']],
-                [host.open, ['{{protocol}}://{{domain}}:{{proxyport}}', 'Your project is ready!']]
+                [host.open, '{{protocol}}://{{domain}}:{{proxyport}}'],
+                [events.publish, ['MESSAGE', ['Server ready!!!']], true]
 
-            ]]
+            ]],
 
-        ]]
+            [events.publish, ['STEP', ['open_project']]]
+
+        ]],
+        [host.check, ['{{protocol}}://{{domain}}', true]],
+        [events.publish, ['STEP', ['project_dependencies']]],
+        [events.publish, ['PROJECT_COMPLETED']]
 
     ];
 

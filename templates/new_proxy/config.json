@@ -123,7 +123,8 @@
             "config_plugins": "Setting plugins...",
             "docker_start" : "Starting Docker...",
             "build_project": "Your project is built.",
-            "open_project": "Opening your project."
+            "open_project": "Opening your project.",
+            "project_dependencies": "Installing project dependencies..."
 
         },
 

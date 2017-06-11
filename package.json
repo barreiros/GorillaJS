@@ -24,9 +24,11 @@
     "gorilla": "index.js"
   },
   "files": [
-    "lib",
+    "index.js",
     "README.md",
-    "index.js"
+    "lib",
+    "plugins/django",
+    "plugins/wordpress.js"
   ],
   "dependencies": {
     "aws-sdk": "^2.52.0",
