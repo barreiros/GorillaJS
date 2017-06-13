@@ -161,7 +161,7 @@ fi
 
 if ! grep -q "MEDIA_ROOT" /var/www/{{project.domain}}/{{project.slug}}/settings.py; then
 
-    echo 'MEDIA_ROOT = "media"' >> ./var/www/{{project.domain}}/{{project.slug}}/settings.py
+    echo 'MEDIA_ROOT = "media"' >> /var/www/{{project.domain}}/{{project.slug}}/settings.py
 
 fi
 
