@@ -15,11 +15,10 @@ if [ ! -e /var/www/{{project.domain}}/requirements.txt ]; then
 fi
 
 
-echo 'Checking database' > /var/www/{{project.domain}}/{{project.slug}}/gorilla-status.txt &&
-
 if [ "$ENGINE" == "PostgreSQL" ]; then
 
-    apk add --no-cache postgresql-dev &&
+    apk add --no-cache postgresql postgresql-dev &&
+    apk del mariadb-dev &&
 
     # Si no está el módulo de postgresql, lo añado a la lista de requirements.
     if ! grep -q "psycopg2" /var/www/{{project.domain}}/requirements.txt; then
@@ -31,6 +30,7 @@ if [ "$ENGINE" == "PostgreSQL" ]; then
 elif [ "$ENGINE" == "MySQL" ]; then
 
     apk add --no-cache mariadb-dev &&
+    apk del postgresql-dev &&
 
     # Si no están lo módulos de mysql, los añado.
     if ! grep -q "MySQL-python" /var/www/{{project.domain}}/requirements.txt; then
@@ -52,6 +52,11 @@ elif [ "$ENGINE" == "MySQL" ]; then
     fi
 
 fi
+
+while !(pg_isready -h {{project.domain}}_postgresql -d {{database.dbname}})
+do
+    sleep 1
+done
 
 if [ "$MESSAGES" == "yes" ]; then
 
@@ -186,7 +191,7 @@ if [ ! -d "static" ]; then
 
 fi
 
-sleep 10 &&
+echo 'Checking database' > /var/www/{{project.domain}}/{{project.slug}}/gorilla-status.txt &&
 
 # Sincronizo la base de datos.
 python /var/www/{{project.domain}}/manage.py migrate &&
