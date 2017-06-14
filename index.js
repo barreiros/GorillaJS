@@ -284,7 +284,7 @@ function build(){
         ]],
 
         [tools.paramForced, ['docker', 'port', Math.floor(Math.random() * (4999 - 4700)) + 4700], 'dockerport'],
-        [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], path.join(__dirname, 'templates', 'new_django')]],
+        [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], '{{template_path}}']],
         [tools.retrieveConfigData, [path.join(homeUserPath, proxyName), '{{template_slug}}']],
 
         [events.publish, ['STEP', ['check_domain']]],
@@ -304,7 +304,7 @@ function build(){
 
         [events.publish, ['STEP', ['move_files']]],
 
-        [cross.moveFiles, [path.join(homeUserPath, proxyName, 'proxy', 'template'), false, ['.DS_Store', '.git'], path.join(__dirname, 'templates', 'new_proxy')]],
+        [cross.moveFiles, [path.join(homeUserPath, proxyName, 'proxy', 'template'), false, ['.DS_Store', '.git'], path.join(homeUserPath, proxyName, 'templates', 'gorillajs-proxy')]],
 
         [events.publish, ['STEP', ['config_plugins']]],
 
