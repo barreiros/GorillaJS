@@ -10,9 +10,6 @@
 	path = templates/proxy
 	url = https://github.com/barreiros/GorillaJS-Proxy
     branch = master
-[submodule "templates/html5"]
-	path = templates/html5
-	url = https://github.com/barreiros/GorillsJS-HTML5
 [submodule "templates/opencart"]
 	path = templates/opencart
 	url = https://github.com/barreiros/GorillaJS-Opencart
@@ -25,3 +22,6 @@
 [submodule "plugins"]
 	path = plugins
 	url = https://github.com/barreiros/GorillaJS-Plugins
+[submodule "templates/php-7"]
+	path = templates/php-7
+	url = https://github.com/barreiros/GorillaJS-PHP-7
