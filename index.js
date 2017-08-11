@@ -325,7 +325,7 @@ function build(){
         [m_docker.start, ['{{machine-name}}', path.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}', '{{ssh-enabled}}']],
         [m_docker.stop, [null, 'gorillajsproxy']],
         [m_docker.base, [path.join(homeUserPath, proxyName, 'proxy', 'template', composeFile), proxyName, '{{proxyport}}']],
-        [events.publish, ['DOCKER_STARTED']],
+        [events.publish, ['DOCKER_STARTED'], true],
         [tools.fusion, [path.join(projectPath, gorillaFolder, gorillaFile)]],
 
         [events.publish, ['STEP', ['build_project']]],
@@ -352,7 +352,7 @@ function build(){
         ]],
         [host.check, ['{{protocol}}://{{domain}}', true]],
         [events.publish, ['STEP', ['project_dependencies']]],
-        [events.publish, ['PROJECT_COMPLETED']]
+        [events.publish, ['PROJECT_COMPLETED'], true]
 
     ];
 
