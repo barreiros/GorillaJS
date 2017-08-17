@@ -81,8 +81,6 @@ function checkUserInput(){
 
     }else{
 
-        promisesPack.push([tools.printLogo]);
-
         if((argv.hasOwnProperty('v') || argv.hasOwnProperty('version')) && argv._.length === 0){
 
             console.log(tools.printVersion());
@@ -100,6 +98,8 @@ function checkUserInput(){
             );
 
             if(argv._[0] === 'build'){
+
+                promisesPack.push([tools.printLogo]);
 
                 if(argv._[0] && argv._[1]){
 
@@ -154,6 +154,8 @@ function checkUserInput(){
                 );
 
             }else if(argv._[0] === 'run'){
+
+                promisesPack.push([tools.printLogo]);
 
                 if(argv._[0] && argv._[1]){
 
