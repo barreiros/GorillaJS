@@ -330,7 +330,6 @@ function build(){
         [events.publish, ['DOCKER_STARTED'], true],
         [tools.fusion, [path.join(projectPath, gorillaFolder, gorillaFile)]],
 
-        [events.publish, ['STEP', ['build_project']]],
         [promises.cond, '{{islocal}}::yes', [
 
             [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']],
@@ -350,6 +349,10 @@ function build(){
             ]],
 
             [events.publish, ['STEP', ['open_project']]]
+
+        ], [
+        
+            [events.publish, ['STEP', ['build_project']]]
 
         ]],
         [host.check, ['{{protocol}}://{{domain}}', true]],
