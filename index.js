@@ -347,18 +347,14 @@ function build(){
                 [host.open, '{{protocol}}://{{domain}}:{{proxyport}}'],
                 [events.publish, ['MESSAGE', ['Server ready!!!']], true]
 
-            ]],
-
-            [events.publish, ['STEP', ['open_project']]]
-
-        ], [
-        
-            [events.publish, ['STEP', ['build_project']]]
+            ]]
 
         ]],
+        [events.publish, ['STEP', ['build_project']]],
         [host.check, ['{{protocol}}://{{domain}}', true]],
-        [events.publish, ['STEP', ['project_dependencies']]],
-        [events.publish, ['PROJECT_COMPLETED'], true]
+        [events.publish, ['STEP', ['open_browser']]],
+        [events.publish, ['PROJECT_COMPLETED'], true],
+        [exit, '']
 
     ];
 
@@ -368,8 +364,10 @@ function build(){
 }
 
 function exit(text){
+
     console.log(text);
-    events.publish('PROMISEME');
+    process.exit();
+
 }
 
 function showVerbose(systemMessage, force){
