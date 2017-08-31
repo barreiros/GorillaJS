@@ -285,9 +285,9 @@ function build(){
         ]],
 
         [tools.paramForced, ['docker', 'port', Math.floor(Math.random() * (4999 - 4700)) + 4700], 'dockerport'],
-        // [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], '{{template_path}}']],
+        [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], '{{template_path}}']],
         // [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], path.join(envPaths.base, 'templates', 'Django')]],
-        [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], path.join(envPaths.base, 'templates', 'Wordpress')]],
+        // [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], path.join(envPaths.base, 'templates', 'Wordpress')]],
         [tools.retrieveConfigData, [path.join(homeUserPath, proxyName), '{{template_slug}}']],
 
         [events.publish, ['STEP', ['check_domain']]],
