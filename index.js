@@ -244,7 +244,7 @@ function build(){
         [events.publish, ['STEP', ['check_repo']]],
         [promises.cond, '{{template_type}}::Local folder', [
         
-            [tools.param, ['docker', 'template-folder'], 'template']
+            [tools.param, ['docker', 'template_folder'], 'template']
 
         ], [
         
@@ -319,8 +319,6 @@ function build(){
         [tools.setEnvVariables, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder, '*'), ['image']]],
         [events.publish, ['AFTER_SET_TEMPLATE_VARIABLES', [path.join(projectPath, gorillaFolder, gorillaFile), path.join(projectPath, gorillaFolder, gorillaTemplateFolder)]], true],
 
-        [m_docker.ip, '{{machine-name}}', 'ip'],
-
         [events.publish, ['STEP', ['docker_start']]],
         [m_docker.network],
         [commit.replace],
@@ -328,12 +326,18 @@ function build(){
         [m_docker.start, ['{{machine-name}}', path.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}', '{{ssh-enabled}}']],
         [m_docker.stop, [null, 'gorillajsproxy']],
         [m_docker.base, [path.join(homeUserPath, proxyName, 'proxy', 'template', composeFile), proxyName, '{{proxyport}}']],
-        [events.publish, ['DOCKER_STARTED'], true],
         [tools.fusion, [path.join(projectPath, gorillaFolder, gorillaFile)]],
 
         [promises.cond, '{{islocal}}::yes', [
 
-            [host.add, ['{{hosts-file}}', '{{domain}}', '{{ip}}']],
+            [host.checkBeforeAdd, ['{{hosts-file}}', '{{domain}}'], 'add-host'],
+
+            [promises.cond, '{{add-host}}::yes', [
+
+                [tools.param, ['system', 'password', null, null, false], 'system-password'],
+                [host.add, ['{{hosts-file}}', '{{domain}}', '{{system-password}}']]
+
+            ]],
 
             [promises.cond, '{{proxyport}}::80', [
 
@@ -350,6 +354,8 @@ function build(){
             ]]
 
         ]],
+
+        [events.publish, ['DOCKER_STARTED'], true],
         [events.publish, ['STEP', ['build_project']]],
         [host.check, ['{{protocol}}://{{domain}}', true]],
         [events.publish, ['STEP', ['open_browser']]],
