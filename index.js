@@ -288,6 +288,7 @@ function build(){
         [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], '{{template_path}}']],
         // [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], path.join(envPaths.base, 'templates', 'Django')]],
         // [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], path.join(envPaths.base, 'templates', 'Wordpress')]],
+        // [cross.moveFiles, [path.join(projectPath, gorillaFolder, gorillaTemplateFolder), false, ['.DS_Store', 'project', '.git'], path.join(envPaths.base, 'templates', 'nodejs')]],
         [tools.retrieveConfigData, [path.join(homeUserPath, proxyName), '{{template_slug}}']],
 
         [events.publish, ['STEP', ['check_domain']]],
@@ -341,13 +342,15 @@ function build(){
 
             [promises.cond, '{{proxyport}}::80', [
 
-                [host.check, ['{{protocol}}://{{domain}}']],
+                // [host.check, ['{{protocol}}://{{domain}}']],
+                [host.check, ['http://{{domain}}']],
                 [host.open, '{{protocol}}://{{domain}}'],
                 [events.publish, ['MESSAGE', ['Server ready!!!']], true]
 
             ], [
 
-                [host.check, ['{{protocol}}://{{domain}}']],
+                // [host.check, ['{{protocol}}://{{domain}}']],
+                [host.check, ['http://{{domain}}']],
                 [host.open, '{{protocol}}://{{domain}}:{{proxyport}}'],
                 [events.publish, ['MESSAGE', ['Server ready!!!']], true]
 
