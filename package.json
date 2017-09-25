@@ -5,8 +5,8 @@
     "email": "hola@davidbarreiros.es",
     "url": "davidbarreiros.es"
   },
-  "version": "0.4.0",
-  "description": "GorillaJS is a Docker tool-based that helps you to kickstart new projects. It get save time making easier repeated task such as database creation, clone repositories or install applications.",
+  "version": "0.5.0",
+  "description": "A smart development environment designed to easily install and neatly manage web applications. Gorilla JS frees you from the repetitive daily tasks like apps installation, database management, creation of virtual environment, server configuration… And it keeps your projects in order and independents.",
   "keywords": [
     "Docker",
     "templates",
@@ -26,9 +26,7 @@
   "files": [
     "index.js",
     "README.md",
-    "lib",
-    "plugins/django",
-    "plugins/wordpress.js"
+    "lib"
   ],
   "dependencies": {
     "aws-sdk": "^2.52.0",
