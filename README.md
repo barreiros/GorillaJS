@@ -1,296 +1,62 @@
-
- 
-
 <p align="center">
-  <img src="http://s23.postimg.org/ka5fnkw23/logo_mini.jpg" alt="GorillaJS logo"/>
+  <img src="https://gorillajs-web.s3.amazonaws.com/main-files/uploads/2017/08/logo_beta.png" alt="GorillaJS logo"/>
 </p>
 
-> *English version*: I'm translating the documentation. For now, you can read it in Spanish, which is a very nice language.
-
-**GorillaJS es una herramienta basada en Docker que simplifica la creación de entornos de desarrollo web**
-
-# Objetivo y filosofía  
-
-GorillaJS pretende servir de apoyo a los desarrolladores web ahorrándoles tiempo en la ejecución de tareas repetitivas, como podrían ser la configuración e instalación de aplicaciones, la creación de bases de datos o la réplica del proyecto.
-
-Para conseguir esto, GorillaJS utiliza un sistema simple de preguntas y respuestas que va almacenando en el archivo .gorilla/gorillafile y que después utiliza para configurar el proyecto.   
-> Es importante saber que, aunque GorillaJS se base en Docker y Nodejs, no es necesario tener ningún conocimiento en estas tecnologías, más allá de la simple instalación de ambas.
-  
-<p align="center">
-    <a href="http://www.youtube.com/watch?feature=player_embedded&v=LKXsY0a4BWo" target="_blank">
-        <img src="http://img.youtube.com/vi/LKXsY0a4BWo/0.jpg" alt="How to install Wordpress in 80 seconds" width="50%" height="auto" border="3" />
-    </a>
-</p>
-
-En este ejemplo GorillaJS usa la [plantilla predefinida de Wordpress](#plantillas-por-defecto) para:
-* iniciar los contenedores de Docker
-* instalar el entorno LAMP
-* crear y configurar la base de datos
-* descargar los archivos del repositorio oficial de Wordpress
-* instalar Wordpress
-* configurar el archivo hosts del ordenador
-* abrir el navegador con la url del proyecto.
-
-Todo esto lo consigue con un solo comando y en menos de 2 minutos.
-
----
-
-##### Instalación
-
-> GorillaJS está en fase beta, y es compatible con Mac y Linux. En un futuro estará disponible en Windows.
-
-GorillaJS se instala desde [npm](https://docs.npmjs.com/getting-started/installing-node) y necesita Docker para funcionar.
-
-```nodejs
-npm install -g gorillajs
-```
-
-##### Instalar Docker
-
-* [Mac](https://docs.docker.com/docker-for-mac/)
-> Es necesario tener instaldo Docker for Mac. Con Docker Toolbox no funciona.
-
-* Linux
-> Instalar [Docker](https://docs.docker.com/engine/getstarted/linux_install_help/) y [Docker Compose](https://docs.docker.com/compose/install/). 
-
-* [Windows](https://docs.docker.com/docker-for-windows/)
-> Es necesario tener instalado Docker for Windows. Con Docker Toolbox no funciona.
-
-##### Cómo se usa
-
-GorillaJS tiene un solo comando: 
-
-```nodejs
-gorilla init [path]
-```  
-
-> El path es opcional y si no se indica GorillaJS creará el proyecto en el directorio actual.
-
-Este comando sirve tanto para instalar un proyecto como para iniciarlo. La diferencia es que si se ejecuta *gorilla init [path]* en un directorio en el que ya existe un proyecto de GorillaJS se vuelve a configurar el proyecto con los valores que se guardaron la última vez y se reinician los contenedores de Docker. Para cambiar los valores hay que usar el parámetro -f. 
-
-```nodejs
-gorilla init [path] -f
-```
-
-> GorillaJS solo sobreescribe archivos de configuración, **nunca borra los archivos del proyecto**.
-
-
-##### Parámetros
-
-| Nombre | Función             |
-| ---    | ---                 |
-| -d     | Enable debug mode |
-| -f     | Force to recreate the project (this action don't remove your project files)|
-| -p | Select a custom port for the GorillaJS proxy. By default it use 80. If this port is used by other application i.e Apache, GorillaJS will return error.
-
-# Plantillas por defecto
-
-Por defecto GorillaJS viene con una plantilla para crear proyectos de Wordpress. Para poder usar esta plantilla es necesario aportar los siguientes valores:
-
-* **Select the docker template value from the list above**  
-> Por ahora se puede elegir entre un proyecto en blanco (blank) en el que hay una carpeta public con un servidor Apache configurado, un proyecto en blanco con base de datos (blank+database) o un proyecto de Wordpress (wordpress). Si con estas no tienes suficiente, te animo a que hagas tus [propias plantillas](#plantillas-personalizadas) :-)
-
- * **Tell me your local project url**  
-> El nombre de dominio a través del cual se quiere acceder al site. Hay que poner solo el nombre: sin http://, ni https://, nin www.
- 
- * **Enter the system hostsfile value**  
-> La ruta absoluta del archivo hosts del ordenador desde el que se está ejecutando GorillaJS. Para más información sobre [dónde encontrar](https://en.wikipedia.org/wiki/Hosts_file la ruta del archivo hosts).
-
-* **What is your public folder?**  
-> La carpeta pública en la que irán los archivos de Wordpress. Si ya existe una carpeta con los archivos, GorillaJS no la sobreescribe: usa esa misma carpeta, respetando los contenidos.
-
-* **The data base name**
-
-* **The data base user name**
-
-* **The data base password**  
-> Es muy importante saber que si ya existe un proyecto de Wordpress previo, como GorillaJS no sobreescribe los archivos, la configuración de estos tres últimos valores tiene que seguir igual que la del archivo wp-config, y en este archivo es necesario cambiar el valor de la constante DB_HOST a *mysql*.
-
-* **Where do you want to store the data base files**  
-> Docker necesita una carpeta en la que guardar los datos de la base de datos porque, por naturaleza, los borra cada vez que se apaga el contenedor. Esta carpeta se usa para salvar esos datos y no perderlos. Es uno de los dos [*volumes*](https://docs.docker.com/engine/tutorials/dockervolumes/) que usa esta plantilla. El otro es la carpeta pública en la que van los archivos de Wordpress.
-
-
-# Plantillas personalizadas
-
-> Esta parte solo es para los usuarios que quieran hacer una plantilla personalizada, y requiere conocimientos avanzados de Docker.
-
-Además de las plantillas que trae por defecto, GorillaJS permite crear plantillas personalizadas. El único requisito para crear una plantilla es que ésta debe tener un archivo *docker-compose.yml*. [Aquí hay más información sobre Docker Compose](https://docs.docker.com/compose/).
-Por ejemplo, la plantilla de Wordpress, que está en .../templates/wordpress/ utiliza varios archivos a lo largo del proceso de configuración. 
-
-| Nombre                            | Función                                                                                                                                                                                                                       |
-| ---                               | ---                                                                                                                                                                                                                           |
-| apache-httpd.conf                 | Se usa una vez iniciados los contenedores, para sobreescribir la configuración por defecto de Apache.                                                                                                                         |
-| apache-init.conf                  | Se usa al iniciar Apache y se encarga de descargar Wordpress del repositorio oficial y de instalarlo a través de WP-CLI. También se encarga de configurar el archivo wp-config y de renombrar el dominio, si fuera necesario. |
-| apache-vhost.conf                 | Se usa para crear el virtualhost dentro del contenedor de Apache.                                                                                                                                                             |
-| docker-compose.yml                | Generar los contenedores de Docker (Apache y MySQL) y los volúmenes en los que va la aplicación y los datos persistentes de mysql.                                                                                            |
-| gorillafile                       | Se usa para pasarle a GorillaJS valores de configuración iniciales de plantilla. [Más información](#user-content-archivo-gorillafile).                                                                                        |
-| messages                          | Se usar para indicarle a GorillaJS qué debe preguntar para conseguir un valor. [Más información](#user-content-archivo-messages).                                                                                             |
-| mysql-debian.cnf, mysql-init.conf | Son archivos de configuración de mysql, como Apache.                                                                                                                                                                          |
-| php-php5-fpm.conf                 | Configuración inicial de php-fpm.                                                                                                                                                                                             |
-| waiting.html                      | Se usa en lugar del index.html que viene por defecto en Apache.                                                                                                                                                               |
-
-Estos archivos están en la plantilla porque, de alguna manera, se encargan de la configuración de una parte del proyecto que debe ser única. Por ejemplo, el virtualhost de Apache: 
-
-```bash
-
-<VirtualHost *:80>
-
-    Servername {{project.domain}}
-
-    DocumentRoot /var/www/{{project.domain}}/{{project.srcout}}
-
-    ErrorLog /var/log/apache2/{{project.domain}}-error.log
-    CustomLog /var/log/apache2/{{project.domain}}-access.log combined
-  
-    <Directory /var/www/{{project.domain}}/{{project.srcout}}>
-        Options Indexes FollowSymLinks MultiViews
-        AllowOverride All
-        Order allow,deny
-        allow from all
-    </Directory>
-
-</VirtualHost>
-
-```
-
-En este archivo los valores de ServerName, DocumentRoot, etc... tienen que ser únicos, por razones obvias. De otra manera, si se quisiera acceder al proyecto a través del nombre de dominio, y las configuraciones no fuera únicas, el host no sabría qué proyecto mostrar. Esto, como ya se ha dicho antes, es opcional; pues en este ejemplo en concreto se podría acceder a través de ip y dejar la configuración por defecto de Apache.  
-
-#### Uso de variables en la plantilla.
-
-GorillaJS recorre todos los archivos que hay en la carpeta de la plantilla para localizar variables y poder asignarles los valores que hay en el archivo [*gorillafile*](#user-content-archivo-gorillafile). Estas variables siguen un marcado específico: siempre van encerradas entre {{}}. Por ejemplo: 
-
-```bash
-{{NOMBRE_DE_LA_VARIABLE}}  
-```
-
-También se puede agrupar usando el marcado:
-
-```bash
-{{NOMBRE_DEL_GRUPO.NOMBRE_DE_LA_VARIABLE}}
-```
-
-GorillaJS solo reconoce hasta un segundo nivel de profundidad. El siguiente ejemplo no será válido:
-
-```bash
-{{NOMBRE_DEL_GRUPO.NOMBRE_DE_LA_VARIABLE.NOMBRE_DE_OTRA_VARIABLE}}
-
-```
-
-> GorillaJS recorre los archivos cada vez que ejecutamos el comando *gorilla init*, es decir, siempre que se inicia el proyecto. 
-
-#### Archivo gorillafile
-
-La plantilla puede traer un archivo gorillafile por defecto. Los valores que se pongan en este archivo se complementarán con los generados por el sistema de preguntas y respuestas.  
-Siguiendo con el ejemplo de la plantilla de Wordpress, el archivo gorillafile que se genera a través de esa plantilla sería algo así:
-
-```bash
-
-"local": {
-    "docker": {
-        "gorillafolder": ".gorilla",
-        "templatefolder": "template",
-        "template": "wordpress",
-        "port": 4815
-    },
-    "project": {
-        "slug": "veryease",
-        "domain": "veriease.local",
-        "srcout": "application",
-        "datafolder": "application-db"
-    },
-    "apache": {
-        "adminemail": "test@yourdomain.com"
-    },
-    "database": {
-        "dbname": "veryeasedb",
-        "username": "veryeaseuser",
-        "password": "1234"
-    },
-    "host": {
-        "enabled": "domain"
-    }
-}
-
-```
-> Al estar en formato json, se pueden cambiar los valores del fichero, guardar y volver a ejecutar gorilla init para cambiar la configuración del proyecto.
-
-El archivo gorillafile puede servir para dos propósitos:
-* Sugerir valores por defecto a las preguntas que se le muestran al usuario.
-* Asignar un valor predeterminado a una variable y evitar que se le pregunte al usuario por ella (esto será así mientras el usuario no ejecute gorilla con la opción -f).
-
-**Sugerir valores**
-Para sugerir valores, éstos tienen que ir en un árbol que empieze con el valor *default*. Por ejemplo:
-
-```bash
-
-"default": {
-    "database": {
-        "name": "application-db",
-        "user": "gorilla.local"
-    },
-    "system": {
-        "hostsfile": "/etc/hosts"
-    },
-    ...
-
-```
-
-**Asignar valores**
-Para asignar valores, éstos tienen que ir en un árbol que empieze con el valor *local*. Por ejemplo:
-
-```bash
-
-"local": {
-    "project": {
-        "datafolder": "application-db",
-        "domain": "gorilla.local"
-    },
-    ...
-
-```
-
-De esta manera, se podría crear un archivo gorillafile en la plantilla que fuera algo así:
-
-```bash
-
-{
-    "local": {
-        "project": {
-            "datafolder": "application-db",
-            "domain": "gorilla.local"
-        }
-    },
-    "default": {
-        "database": {
-            "name": "application-db",
-            "user": "gorilla.local"
-        },
-        "system": {
-            "hostsfile": "/etc/hosts"
-        }
-    }
-}
-
-```
-De esta forma, si hay un archivo en la plantilla con las variables {{database.name}} GorillaJS le sugerirá al usuario que use el valor *application-db*, mientras que si en la plantilla hay una variable {{project.domain}}, GorillaJS no le preguntará nada al usuario y rellenará ese varaible con el valor *gorilla.local*, a menos que el usuario haya ejecutado gorilla init -f, en cuyo caso solo le sugerirá usar el valor *gorilla-local*.
-
-#### Archivo messages
-
-También se puede personalizar el texto de la pregunta que GorillaJS le muestra al usuario. Para hacer esto se usa el archivo *messages* que, al igual que el archivo gorillafile, está en formato json.  
-Un ejemplo de archivo message sería este:
-
-```bash
-{
-    "questions": {
-        "database": {
-            "name": "Please, enter the data base name. Just letters and numbers, no special characters",
-            "user": "Please, enter the user data base"
-        }
-    }
-}
-
-```
-
-Esta vez el árbol tiene que empezar con el valor "questions", seguido de la ruta a las variables a las que se le quiere cambiar la pregunta. Si no hay ninguna pregunta, el formato será el que viene por defecto en GorillaJS: 
-
-*"Please, enter the NOMBRE_DEL_GRUPO NOMBRE_DE_LA_VARIALBE value."*
+## Gorilla JS
+A smart development environment designed to easily install and neatly manage web applications
+
+** Say hello to the new ways **
+Gorilla JS frees you from the repetitive daily tasks like apps installation, database management, creation of virtual environment, server configuration… And it keeps your projects in order and independents. 
+
+### Features
+#### Multiplatform
+It’s available for Windows, Mac and Linux. You’ll be able to use your projects in any platform wherever you have created them.
+#### Local and remote
+Your projects work in any machine with Docker and NodeJS. It doesn’t matter if it’s in your personal computer or in a remote server. 
+#### CLI
+GorillaJS is developing in NodeJS and it uses the command line to communicate with humans. 
+#### Multitechnology
+You can create installers for any app which works in a Linux server. 
+#### Docker
+GorillaJS is based on Docker’s container technology. If you haven’t heard about it, don’t worry. You only will need to know how to install it.
+#### Easy to use 
+Using GorillaJS is very easy. You only need to answer a few questions and your app will be ready. 
+
+### Installers
+The installer is the foundation of your project. A stencil in which you can build your app. There’re installers for WordPress , Django, NodeJS… and you can also create a custom one.
+
+#### Django
+This installer allows you to produce Django’s projects fast and easily, and manage them in an orderly and independent way without needing to create virtual environments. In a few seconds your app will be ready to start to work. And with the plugins for GorillaJS you’ll be able to back up, install PIP and system packages and share the project with others developers. 
+#### WordPress
+This installer allows you to generate WordPress’s projects easily without need to configure database, access permissions or install libraries again and again. In a few seconds WordPress will be ready to start to work. With the plugins for GorillaJS you’ll be able to manage and back up of database easily, share the project with others developers, install ….. and a lot more.
+#### PHP 7
+This installer for GorillaJS allows you to generate a blank project which serves as a foundation of apps like Laravel, Symfony, CakePHP, etc., whose need PHP 7 to work.
+#### Create your own installer
+If the installers of GorillaJS don’t adapt to your needs you can follow this tutorial step-by-step in order to learn how to create your own installers. 
+
+### Plugins
+Plugins add extra usefulness to your project. With them you can manage your database, turn on https, share your project with others developers, install new libraries… 
+
+#### DB for Django 
+With the plugins for GorillaJS you’ll be able to add PostgreSQL and MySQL databases to your Django’s projects easily and without need to configure or manage Docker containers. 
+#### kDjango manage
+With this plugin you’ll be able to manage Django with manage.py in an easy way and install and manage Python3 packages, as well as saving automatically the changes in the container so as not to lose them the next time you start the project. And all of this without needing to access to Docker’s container. 
+#### Extra packages
+With this plugin for GorillaJS you’ll be able to install and manage easily Linux packages (apt, apk,…) in your projects. It’s compatible with the most popular manager: apt, apk, pacman y yum.
+#### Composer & PEAR
+With this plugin you’ll be able to install and manage the php dependences in your projects created with GorillaJS. You can install libraries and Composer, PEAR and PECL packages. 
+#### DB for PHP7
+WIth this plugin you’ll be able to add a database in any of your projects created with the PHP7 stencil.
+#### Commit
+It saves the changes you had done in Docker’s container.
+#### DB manager
+With this plugin for GorillaJS you’ll be able to manage the basic tasks with your database in an easy and fast way. With just a command you’ll be able to export, import or replace data from the database which your project uses.
+#### Let’s Encrypt
+With this plugin for GorillaJS you’ll be able to create and refresh certificates issues by Let’s Encrypt easily and turn on the insured navigation in your projects. 
+####Adminer
+Adminer is a powerful database sysadmin with graphical interface. It’s compatible with the most of actual technologies. This plugin for GorillaJS creates an Adminer’s court in which of your projects in order that you could manage your database easily.
+#### Team
+Team is a plugin for GorillaJS whose work is make a copy of all the files, databases and images that your project use and it send to the cloud so that you could share it with others team members. GorillaJS takes charge of everything. You only have to choose the project you want to share. 
+
+#### Documentation
+Please, visit [gorillajs.com](https://gorillajs.com).
