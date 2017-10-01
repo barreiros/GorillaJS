@@ -28,8 +28,7 @@ var uuid = require('uuid/v4');
 global.envPaths = {
 
     'base': __dirname,
-    'libraries': path.join(__dirname, 'lib'),
-    'plugins': path.join(__dirname, 'plugins')
+    'libraries': path.join(__dirname, 'lib')
 
 }
 
@@ -63,6 +62,8 @@ var verbose = variables.verbose;
 var templateOptions = variables.templateOptions;
 var templateRepos = variables.templateRepos;
 
+global.envPaths.plugins = path.join(homeUserPathNodeJS, proxyName, 'plugins');
+
 events.subscribe('ERROR', showError);
 events.subscribe('VERBOSE', showVerbose);
 events.subscribe('WARNING', tools.showWarning);
@@ -94,6 +95,8 @@ function checkUserInput(){
 
             promisesPack.push(
 
+                [tools.retrieveConfigData, [path.join(homeUserPathNodeJS, proxyName), 'gorillajs-proxy']],
+                [tools.retrieveConfigData, [path.join(homeUserPathNodeJS, proxyName), 'overwrite']],
                 [plugins.include]
 
             );
@@ -148,8 +151,6 @@ function checkUserInput(){
                         [tools.paramForced, ['project', 'id', '{{id}}']]
 
                     ]],
-                    [tools.retrieveConfigData, [path.join(homeUserPathNodeJS, proxyName), 'gorillajs-proxy']],
-                    [tools.retrieveConfigData, [path.join(homeUserPathNodeJS, proxyName), 'overwrite']],
                     [build]
 
                 );
@@ -264,8 +265,8 @@ function build(){
 
         [tools.basename, ['{{template}}'], 'template_basename'],
         [tools.sanitize, ['{{template_basename}}', '-'], 'template_slug'],
-        [tools.paramForced, ['docker', 'data_path', path.join(homeUserPathBash, proxyName, 'data'), false], 'data_path'],
-        [tools.paramForced, ['docker', 'template_path', path.join(homeUserPathBash, proxyName, 'templates', '{{template_slug}}'), false], 'template_path'],
+        [tools.paramForced, ['docker', 'data_path', path.join(homeUserPathBash, proxyName, 'data')], 'data_path'],
+        [tools.paramForced, ['docker', 'template_path', path.join(homeUserPathBash, proxyName, 'templates', '{{template_slug}}')], 'template_path'],
         [tools.paramForced, ['docker', 'template_slug', '{{template_slug}}']],
         [tools.paramForced, ['docker', 'template', '{{template}}']],
 
@@ -389,7 +390,7 @@ function showVerbose(systemMessage, force){
 function showError(number){
 
     tools.showError(number);
-    tools.showStep('gorilla-cleaner');
+    tools.showStep('cleaner');
 
     events.unsubscribe('VERBOSE', showVerbose);
     events.unsubscribe('WARNING', tools.showWarning);
