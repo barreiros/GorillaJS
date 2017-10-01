@@ -5,7 +5,7 @@
     "email": "hola@davidbarreiros.es",
     "url": "davidbarreiros.es"
   },
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "A smart development environment designed to easily install and neatly manage web applications. Gorilla JS frees you from the repetitive daily tasks like apps installation, database management, creation of virtual environment, server configuration… And it keeps your projects in order and independents.",
   "keywords": [
     "Docker",
