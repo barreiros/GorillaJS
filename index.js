@@ -104,6 +104,7 @@ function checkUserInput(){
                 [m_docker.getTemplateSource, [path.join(homeUserPathBash, proxyName, 'templates'), templateRepos.proxy, 'gorillajs-proxy']],
                 [tools.retrieveConfigData, [path.join(homeUserPathNodeJS, proxyName), 'gorillajs-proxy']],
                 [tools.retrieveConfigData, [path.join(homeUserPathNodeJS, proxyName), 'overwrite']],
+                [tools.track, ['Platform', process.platform, '', 3]],
                 [plugins.include]
 
             );
@@ -219,11 +220,13 @@ function run(){
     promisesPack = [
 
         [tools.param, ['project', 'domain'], 'domain'],
+        [tools.param, ['docker', 'template_type'], 'template_type'],
         [tools.sanitize, ['{{domain}}', ''], 'slug'],
 
         [commit.replace],
         [m_docker.startSimple, [path.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}']],
         [m_docker.startSimple, [path.join(homeUserPathBash, proxyName, 'proxy', 'template', composeFile), proxyName]],
+        [tools.track, ['Installer', '{{template_type}}', '', 1]],
 
         [events.publish, ['STEP', ['Your project is ready!']]]
 
@@ -243,6 +246,7 @@ function build(){
         [events.publish, ['STEP', ['starting']]],
         [tools.paramForced, ['docker', 'gorillafolder', gorillaFolder]],
         [tools.param, ['docker', 'template_type', templateOptions], 'template_type'],
+        [tools.track, ['Installer', '{{template_type}}', '', 1]],
         [events.publish, ['TEMPLATE_SELECTED', '{{template_type}}'], true],
 
         [events.publish, ['STEP', ['check_repo']]],
@@ -299,6 +303,7 @@ function build(){
         [tools.param, ['project', 'domain'], 'domain'],
         [tools.sanitize, ['{{domain}}', ''], 'slug'],
         [tools.isLocalProject, '{{domain}}', 'islocal'],
+        [tools.track, ['IsLocal', '{{islocal}}', '', 2]],
         [tools.paramForced, ['project', 'protocol', 'http'], 'protocol'],
         [tools.paramForced, ['project', 'islocal', '{{islocal}}']],
         [tools.paramForced, ['project', 'slug', '{{slug}}']],
@@ -364,6 +369,7 @@ function build(){
 
         [events.publish, ['DOCKER_STARTED'], true],
         [events.publish, ['STEP', ['build_project']]],
+        [tools.track, ['ProjectStatus', 'Completed', '', 4]],
         [host.check, ['{{protocol}}://{{domain}}', true]],
         [events.publish, ['STEP', ['open_browser']]],
         [events.publish, ['PROJECT_COMPLETED'], true],
