@@ -93,8 +93,15 @@ function checkUserInput(){
 
         }else{
 
+            if(argv._[0] === 'build' || argv._[0] === 'run'){
+
+                promisesPack.push([tools.printLogo]);
+
+            }
+
             promisesPack.push(
 
+                [m_docker.getTemplateSource, [path.join(homeUserPathBash, proxyName, 'templates'), templateRepos.proxy, 'gorillajs-proxy']],
                 [tools.retrieveConfigData, [path.join(homeUserPathNodeJS, proxyName), 'gorillajs-proxy']],
                 [tools.retrieveConfigData, [path.join(homeUserPathNodeJS, proxyName), 'overwrite']],
                 [plugins.include]
@@ -102,8 +109,6 @@ function checkUserInput(){
             );
 
             if(argv._[0] === 'build'){
-
-                promisesPack.push([tools.printLogo]);
 
                 if(argv._[0] && argv._[1]){
 
@@ -139,7 +144,6 @@ function checkUserInput(){
 
                     [m_docker.check],
                     [m_docker.config],
-                    [m_docker.getTemplateSource, [path.join(homeUserPathBash, proxyName, 'templates'), templateRepos.proxy, 'gorillajs-proxy']],
 
                     [tools.createGorillaFile, [path.join(projectPath, gorillaFolder, gorillaFile), gorillaFolder], 'id'],
                     [promises.cond, '{{id}}!:', [
@@ -156,8 +160,6 @@ function checkUserInput(){
                 );
 
             }else if(argv._[0] === 'run'){
-
-                promisesPack.push([tools.printLogo]);
 
                 if(argv._[0] && argv._[1]){
 
