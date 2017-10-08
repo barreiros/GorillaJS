@@ -101,6 +101,7 @@ function checkUserInput(){
 
             promisesPack.push(
 
+                [tools.createFolderTree],
                 [m_docker.getTemplateSource, [path.join(homeUserPathBash, proxyName, 'templates'), templateRepos.proxy, 'gorillajs-proxy']],
                 [tools.retrieveConfigData, [path.join(homeUserPathNodeJS, proxyName), 'gorillajs-proxy']],
                 [tools.retrieveConfigData, [path.join(homeUserPathNodeJS, proxyName), 'overwrite']],
