@@ -91,6 +91,10 @@ function checkUserInput(){
 
             console.log('Please, visit https://gorillajs.com');
 
+        }else if(process.env.hasOwnProperty('SUDO_USER')){
+
+            events.publish('ERROR', ['044']);
+
         }else{
 
             if(argv._[0] === 'build' || argv._[0] === 'run'){
