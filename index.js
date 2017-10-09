@@ -71,7 +71,27 @@ events.subscribe('STEP', tools.showStep);
 events.subscribe('MESSAGE', tools.showMessage);
 events.subscribe('ANSWER', tools.answer);
 
-checkUserInput();
+setDefaultEnvironment();
+
+function setDefaultEnvironment(){
+
+    var promisesPack = [];
+
+    promisesPack.push(
+
+        [tools.createFolderTree],
+        [m_docker.getTemplateSource, [path.join(homeUserPathBash, proxyName, 'templates'), templateRepos.proxy, 'gorillajs-proxy']],
+        [tools.retrieveConfigData, [path.join(homeUserPathNodeJS, proxyName), 'gorillajs-proxy']],
+        [tools.retrieveConfigData, [path.join(homeUserPathNodeJS, proxyName), 'overwrite']],
+        [tools.track, ['Platform', process.platform, '', 3]],
+        [checkUserInput]
+
+    );
+
+    promises.add(promisesPack);
+    promises.start();
+
+}
 
 function checkUserInput(){
 
@@ -105,11 +125,6 @@ function checkUserInput(){
 
             promisesPack.push(
 
-                [tools.createFolderTree],
-                [m_docker.getTemplateSource, [path.join(homeUserPathBash, proxyName, 'templates'), templateRepos.proxy, 'gorillajs-proxy']],
-                [tools.retrieveConfigData, [path.join(homeUserPathNodeJS, proxyName), 'gorillajs-proxy']],
-                [tools.retrieveConfigData, [path.join(homeUserPathNodeJS, proxyName), 'overwrite']],
-                [tools.track, ['Platform', process.platform, '', 3]],
                 [plugins.include]
 
             );
