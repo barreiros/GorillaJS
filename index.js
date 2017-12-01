@@ -359,13 +359,10 @@ function build(){
         [m_docker.stop, [null, 'gorillajsproxy']],
         [m_docker.base, [path.join(homeUserPathBash, proxyName, 'proxy', 'template', composeFile), proxyName, '{{proxyport}}']],
         [tools.fusion, [path.join(projectPath, gorillaFolder, gorillaFile)]],
-        [events.publish, ['STEP', ['Hey, Bar']]],
 
         [promises.cond, '{{islocal}}::yes', [
 
-            [events.publish, ['STEP', ['Entro en local']]],
             [host.checkBeforeAdd, ['{{hosts-file}}', '{{domain}}'], 'add-host'],
-            [events.publish, ['STEP', ['Ya he comprobado el hosts']]],
 
             [promises.cond, '{{add-host}}::yes', [
 
@@ -376,14 +373,12 @@ function build(){
 
             [promises.cond, '{{proxyport}}::80', [
 
-                [events.publish, ['STEP', ['Entro al puerto 80']]],
                 [host.check, ['http://{{domain}}']],
                 [host.open, '{{protocol}}://{{domain}}'],
                 [events.publish, ['MESSAGE', ['Server ready!!!']], true]
 
             ], [
 
-                [events.publish, ['STEP', ['Entro en el puerto distinto']]],
                 [host.check, ['http://{{domain}}:{{proxyport}}']],
                 [host.open, '{{protocol}}://{{domain}}:{{proxyport}}'],
                 [events.publish, ['MESSAGE', ['Server ready!!!']], true]
@@ -404,13 +399,11 @@ function build(){
 
         ]],
 
-        [events.publish, ['STEP', ['Envío docker started']]],
         [events.publish, ['DOCKER_STARTED'], true],
         [events.publish, ['STEP', ['build_project']]],
         [tools.track, ['ProjectStatus', 'Completed', '', 4]],
         [events.publish, ['STEP', ['open_browser']]],
         [events.publish, ['PROJECT_COMPLETED'], true],
-        [events.publish, ['STEP', ['Proyecto completo']]],
         [exit, '']
 
     ];
