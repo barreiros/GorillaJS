@@ -152,12 +152,6 @@ function checkUserInput(){
 
                 }
 
-                if(argv.hasOwnProperty('p')){
-
-                    proxyPort = argv.p;
-
-                }
-
                 promisesPack.push(
 
                     [tools.config, env],
@@ -179,6 +173,14 @@ function checkUserInput(){
                     [build]
 
                 );
+
+                if(argv.hasOwnProperty('p')){
+
+                    promisesPack.push(
+                        [tools.paramForced, ['proxy', 'port', argv.p], 'proxyport']
+                    );
+
+                }
 
             }else if(argv._[0] === 'run'){
 
@@ -357,10 +359,13 @@ function build(){
         [m_docker.stop, [null, 'gorillajsproxy']],
         [m_docker.base, [path.join(homeUserPathBash, proxyName, 'proxy', 'template', composeFile), proxyName, '{{proxyport}}']],
         [tools.fusion, [path.join(projectPath, gorillaFolder, gorillaFile)]],
+        [events.publish, ['STEP', ['Hey, Bar']]],
 
         [promises.cond, '{{islocal}}::yes', [
 
+            [events.publish, ['STEP', ['Entro en local']]],
             [host.checkBeforeAdd, ['{{hosts-file}}', '{{domain}}'], 'add-host'],
+            [events.publish, ['STEP', ['Ya he comprobado el hosts']]],
 
             [promises.cond, '{{add-host}}::yes', [
 
@@ -371,28 +376,41 @@ function build(){
 
             [promises.cond, '{{proxyport}}::80', [
 
-                // [host.check, ['{{protocol}}://{{domain}}']],
+                [events.publish, ['STEP', ['Entro al puerto 80']]],
                 [host.check, ['http://{{domain}}']],
                 [host.open, '{{protocol}}://{{domain}}'],
                 [events.publish, ['MESSAGE', ['Server ready!!!']], true]
 
             ], [
 
-                // [host.check, ['{{protocol}}://{{domain}}']],
-                [host.check, ['http://{{domain}}']],
+                [events.publish, ['STEP', ['Entro en el puerto distinto']]],
+                [host.check, ['http://{{domain}}:{{proxyport}}']],
                 [host.open, '{{protocol}}://{{domain}}:{{proxyport}}'],
                 [events.publish, ['MESSAGE', ['Server ready!!!']], true]
 
             ]]
 
+        ], [
+
+            [promises.cond, '{{proxyport}}::80', [
+
+                [host.check, ['http://{{domain}}', true]]
+
+            ], [
+
+                [host.check, ['http://{{domain}}:{{proxyport}}', true]]
+
+            ]]
+
         ]],
 
+        [events.publish, ['STEP', ['Envío docker started']]],
         [events.publish, ['DOCKER_STARTED'], true],
         [events.publish, ['STEP', ['build_project']]],
         [tools.track, ['ProjectStatus', 'Completed', '', 4]],
-        [host.check, ['{{protocol}}://{{domain}}', true]],
         [events.publish, ['STEP', ['open_browser']]],
         [events.publish, ['PROJECT_COMPLETED'], true],
+        [events.publish, ['STEP', ['Proyecto completo']]],
         [exit, '']
 
     ];
