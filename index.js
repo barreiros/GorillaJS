@@ -248,6 +248,7 @@ function run(){
         [commit.replace],
         [m_docker.startSimple, [path.join(workingPath, gorillaFolder, gorillaTemplateFolder, composeFile), '{{slug}}']],
         [m_docker.startSimple, [path.join(homeUserPathBash, proxyName, 'proxy', 'template', composeFile), proxyName]],
+        [host.check, ['http://{{domain}}:{{proxyport}}']],
         [tools.track, ['Installer', '{{template_type}}', '', 1]],
 
         [events.publish, ['STEP', ['Your project is ready!']]]
