@@ -1,0 +1,6 @@
+# Este archivo se tiene que ejecutar desde la raíz de GorillaJS.
+# docker build -t gorillajs/ubuntu . -f templates/common/dockerfile-ubuntu
+
+FROM ubuntu:14.04
+
+RUN apt-get update && apt-get -y install supervisor build-essential ssh-client curl wget && apt-get autoremove

@@ -1,0 +1,11 @@
+# Este archivo se tiene que ejecutar desde la raíz de GorillaJS.
+# docker build -t gorillajs/nodejs . -f templates/common/dockerfile-alpine-nodejs
+
+FROM gorillajs/alpine
+
+MAINTAINER David Barreiros Ibáñez <hola@davidbarreiros.es>
+
+RUN adduser -u 1000 -D mysql \
+    && apk add --no-cache nodejs nodejs-npm \
+    && npm install forever -g \
+    && rm -rf /var/cache/apk/*

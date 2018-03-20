@@ -1,0 +1,11 @@
+# Este archivo se tiene que ejecutar desde la raíz de GorillaJS.
+# docker build -t gorillajs/mongo . -f templates/common/dockerfile-alpine-mongo
+
+FROM gorillajs/alpine
+
+MAINTAINER David Barreiros Ibáñez <hola@davidbarreiros.es>
+
+RUN apk update \
+    && apk add --no-cache postgresql>9.6.2 postgresql-contrib>9.6.2 \
+    && apk add --no-cache mongodb \ 
+    && rm -rf /var/cache/apk/* 

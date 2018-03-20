@@ -1,0 +1,18 @@
+{
+  "name": "extra_packages_dependencies_gorillajs_plugin",
+  "version": "0.0.1",
+  "description": "Add packages to containers.",
+  "main": "extra_packages.js",
+  "author": {
+    "name": "David Barreiros",
+    "email": "hola@davidbarreiros.es",
+    "url": "davidbarreiros.es"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^0.26.2",
+    "minimist": "^1.2.0",
+    "pty.js": "^0.3.1",
+    "yamljs": "^0.2.8"
+  }
+}
