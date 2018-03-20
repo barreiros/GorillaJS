@@ -3,11 +3,17 @@
 
 var _yargs = require('yargs');
 
-var _const = require('./const.js');
-
 var _Plugins = require('./class/Plugins.js');
 
 var _Plugins2 = _interopRequireDefault(_Plugins);
+
+var _Processes = require('./class/Processes.js');
+
+var _Processes2 = _interopRequireDefault(_Processes);
+
+var _Scheme = require('./class/Scheme.js');
+
+var _Scheme2 = _interopRequireDefault(_Scheme);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -33,12 +39,21 @@ var Main = function Main() {
 
         // Imprimo el logo.
 
-        console.log(_const.PROJECT_PATH);
+        var processes = new _Processes2.default();
+        processes.build();
     } else if (_yargs.argv._[0] === 'run') {
 
         // Imprimo el logo.
 
-    }
+        var _processes = new _Processes2.default();
+        _processes.run();
+    } else if (_yargs.argv._[0] === 'stop') {
+
+        // Imprimo el logo.
+
+        var _processes2 = new _Processes2.default();
+        _processes2.stop();
+    } else if (_yargs.argv._[0] === 'scheme') {}
 
     console.log(_yargs.argv);
 };

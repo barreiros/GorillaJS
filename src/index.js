@@ -1,11 +1,9 @@
 #! /usr/bin/env node
 
 import { argv } from 'yargs'
-import { PROJECT_PATH } from './const.js'
 import Plugins from './class/Plugins.js'
-import Build from './class/BuildProcess.js'
-import Run from './class/RunProcess.js'
-import Stop from './class/StopProcess.js'
+import Processes from './class/Processes.js'
+import Scheme from './class/Scheme.js'
 
 class Main {
 
@@ -28,17 +26,26 @@ class Main {
         }else if(argv._[0] === 'build'){
 
             // Imprimo el logo.
-
-            console.log(PROJECT_PATH)
+            
+            let processes = new Processes()
+            processes.build()
             
         }else if(argv._[0] === 'run'){
 
             // Imprimo el logo.
             
+            let processes = new Processes()
+            processes.run()
+
         }else if(argv._[0] === 'stop'){
 
             // Imprimo el logo.
             
+            let processes = new Processes()
+            processes.stop()
+            
+        }else if(argv._[0] === 'scheme'){
+
         }
 
         console.log(argv)
