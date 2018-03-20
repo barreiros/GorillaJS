@@ -161,6 +161,7 @@ function checkUserInput(){
                     [m_docker.config],
 
                     [tools.createGorillaFile, [path.join(projectPath, gorillaFolder, gorillaFile), gorillaFolder], 'id'],
+                    
                     [promises.cond, '{{id}}!:', [
 
                         [tools.paramForced, ['project', 'id', uuid()]]
