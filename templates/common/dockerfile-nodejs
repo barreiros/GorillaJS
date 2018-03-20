@@ -1,0 +1,14 @@
+# Este archivo se tiene que ejecutar desde la raíz de GorillaJS.
+# docker build -t gorillajs/nodejs-base . -f templates/common/dockerfile-nodejs
+
+FROM ubuntu:14.04
+
+RUN echo "deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -cs) main restricted multiverse\ndeb-src http://archive.ubuntu.com/ubuntu $(lsb_release -cs) main restricted multiverse" | sudo tee -a /etc/apt/sources.list > /dev/null
+RUN apt-get update && apt-get -y --fix-missing install curl supervisor 
+RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+RUN apt-get update && apt-get -y --fix-missing install nodejs build-essential supervisor 
+RUN npm install forever -g
+
+COPY templates/common/nodejs-supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+CMD ["/usr/bin/supervisord"]
