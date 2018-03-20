@@ -21,7 +21,7 @@
     "license": "MIT",
     "preferGlobal": true,
     "bin": {
-        "gorilla": "app/index.js"
+        "gorilla6": "app/index.js"
     },
     "files": [
         "app",
@@ -33,12 +33,14 @@
         "babel-standalone": "^6.26.0",
         "gulp": "^3.9.1",
         "gulp-babel": "^7.0.1",
+        "gulp-param": "^1.0.3",
         "gulp-using": "^0.1.1",
-        "gulp-param": "^1.0.3"
+        "yargs": "^11.0.0"
     },
     "babel": {
         "presets": [
             "env"
         ]
-    }
+    },
+    "dependencies": {}
 }
