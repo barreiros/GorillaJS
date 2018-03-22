@@ -1,0 +1,52 @@
+{
+
+    "schema": {
+
+        "docker": {
+
+            "template_type": {
+
+                "question": "Select template"
+
+            }
+
+        },
+
+        "project": {
+
+            "domain": {
+
+                "question": "Project domain"
+
+            }
+
+        },
+
+        "database": {
+
+            "dbname": {
+
+                "question": "Database name",
+                "default": "gorilladb"
+
+            },
+
+            "username": {
+
+                "question": "Database user name",
+                "default": "gorilla"
+
+            },
+
+            "password": {
+
+                "question": "Database password",
+                "default": "gorilla_598565"
+
+            }
+
+        }
+
+    }
+
+}

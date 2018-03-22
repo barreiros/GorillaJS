@@ -1,0 +1,19 @@
+{
+
+    "schema": {
+
+        "docker": {
+
+            "template_type": {
+
+                "question": "Select template",
+                "option": "Django",
+                "value": "django"
+
+            }
+
+        }
+
+    }
+
+}

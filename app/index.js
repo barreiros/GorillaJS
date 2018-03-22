@@ -11,9 +11,9 @@ var _Processes = require('./class/Processes.js');
 
 var _Processes2 = _interopRequireDefault(_Processes);
 
-var _Scheme = require('./class/Scheme.js');
+var _Schema = require('./class/Schema.js');
 
-var _Scheme2 = _interopRequireDefault(_Scheme);
+var _Schema2 = _interopRequireDefault(_Schema);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -53,7 +53,12 @@ var Main = function Main() {
 
         var _processes2 = new _Processes2.default();
         _processes2.stop();
-    } else if (_yargs.argv._[0] === 'scheme') {}
+    } else if (_yargs.argv._[0] === 'schema') {
+
+        var schema = new _Schema2.default();
+
+        return schema.process();
+    }
 
     console.log(_yargs.argv);
 };

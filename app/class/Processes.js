@@ -20,6 +20,13 @@ var Processes = function () {
         value: function build() {
 
             console.log('Build');
+
+            // Una vez recuperado el schema y hechas las preguntas todavía quedarán algunas variables de las plantillas que no están contempladas. Por ejemplo, docker.port. 
+            // Los valores para estas variables los podría añadir directamente al gorillafile antes de iniciar el proceso de reemplazo.
+            // project.id
+            // project.slug
+            // docker.port
+            // docker.data_path
         }
     }, {
         key: 'run',

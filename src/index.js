@@ -3,7 +3,7 @@
 import { argv } from 'yargs'
 import Plugins from './class/Plugins.js'
 import Processes from './class/Processes.js'
-import Scheme from './class/Scheme.js'
+import Schema from './class/Schema.js'
 
 class Main {
 
@@ -26,7 +26,7 @@ class Main {
         }else if(argv._[0] === 'build'){
 
             // Imprimo el logo.
-            
+
             let processes = new Processes()
             processes.build()
             
@@ -44,7 +44,11 @@ class Main {
             let processes = new Processes()
             processes.stop()
             
-        }else if(argv._[0] === 'scheme'){
+        }else if(argv._[0] === 'schema'){
+
+            let schema = new Schema()
+            
+            return schema.process()
 
         }
 

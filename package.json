@@ -34,13 +34,16 @@
         "gulp": "^3.9.1",
         "gulp-babel": "^7.0.1",
         "gulp-param": "^1.0.3",
-        "gulp-using": "^0.1.1",
-        "yargs": "^11.0.0"
+        "gulp-using": "^0.1.1"
     },
     "babel": {
         "presets": [
             "env"
         ]
     },
-    "dependencies": {}
+    "dependencies": {
+        "glob": "^7.1.2",
+        "fs-extra": "^5.0.0",
+        "yargs": "^11.0.0"
+    }
 }
