@@ -57,10 +57,9 @@ var Main = function Main() {
 
         var schema = new _Schema2.default();
 
-        return schema.process();
+        // Devuelvo directamente el json.
+        console.log(JSON.stringify(schema.process(_yargs.argv.force)));
     }
-
-    console.log(_yargs.argv);
 };
 
 new Main();

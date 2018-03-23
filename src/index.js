@@ -48,11 +48,10 @@ class Main {
 
             let schema = new Schema()
             
-            return schema.process()
+            // Devuelvo directamente el json.
+            console.log(JSON.stringify(schema.process(argv.force)))
 
         }
-
-        console.log(argv)
 
     }
 

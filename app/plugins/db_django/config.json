@@ -2,54 +2,53 @@
 
     "schema": {
 
-        "test": "Esto es un texto",
-
         "docker": {
 
             "template_type": {
 
-                "question": "Select template",
-                "values": [
+                "values":{
 
-                    {
-                        "option": "Wordpress",
-                        "value": "wordpress"
-                    },
-                    {
-                        "option": "Django",
-                        "value": "django"
-                    },
-                    {
-                        "option": "NodeJS",
-                        "value": "nodejs"
-                    },
-                    {
-                        "option": "PHP 7",
-                        "value": "php-7"
-                    },
-                    {
-                        "option": "Opencart",
-                        "value": "opencart"
-                    }
+                    "option": "Mi template",
+                    "value": "mi template"
 
-                ],
-                "default": "wordpress"
-
-            }
-
-        },
-
-        "project": {
-
-            "domain": {
-
-                "question": "Project domain"
+                }
 
             }
 
         },
 
         "database": {
+
+            "engine": {
+
+                "question": "Select the database engine",
+                "values": [
+
+                    {
+                        "option": "SQLite",
+                        "value": "sqlite"
+                    },
+                    {
+                        "option": "PostgreSQL",
+                        "value": "postgresql"
+                    },
+                    {
+                        "option": "MySQL",
+                        "value": "mysql"
+                    }
+
+                ],
+                "depends_on": {
+
+                    "docker": {
+
+                        "template_type": "django"
+
+                    }
+                },
+                "default": "sqlite"
+
+            },
 
             "dbname": {
 
@@ -59,7 +58,7 @@
 
                     "docker": {
 
-                        "template_type": "wordpress"
+                        "template_type": "django"
 
                     }
                 }
@@ -74,7 +73,7 @@
 
                     "docker": {
 
-                        "template_type": "wordpress"
+                        "template_type": "django"
 
                     }
                 }
@@ -89,7 +88,7 @@
 
                     "docker": {
 
-                        "template_type": "wordpress"
+                        "template_type": "django"
 
                     }
                 }
