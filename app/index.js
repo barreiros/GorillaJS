@@ -15,6 +15,10 @@ var _Schema = require('./class/Schema.js');
 
 var _Schema2 = _interopRequireDefault(_Schema);
 
+var _Project = require('./class/Project.js');
+
+var _Project2 = _interopRequireDefault(_Project);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -56,9 +60,18 @@ var Main = function Main() {
     } else if (_yargs.argv._[0] === 'schema') {
 
         var schema = new _Schema2.default();
+        var json = schema.process(_yargs.argv.force);
+
+        if (_yargs.argv.project) {
+            // Si en la llamada viene el parámetro "project" devuelvo también el gorillafile con la configuración del proyecto.
+
+            // El constructor de la clase Project permite pasarle el path hacia un proyecto concreto.
+            var project = new _Project2.default();
+            json.config = project.config;
+        }
 
         // Devuelvo directamente el json.
-        console.log(JSON.stringify(schema.process(_yargs.argv.force)));
+        console.log(JSON.stringify(json));
     }
 };
 

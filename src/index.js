@@ -4,6 +4,7 @@ import { argv } from 'yargs'
 import Plugins from './class/Plugins.js'
 import Processes from './class/Processes.js'
 import Schema from './class/Schema.js'
+import Project from './class/Project.js'
 
 class Main {
 
@@ -47,9 +48,18 @@ class Main {
         }else if(argv._[0] === 'schema'){
 
             let schema = new Schema()
+            let json = schema.process(argv.force)
             
+            if(argv.project){ // Si en la llamada viene el parámetro "project" devuelvo también el gorillafile con la configuración del proyecto.
+
+                // El constructor de la clase Project permite pasarle el path hacia un proyecto concreto.
+                let project = new Project()
+                json.config = project.config
+
+            }
+
             // Devuelvo directamente el json.
-            console.log(JSON.stringify(schema.process(argv.force)))
+            console.log(JSON.stringify(json))
 
         }
 
