@@ -59,8 +59,8 @@ var Main = function Main() {
         _processes2.stop();
     } else if (_yargs.argv._[0] === 'schema') {
 
-        var schema = new _Schema2.default();
-        var json = schema.process(_yargs.argv.force);
+        var schema = new _Schema2.default(_yargs.argv.force);
+        var json = schema.list;
 
         if (_yargs.argv.project) {
             // Si en la llamada viene el parámetro "project" devuelvo también el gorillafile con la configuración del proyecto.
@@ -70,7 +70,7 @@ var Main = function Main() {
             json.config = project.config;
         }
 
-        // Devuelvo directamente el json.
+        // Devuelvo el json.
         console.log(JSON.stringify(json));
     }
 };

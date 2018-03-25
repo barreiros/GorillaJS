@@ -47,8 +47,8 @@ class Main {
             
         }else if(argv._[0] === 'schema'){
 
-            let schema = new Schema()
-            let json = schema.process(argv.force)
+            let schema = new Schema(argv.force)
+            let json = schema.list
             
             if(argv.project){ // Si en la llamada viene el parámetro "project" devuelvo también el gorillafile con la configuración del proyecto.
 
@@ -58,7 +58,7 @@ class Main {
 
             }
 
-            // Devuelvo directamente el json.
+            // Devuelvo el json.
             console.log(JSON.stringify(json))
 
         }

@@ -40,11 +40,9 @@
                 ],
                 "depends_on": {
 
-                    "docker": {
+                    "path": ".docker.template_type",
+                    "value": "django"
 
-                        "template_type": "django"
-
-                    }
                 },
                 "default": "sqlite"
 
@@ -56,11 +54,9 @@
                 "default": "gorilladb",
                 "depends_on": {
 
-                    "docker": {
+                    "path": ".docker.template_type",
+                    "value": "django"
 
-                        "template_type": "django"
-
-                    }
                 }
 
             },
@@ -71,11 +67,9 @@
                 "default": "gorilla",
                 "depends_on": {
 
-                    "docker": {
+                    "path": ".docker.template_type",
+                    "value": "django"
 
-                        "template_type": "django"
-
-                    }
                 }
 
             },
@@ -86,11 +80,9 @@
                 "default": "gorilla_598565",
                 "depends_on": {
 
-                    "docker": {
+                    "path": ".docker.template_type",
+                    "value": "django"
 
-                        "template_type": "django"
-
-                    }
                 }
             }
 

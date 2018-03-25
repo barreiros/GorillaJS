@@ -2,8 +2,6 @@
 
     "schema": {
 
-        "test": "Esto es un texto",
-
         "docker": {
 
             "template_type": {
@@ -57,11 +55,9 @@
                 "default": "gorilladb",
                 "depends_on": {
 
-                    "docker": {
+                    "path": ".docker.template_type",
+                    "value": "wordpress"
 
-                        "template_type": "wordpress"
-
-                    }
                 }
 
             },
@@ -72,11 +68,9 @@
                 "default": "gorilla",
                 "depends_on": {
 
-                    "docker": {
+                    "path": ".docker.template_type",
+                    "value": "wordpress"
 
-                        "template_type": "wordpress"
-
-                    }
                 }
 
             },
@@ -87,11 +81,9 @@
                 "default": "gorilla_598565",
                 "depends_on": {
 
-                    "docker": {
+                    "path": ".docker.template_type",
+                    "value": "wordpress"
 
-                        "template_type": "wordpress"
-
-                    }
                 }
             }
 
