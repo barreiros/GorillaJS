@@ -84,6 +84,8 @@ class Questions {
         // Le muestro las preguntas al usuario de forma asíncrona. Así que creo una función que pueda volver a llamar, si es necesario, en el callback de la pregunta. 
         let question = (data) => {
 
+            console.log(data)
+
             // Compruebo si la pregunta ya había sido contestada.
             if(data.base[data.key]){
 
@@ -142,20 +144,28 @@ class Questions {
             // Si llego aquí es porque he pasado todos los filtros y puedo hacer la pregunta.
             if(data.question.values && typeof data.question.values === 'object'){ // Si hay más de una opción, muestro el prompt con el selector.
 
-                let options = []
+                let list = []
 
                 for(let value of data.question.values){
 
-                    options.push(value.option)
+                    list.push(value.option)
 
                 }
 
-                prompt([{
+                let options = {
                     type: 'list',
                     name: 'result',
                     message: data.question.question,
-                    choices: options
-                }]).then(answer => {
+                    choices: list
+                }
+
+                if(data.question.default){
+                    
+                    options.default = data.question.default
+
+                }
+
+                prompt([options]).then(answer => {
 
                     // Recupero el valor de la opción que he seleccionado en el listado.
                     let value = JSPath.apply('.values{.option === "' + answer.result + '"}', data.question)
@@ -168,12 +178,20 @@ class Questions {
 
             }else if(data.question.question.indexOf('pass') > -1){
                     
-                prompt([{
+                let options = {
                     type: 'password',
                     name: 'result',
                     step: data.question.key,
                     message: data.question.question,
-                }]).then(answer => {
+                }
+
+                if(data.question.default){
+                    
+                    options.default = data.question.default
+
+                }
+
+                prompt([options]).then(answer => {
 
                     data.base[data.key] = answer.result
 
@@ -183,12 +201,20 @@ class Questions {
 
             }else{
 
-                prompt([{
+                let options = {
                     type: 'input',
                     name: 'result',
                     step: data.question.key,
                     message: data.question.question,
-                }]).then(answer => {
+                }
+
+                if(data.question.default){
+                    
+                    options.default = data.question.default
+
+                }
+
+                prompt([options]).then(answer => {
 
                     data.base[data.key] = answer.result
 

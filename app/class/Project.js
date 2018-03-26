@@ -22,6 +22,10 @@ var _v2 = _interopRequireDefault(_v);
 
 var _mergeJson = require('merge-json');
 
+var _jspath = require('jspath');
+
+var _jspath2 = _interopRequireDefault(_jspath);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -39,10 +43,53 @@ var Project = function () {
             // Si el archivo gorillafile no existe, creo un nuevo proyecto.
 
             this.createProject();
+        } else {
+
+            this.ensureEnv();
         }
     }
 
     _createClass(Project, [{
+        key: 'ensureEnv',
+        value: function ensureEnv() {
+
+            // Recupero la configuración del proyecto y busco el nodo del entorno actual.
+            var config = (0, _fs.readFileSync)(this.gorillaFilePath, 'utf8');
+
+            // Si está vacío, creo un objeto.
+            if (config === '') {
+
+                config = {};
+            } else {
+
+                config = JSON.parse(config);
+            }
+
+            if (!config[_const.PROJECT_ENV]) {
+
+                // Busco en toda la configuración el id del proyecto, por si estuviera en otro entorno.
+                var id = _jspath2.default.apply('..project.id', config);
+
+                if (id.length) {
+
+                    config[_const.PROJECT_ENV] = {
+
+                        project: {
+
+                            id: id[0]
+
+                        }
+
+                    };
+
+                    this.saveValue(config);
+                } else {
+
+                    this.createProject();
+                }
+            }
+        }
+    }, {
         key: 'createProject',
         value: function createProject() {
 

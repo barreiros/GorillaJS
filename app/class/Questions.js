@@ -96,6 +96,8 @@ var Questions = function () {
             // Le muestro las preguntas al usuario de forma asíncrona. Así que creo una función que pueda volver a llamar, si es necesario, en el callback de la pregunta. 
             var question = function question(data) {
 
+                console.log(data);
+
                 // Compruebo si la pregunta ya había sido contestada.
                 if (data.base[data.key]) {
 
@@ -151,7 +153,7 @@ var Questions = function () {
                 if (data.question.values && _typeof(data.question.values) === 'object') {
                     // Si hay más de una opción, muestro el prompt con el selector.
 
-                    var options = [];
+                    var list = [];
 
                     var _iteratorNormalCompletion = true;
                     var _didIteratorError = false;
@@ -162,7 +164,7 @@ var Questions = function () {
                             var value = _step.value;
 
 
-                            options.push(value.option);
+                            list.push(value.option);
                         }
                     } catch (err) {
                         _didIteratorError = true;
@@ -179,12 +181,19 @@ var Questions = function () {
                         }
                     }
 
-                    (0, _inquirer.prompt)([{
+                    var options = {
                         type: 'list',
                         name: 'result',
                         message: data.question.question,
-                        choices: options
-                    }]).then(function (answer) {
+                        choices: list
+                    };
+
+                    if (data.question.default) {
+
+                        options.default = data.question.default;
+                    }
+
+                    (0, _inquirer.prompt)([options]).then(function (answer) {
 
                         // Recupero el valor de la opción que he seleccionado en el listado.
                         var value = _jspath2.default.apply('.values{.option === "' + answer.result + '"}', data.question);
@@ -195,12 +204,19 @@ var Questions = function () {
                     });
                 } else if (data.question.question.indexOf('pass') > -1) {
 
-                    (0, _inquirer.prompt)([{
+                    var _options = {
                         type: 'password',
                         name: 'result',
                         step: data.question.key,
                         message: data.question.question
-                    }]).then(function (answer) {
+                    };
+
+                    if (data.question.default) {
+
+                        _options.default = data.question.default;
+                    }
+
+                    (0, _inquirer.prompt)([_options]).then(function (answer) {
 
                         data.base[data.key] = answer.result;
 
@@ -208,12 +224,19 @@ var Questions = function () {
                     });
                 } else {
 
-                    (0, _inquirer.prompt)([{
+                    var _options2 = {
                         type: 'input',
                         name: 'result',
                         step: data.question.key,
                         message: data.question.question
-                    }]).then(function (answer) {
+                    };
+
+                    if (data.question.default) {
+
+                        _options2.default = data.question.default;
+                    }
+
+                    (0, _inquirer.prompt)([_options2]).then(function (answer) {
 
                         data.base[data.key] = answer.result;
 

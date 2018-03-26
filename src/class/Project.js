@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync } from 'fs'
 import path from 'path'
 import uuid from 'uuid/v4'
 import { merge } from 'merge-json'
+import JSPath from 'jspath'
 
 class Project {
 
@@ -16,7 +17,56 @@ class Project {
 
             this.createProject()
 
+        }else{
+
+            this.ensureEnv()
+
+        } 
+
+    }
+
+    ensureEnv(){
+
+        // Recupero la configuración del proyecto y busco el nodo del entorno actual.
+        let config = readFileSync(this.gorillaFilePath, 'utf8')
+
+        // Si está vacío, creo un objeto.
+        if(config === ''){
+
+            config = {}
+
+        }else{
+
+            config = JSON.parse(config)
+
         }
+
+        if(!config[PROJECT_ENV]){
+
+            // Busco en toda la configuración el id del proyecto, por si estuviera en otro entorno.
+            let id = JSPath.apply('..project.id', config)
+
+            if(id.length){
+
+                config[PROJECT_ENV] = {
+
+                    project: {
+
+                        id: id[0]
+
+                    }
+
+                }
+
+                this.saveValue(config)
+
+            }else{
+
+                this.createProject()
+
+            }
+
+        }   
 
     }
 
