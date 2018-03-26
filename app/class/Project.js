@@ -38,6 +38,7 @@ var Project = function () {
 
         this.gorillaFilePath = _path2.default.join(projectPath, '.gorilla', 'gorillafile');
         this.projectPath = projectPath;
+        this.domainSlug = '';
 
         if (!(0, _fsExtra.pathExistsSync)(this.gorillaFilePath)) {
             // Si el archivo gorillafile no existe, creo un nuevo proyecto.
@@ -164,6 +165,39 @@ var Project = function () {
         get: function get() {
 
             return JSON.parse((0, _fs.readFileSync)(this.gorillaFilePath, 'utf8'));
+        }
+    }, {
+        key: 'slug',
+        get: function get() {
+
+            if (this.domainSlug === '') {
+
+                var config = JSON.parse((0, _fs.readFileSync)(this.gorillaFilePath, 'utf8'));
+                var slug = config[_const.PROJECT_ENV].project.domain;
+                var separator = '';
+
+                if (slug.charAt(0) === '/') {
+
+                    slug = slug.substr(1);
+                }
+
+                slug = slug.replace(/^\s+|\s+$/g, ''); // trim
+                slug = slug.toLowerCase();
+
+                // remove accents, swap ñ for n, etc
+                var from = "àáäâèéëêìíïîòóöôùúüûñç·/_-,:;";
+                for (var i = 0, l = from.length; i < l; i++) {
+                    slug = slug.replace(new RegExp(from.charAt(i), 'g'), separator);
+                }
+
+                slug = slug.replace(/[^a-z0-9]/g, separator) // remove invalid chars
+                .replace(/\s+/g, separator) // collapse whitespace and replace by -
+                .replace(/-+/g, separator); // collapse dashes
+
+                this.domainSlug = slug;
+            }
+
+            return this.domainSlug;
         }
     }]);
 

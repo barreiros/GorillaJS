@@ -1,5 +1,11 @@
 #! /usr/bin/env node
 
+/**
+ *
+ * Please, read the license: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+ *
+ **/
+
 import { argv } from 'yargs'
 import Plugins from './class/Plugins.js'
 import Processes from './class/Processes.js'
@@ -21,8 +27,16 @@ class Main {
 
             // Imprimo el logo.
 
-            // Instancio la clase Plugins y le paso los parámetros.
-            let plugins = new Plugins(argv)
+            // Instancio la clase Plugins
+            let plugins = new Plugins()
+
+            if(argv._[1] === 'add'){
+
+            }else if(argv._[1] === 'remove'){
+
+            }else if(argv._[1] === 'list'){
+
+            }
 
         }else if(argv._[0] === 'build'){
 

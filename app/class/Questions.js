@@ -96,8 +96,6 @@ var Questions = function () {
             // Le muestro las preguntas al usuario de forma asíncrona. Así que creo una función que pueda volver a llamar, si es necesario, en el callback de la pregunta. 
             var question = function question(data) {
 
-                console.log(data);
-
                 // Compruebo si la pregunta ya había sido contestada.
                 if (data.base[data.key]) {
 

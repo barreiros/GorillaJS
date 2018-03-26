@@ -8,6 +8,10 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _const = require('../const.js');
 
+var _Plugins = require('./Plugins.js');
+
+var _Plugins2 = _interopRequireDefault(_Plugins);
+
 var _Schema = require('./Schema.js');
 
 var _Schema2 = _interopRequireDefault(_Schema);
@@ -19,6 +23,10 @@ var _Project2 = _interopRequireDefault(_Project);
 var _Questions = require('./Questions.js');
 
 var _Questions2 = _interopRequireDefault(_Questions);
+
+var _Tools = require('./Tools.js');
+
+var _mergeJson = require('merge-json');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -33,6 +41,9 @@ var Processes = function () {
         key: 'build',
         value: function build() {
 
+            // Inicio los plugins
+            var plugins = new _Plugins2.default();
+
             // Recupero el schema.
             var schema = new _Schema2.default();
 
@@ -43,37 +54,46 @@ var Processes = function () {
             var questions = new _Questions2.default(schema.list, project.config[_const.PROJECT_ENV]);
 
             // Las llamadas a las preguntas son asíncronas, así que tengo que esperar al callback para seguir haciendo cualquier operación.
-            questions.process(function (answers) {
+            questions.process(function (config) {
 
                 var jsonEnv = {};
+                var jsonComplementary = {};
 
                 // Guardo la configuración del entorno actual en el archivo gorillafile
-                jsonEnv[_const.PROJECT_ENV] = answers;
+                jsonEnv[_const.PROJECT_ENV] = config;
                 project.saveValue(jsonEnv);
+
+                // Complemento la configuración con otros valores necesarios, como el puerto del proxy, paths, etc.
+                jsonComplementary[_const.PROJECT_ENV] = {
+                    "proxy": {
+                        "port": 80,
+                        "userpath": _const.PROXY_PATH
+                    },
+                    "project": {
+                        "slug": project.slug,
+                        "protocol": "http",
+                        "islocal": _const.PROJECT_IS_LOCAL
+                    },
+                    "docker": {
+                        "port": Math.floor(Math.random() * (4999 - 4000)) + 4000,
+                        "data_path": _const.DATA_PATH
+                    }
+
+                    // Unifico las variables complementarias con la configuración general.
+                };config = (0, _mergeJson.merge)(jsonComplementary, config);
+
+                // Lanzo un evento con la configuración por si los plugins necesitan aplicar algún cambio. 
+                _Tools.events.publish('PLUGINS_MODIFY_CONFIG', [config]);
+
+                // console.log(config)
+
+                // Muevo los archivos de la plantilla hasta su destino.
+
+                // Reemplazo las variables de las plantillas por su valor correspondiente del objeto con la configuración que le paso.
+
 
                 // Complemento el objeto de respuestas con variables / constantes para las que no son necesarias preguntas.
                 // Los valores para estas variables los podría añadir directamente al gorillafile antes de iniciar el proceso de reemplazo.
-                // proxy.port
-                // proxy.host
-                // proxy.userpath
-                // system.hostsfile
-                // project.id
-                // project.slug
-                // project.protocol
-                // project.islocal
-                // docker.port
-                // docker.data_path
-                // docker.template
-                // docker.template_path
-                // docker.template.slug
-                // docker.gorillafolder ¿¿??
-                // docker.template_folder ¿¿??
-                //
-                // Guardo los resultados en el nodo del entorno del gorillafile.
-                //
-                // Muevo los archivos de la plantilla hasta su destino.
-                //
-                // Reemplazo las variables de las plantillas por su valor correspondiente del archivo de configuración.
                 //
                 // Inicio las máquinas de Docker.
                 //

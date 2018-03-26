@@ -1,0 +1,94 @@
+{
+
+    "schema": {
+
+        "docker": {
+
+            "template_type": {
+
+                "question": "Select template",
+                "values": [
+
+                    {
+                        "option": "Wordpress",
+                        "value": "wordpress"
+                    },
+                    {
+                        "option": "Django",
+                        "value": "django"
+                    },
+                    {
+                        "option": "NodeJS",
+                        "value": "nodejs"
+                    },
+                    {
+                        "option": "PHP 7",
+                        "value": "php-7"
+                    },
+                    {
+                        "option": "Opencart",
+                        "value": "opencart"
+                    }
+
+                ],
+                "default": "wordpress"
+
+            }
+
+        },
+
+        "project": {
+
+            "domain": {
+
+                "question": "Project domain"
+
+            }
+
+        },
+
+        "database": {
+
+            "dbname": {
+
+                "question": "Database name",
+                "default": "gorilladb",
+                "depends_on": {
+
+                    "path": ".docker.template_type",
+                    "value": "wordpress"
+
+                }
+
+            },
+
+            "username": {
+
+                "question": "Database user name",
+                "default": "gorilla",
+                "depends_on": {
+
+                    "path": ".docker.template_type",
+                    "value": "wordpress"
+
+                }
+
+            },
+
+            "password": {
+
+                "question": "Database password",
+                "default": "gorilla_598565",
+                "depends_on": {
+
+                    "path": ".docker.template_type",
+                    "value": "wordpress"
+
+                }
+            }
+
+        }
+
+    }
+
+}

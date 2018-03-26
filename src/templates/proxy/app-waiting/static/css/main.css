@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,700,900');
+
+html, body{
+    width: 100%;
+    min-height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.progress-bar-container{
+    position: relative;
+    z-index: 101;
+    width: 100%;
+}
+
+.progress-bar-container .progress-bar-centered{
+    width: 200px;
+    margin: 0 auto;
+}
+
+.progress-bar-container .progress-bar-centered #progress-bar{
+    width: 100%;
+    height: 8px;
+    position: relative;
+}
+
+.gorilla{
+    position: relative;
+    width: 100%;
+    z-index: 50;
+    background: #fff;
+    text-align: center;
+    padding: 50px 0 20px;
+}
+
+.gorilla .logo{
+    width: 200px;
+    margin: 0 0 25px;
+}
+
+.gorilla .message{
+    font-size: 25px;
+    font-weight: 400;
+    color: #70726C;
+    text-align: center;
+    width: 50%;
+    margin: 0 auto;
+    line-height: 36px;
+}
+

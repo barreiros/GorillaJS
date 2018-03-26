@@ -1,5 +1,8 @@
 #!/bin/sh -l
 
+
+chmod -R 755 /var/lib/mysql/ &&
+
 # Check if database already exists.
 if [ ! -d "/var/lib/mysql/mysql" ]; then
 
@@ -37,8 +40,5 @@ mysql -uroot -proot_{{database.password}} -e "CREATE DATABASE IF NOT EXISTS {{da
 mysql -uroot -proot_{{database.password}} -e "GRANT ALL PRIVILEGES ON *.* TO '{{database.username}}'@'%' IDENTIFIED BY '{{database.password}}';" &&
 mysql -uroot -proot_{{database.password}} -e "FLUSH PRIVILEGES;" &&
 
-sed "s/max_allowed_packet/max_allowed_packet=550/g" /etc/mysql/my.cnf &&
-
 mysqladmin -uroot -proot_{{database.password}} shutdown &&
 /usr/bin/mysqld_safe --user mysql --datadir='/var/lib/mysql/'
-

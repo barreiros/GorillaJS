@@ -1,0 +1,11 @@
+{
+
+    "plugin": {
+
+        "name": "Adminer",
+        "version": "0.0.1",
+        "main": "adminer.js"
+
+    }
+
+}

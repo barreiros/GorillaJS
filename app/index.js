@@ -23,6 +23,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+/**
+ *
+ * Please, read the license: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+ *
+ **/
+
 var Main = function Main() {
     _classCallCheck(this, Main);
 
@@ -37,8 +43,10 @@ var Main = function Main() {
 
         // Imprimo el logo.
 
-        // Instancio la clase Plugins y le paso los parámetros.
-        var plugins = new _Plugins2.default(_yargs.argv);
+        // Instancio la clase Plugins
+        var plugins = new _Plugins2.default();
+
+        if (_yargs.argv._[1] === 'add') {} else if (_yargs.argv._[1] === 'remove') {} else if (_yargs.argv._[1] === 'list') {}
     } else if (_yargs.argv._[0] === 'build') {
 
         // Imprimo el logo.
