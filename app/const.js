@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SCHEMA_PATH = exports.SYSTEM_HOSTS_FILE = exports.PROJECT_PLUGINS_CUSTOM = exports.PROJECT_PLUGINS_OFFICIAL = exports.PROJECT_TEMPLATES_CUSTOM = exports.PROJECT_TEMPLATES_OFFICIAL = exports.PROJECT_IS_LOCAL = exports.PROJECT_ENV = exports.PROJECT_PATH = exports.PROXY_PATH = exports.DATA_PATH = exports.GORILLAJS_PATH = exports.HOME_USER_PATH_FOR_SCRIPTS = exports.HOME_USER_PATH_FOR_BASH = undefined;
+exports.SCHEMA_PATH = exports.SYSTEM_HOSTS_FILE = exports.PROJECT_PLUGINS_CUSTOM = exports.PROJECT_PLUGINS_OFFICIAL = exports.PROJECT_TEMPLATES_CUSTOM = exports.PROJECT_TEMPLATES_OFFICIAL = exports.PROJECT_IS_LOCAL = exports.PROJECT_ENV = exports.LICENSE_PATH = exports.PROJECT_PATH = exports.PROXY_PATH = exports.DATA_PATH = exports.GORILLAJS_PATH = exports.HOME_USER_PATH_FOR_SCRIPTS = exports.HOME_USER_PATH_FOR_BASH = undefined;
 
 var _yargs = require('yargs');
 
@@ -20,6 +20,7 @@ var GORILLAJS_PATH = exports.GORILLAJS_PATH = _path2.default.resolve(__dirname);
 var DATA_PATH = exports.DATA_PATH = _path2.default.join(HOME_USER_PATH_FOR_BASH, 'gorillajs', 'data');
 var PROXY_PATH = exports.PROXY_PATH = _path2.default.join(HOME_USER_PATH_FOR_BASH, 'gorillajs', 'proxy');
 var PROJECT_PATH = exports.PROJECT_PATH = _yargs.argv.path ? _path2.default.resolve(_yargs.argv.path) : process.cwd();
+var LICENSE_PATH = exports.LICENSE_PATH = _path2.default.join(HOME_USER_PATH_FOR_SCRIPTS, 'gorillajs', 'license.txt');
 
 var PROJECT_ENV = exports.PROJECT_ENV = _yargs.argv.env ? _yargs.argv.env : 'local';
 var PROJECT_IS_LOCAL = exports.PROJECT_IS_LOCAL = _yargs.argv.public ? true : false;

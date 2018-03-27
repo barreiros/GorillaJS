@@ -5,6 +5,7 @@ import Project from './Project.js'
 import Questions from './Questions.js'
 import { events } from './Tools.js'
 import { merge } from 'merge-json'
+import { license } from './License.js'
 
 class Processes{
 
@@ -14,8 +15,12 @@ class Processes{
 
     build(){
 
-        // Inicio los plugins
-        let plugins = new Plugins()
+        if(license.type === 'PRO'){
+
+            // Inicio los plugins
+            let plugins = new Plugins()
+
+        }
 
         // Recupero el schema.
         let schema = new Schema()

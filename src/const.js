@@ -8,6 +8,7 @@ export const GORILLAJS_PATH = path.resolve(__dirname)
 export const DATA_PATH = path.join(HOME_USER_PATH_FOR_BASH, 'gorillajs', 'data')
 export const PROXY_PATH = path.join(HOME_USER_PATH_FOR_BASH, 'gorillajs', 'proxy')
 export const PROJECT_PATH = argv.path ? path.resolve(argv.path) : process.cwd()
+export const LICENSE_PATH = path.join(HOME_USER_PATH_FOR_SCRIPTS, 'gorillajs', 'license.txt')
 
 export const PROJECT_ENV = argv.env ? argv.env : 'local'
 export const PROJECT_IS_LOCAL = argv.public ? true : false

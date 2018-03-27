@@ -11,30 +11,79 @@ import Plugins from './class/Plugins.js'
 import Processes from './class/Processes.js'
 import Schema from './class/Schema.js'
 import Project from './class/Project.js'
+import { license } from './class/License.js'
 
 class Main {
 
     constructor(){
 
-        // Genero, si no lo está, el archivo de configuración. Este archivo contiene, entre otras cosas, los textos de error.
-        
+        // Inicio la licencia.
+        license.check((type) => {
+
+            // Continúo 
+            this.router()
+
+        })
+
+    }
+
+    router(){
+
         // Compruebo la entrada del usuario.
         if(process.env.hasOwnProperty('SUDO_USER')){
 
             // Error: No se puede usar sudo.
+            
+        }else if(argv._[0] === 'license'){
+
+            // Imprimo el logo.
+
+            // Añado la licencia.
+            if(argv._[1]){
+
+                license.add(argv._[1])
+
+            }else{
+
+                // Error de número de licencia no existe.
+
+            }
 
         }else if(argv._[0] === 'plugin'){
 
             // Imprimo el logo.
 
-            // Instancio la clase Plugins
-            let plugins = new Plugins()
+            if(license.type === 'PRO'){
 
-            if(argv._[1] === 'add'){
+                // Instancio la clase Plugins
+                let plugins = new Plugins()
 
-            }else if(argv._[1] === 'remove'){
+                if(argv._[1] === 'add'){
 
-            }else if(argv._[1] === 'list'){
+                }else if(argv._[1] === 'remove'){
+
+                }else if(argv._[1] === 'list'){
+
+                }
+
+            }
+
+        }else if(argv._[0] === 'template'){
+
+            // Imprimo el logo.
+
+            if(license.type === 'PRO'){
+
+                // Instancio la clase Plugins
+                // let templates = new Templates()
+                //
+                // if(argv._[1] === 'add'){
+                //
+                // }else if(argv._[1] === 'remove'){
+                //
+                // }else if(argv._[1] === 'list'){
+                //
+                // }
 
             }
 

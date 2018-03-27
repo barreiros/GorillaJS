@@ -28,6 +28,8 @@ var _Tools = require('./Tools.js');
 
 var _mergeJson = require('merge-json');
 
+var _License = require('./License.js');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -41,8 +43,11 @@ var Processes = function () {
         key: 'build',
         value: function build() {
 
-            // Inicio los plugins
-            var plugins = new _Plugins2.default();
+            if (_License.license.type === 'PRO') {
+
+                // Inicio los plugins
+                var plugins = new _Plugins2.default();
+            }
 
             // Recupero el schema.
             var schema = new _Schema2.default();
