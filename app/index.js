@@ -69,7 +69,7 @@ var Main = function () {
                     // Error de número de licencia no existe.
 
                 }
-            } else if (_yargs.argv._[0] === 'plugin') {
+            } else if (_yargs.argv._[0] === 'plugin' || _yargs.argv._[0] === 'plugins') {
 
                 // Imprimo el logo.
 
@@ -78,7 +78,23 @@ var Main = function () {
                     // Instancio la clase Plugins
                     var plugins = new _Plugins2.default();
 
-                    if (_yargs.argv._[1] === 'add') {} else if (_yargs.argv._[1] === 'remove') {} else if (_yargs.argv._[1] === 'list') {}
+                    if (_yargs.argv._[1] === 'add') {
+
+                        plugins.add(_yargs.argv._[2]);
+                    } else if (_yargs.argv._[1] === 'remove') {
+
+                        plugins.remove(_yargs.argv._[2]);
+                    } else if (_yargs.argv._[1] === 'list') {
+
+                        console.log(plugins.list);
+                    } else if (_yargs.argv._[1] === 'reinstall') {
+
+                        plugins.reinstall();
+                    }
+                } else {
+
+                    // Error de contratación de plan PRO.
+
                 }
             } else if (_yargs.argv._[0] === 'template') {
 

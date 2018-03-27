@@ -96,12 +96,8 @@ var Processes = function () {
 
                 // Reemplazo las variables de las plantillas por su valor correspondiente del objeto con la configuración que le paso.
 
-
-                // Complemento el objeto de respuestas con variables / constantes para las que no son necesarias preguntas.
-                // Los valores para estas variables los podría añadir directamente al gorillafile antes de iniciar el proceso de reemplazo.
-                //
                 // Inicio las máquinas de Docker.
-                //
+
                 // Compruebo que el proyecto se haya iniciado correctamente.
             });
         }

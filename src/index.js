@@ -49,7 +49,7 @@ class Main {
 
             }
 
-        }else if(argv._[0] === 'plugin'){
+        }else if(argv._[0] === 'plugin' || argv._[0] === 'plugins'){
 
             // Imprimo el logo.
 
@@ -60,11 +60,25 @@ class Main {
 
                 if(argv._[1] === 'add'){
 
+                    plugins.add(argv._[2])
+
                 }else if(argv._[1] === 'remove'){
+
+                    plugins.remove(argv._[2])
 
                 }else if(argv._[1] === 'list'){
 
+                    console.log(plugins.list)
+
+                }else if(argv._[1] === 'reinstall'){
+
+                    plugins.reinstall()
+
                 }
+
+            }else{
+
+                // Error de contratación de plan PRO.
 
             }
 
