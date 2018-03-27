@@ -48,13 +48,21 @@ var Schema = function () {
                     var file = _step.value;
 
 
+                    console.log(file);
+
                     var json = JSON.parse((0, _fs.readFileSync)(file, 'utf8'));
 
-                    if (!output) {
-
-                        output = json;
-                    } else if (json.schema) {
+                    if (json.schema) {
                         (function () {
+
+                            console.log(json.schema);
+
+                            if (!output) {
+
+                                output = {
+                                    "schema": json.schema
+                                };
+                            }
 
                             // Creo una función recursiva para ir añadiendo los campos y así fusionar los json.
                             var recursive = function recursive(base, data) {

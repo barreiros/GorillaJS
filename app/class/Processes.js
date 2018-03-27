@@ -68,7 +68,7 @@ var Processes = function () {
                 jsonEnv[_const.PROJECT_ENV] = config;
                 project.saveValue(jsonEnv);
 
-                // Complemento la configuración con otros valores necesarios, como el puerto del proxy, paths, etc.
+                // Completo la configuración con otros valores necesarios, como el puerto del proxy, paths, etc.
                 jsonComplementary[_const.PROJECT_ENV] = {
                     "proxy": {
                         "port": 80,

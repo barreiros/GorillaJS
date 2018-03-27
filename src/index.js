@@ -7,6 +7,7 @@
  **/
 
 import { argv } from 'yargs'
+import Templates from './class/Templates.js'
 import Plugins from './class/Plugins.js'
 import Processes from './class/Processes.js'
 import Schema from './class/Schema.js'
@@ -28,6 +29,7 @@ class Main {
     }
 
     router(){
+
 
         // Compruebo la entrada del usuario.
         if(process.env.hasOwnProperty('SUDO_USER')){
@@ -82,22 +84,28 @@ class Main {
 
             }
 
-        }else if(argv._[0] === 'template'){
+        }else if(argv._[0] === 'template' || argv._[0] === 'templates'){
 
             // Imprimo el logo.
 
             if(license.type === 'PRO'){
 
-                // Instancio la clase Plugins
-                // let templates = new Templates()
-                //
-                // if(argv._[1] === 'add'){
-                //
-                // }else if(argv._[1] === 'remove'){
-                //
-                // }else if(argv._[1] === 'list'){
-                //
-                // }
+                // Instancio la clase Templates
+                let templates = new Templates()
+
+                if(argv._[1] === 'add'){
+
+                    templates.add(argv._[2])
+
+                }else if(argv._[1] === 'remove'){
+
+                    templates.remove(argv._[2])
+
+                }else if(argv._[1] === 'list'){
+
+                    console.log(templates.list)
+
+                }
 
             }
 

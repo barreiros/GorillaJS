@@ -11,6 +11,10 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _yargs = require('yargs');
 
+var _Templates = require('./class/Templates.js');
+
+var _Templates2 = _interopRequireDefault(_Templates);
+
 var _Plugins = require('./class/Plugins.js');
 
 var _Plugins2 = _interopRequireDefault(_Plugins);
@@ -96,23 +100,25 @@ var Main = function () {
                     // Error de contratación de plan PRO.
 
                 }
-            } else if (_yargs.argv._[0] === 'template') {
+            } else if (_yargs.argv._[0] === 'template' || _yargs.argv._[0] === 'templates') {
 
                 // Imprimo el logo.
 
                 if (_License.license.type === 'PRO') {
 
-                    // Instancio la clase Plugins
-                    // let templates = new Templates()
-                    //
-                    // if(argv._[1] === 'add'){
-                    //
-                    // }else if(argv._[1] === 'remove'){
-                    //
-                    // }else if(argv._[1] === 'list'){
-                    //
-                    // }
+                    // Instancio la clase Templates
+                    var templates = new _Templates2.default();
 
+                    if (_yargs.argv._[1] === 'add') {
+
+                        templates.add(_yargs.argv._[2]);
+                    } else if (_yargs.argv._[1] === 'remove') {
+
+                        templates.remove(_yargs.argv._[2]);
+                    } else if (_yargs.argv._[1] === 'list') {
+
+                        console.log(templates.list);
+                    }
                 }
             } else if (_yargs.argv._[0] === 'build') {
 

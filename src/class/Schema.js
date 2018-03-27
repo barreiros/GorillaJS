@@ -33,13 +33,21 @@ class Schema{
 
         for(let file of glob.sync(files)){
 
+            console.log(file)
+
             let json = JSON.parse(readFileSync(file, 'utf8'))
 
-            if(!output){
+            if(json.schema){
 
-                output = json
+                console.log(json.schema)
 
-            }else if(json.schema){
+                if(!output){
+
+                    output = {
+                        "schema": json.schema
+                    }
+
+                }
 
                 // Creo una función recursiva para ir añadiendo los campos y así fusionar los json.
                 let recursive = (base, data) => {

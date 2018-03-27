@@ -1,5 +1,22 @@
 {
 
+    "schema": {
+
+        "docker": {
+
+            "template_type": {
+
+                "values": [{
+                    "option": "Custom",
+                    "value": "custom"
+                }]
+
+            }
+
+        }
+
+    },
+
     "messages": {
 
         "steps": {
