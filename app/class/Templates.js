@@ -29,9 +29,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Templates = function () {
     function Templates() {
         _classCallCheck(this, Templates);
-
-        // Recupero todos los plugins.
-        var files = '{' + _const.PROJECT_TEMPLATES_OFFICIAL + ',' + _const.PROJECT_TEMPLATES_CUSTOM + '}/*/config.json';
     }
 
     _createClass(Templates, [{
@@ -40,16 +37,21 @@ var Templates = function () {
 
             source = _path2.default.resolve(source);
 
-            console.log(source);
-
             if ((0, _fsExtra.pathExistsSync)(source)) {
 
-                (0, _fsExtra.copySync)(source, _path2.default.join(_const.PROJECT_TEMPLATES_CUSTOM, _path2.default.basename(source)));
+                if ((0, _fsExtra.pathExistsSync)(_path2.default.join(source, 'config.json'))) {
+
+                    (0, _fsExtra.copySync)(source, _path2.default.join(_const.PROJECT_TEMPLATES_CUSTOM, _path2.default.basename(source)));
+                } else {
+
+                    // Error no existe el archivo config.json
+
+                }
             } else {
 
-                console.log('Hola, Bar');
-                // Error carpeta no existe.
-            }
+                    // Error carpeta no existe.
+
+                }
         }
     }, {
         key: 'remove',

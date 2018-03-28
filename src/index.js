@@ -21,6 +21,13 @@ class Main {
         // Inicio la licencia.
         license.check((type) => {
 
+            if(license.type === 'PRO'){
+
+                // Instancio la clase Plugins
+                this.plugins = new Plugins()
+
+            }
+
             // Continúo 
             this.router()
 
@@ -29,7 +36,6 @@ class Main {
     }
 
     router(){
-
 
         // Compruebo la entrada del usuario.
         if(process.env.hasOwnProperty('SUDO_USER')){
@@ -55,26 +61,23 @@ class Main {
 
             // Imprimo el logo.
 
-            if(license.type === 'PRO'){
-
-                // Instancio la clase Plugins
-                let plugins = new Plugins()
+            if(this.plugins){
 
                 if(argv._[1] === 'add'){
 
-                    plugins.add(argv._[2])
+                    this.plugins.add(argv._[2])
 
                 }else if(argv._[1] === 'remove'){
 
-                    plugins.remove(argv._[2])
+                    this.plugins.remove(argv._[2])
 
                 }else if(argv._[1] === 'list'){
 
-                    console.log(plugins.list)
+                    console.log(this.plugins.list)
 
                 }else if(argv._[1] === 'reinstall'){
 
-                    plugins.reinstall()
+                    this.plugins.reinstall()
 
                 }
 

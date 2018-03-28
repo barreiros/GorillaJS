@@ -43,12 +43,6 @@ var Processes = function () {
         key: 'build',
         value: function build() {
 
-            if (_License.license.type === 'PRO') {
-
-                // Inicio los plugins
-                var plugins = new _Plugins2.default();
-            }
-
             // Recupero el schema.
             var schema = new _Schema2.default();
 

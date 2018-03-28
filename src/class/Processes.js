@@ -15,13 +15,6 @@ class Processes{
 
     build(){
 
-        if(license.type === 'PRO'){
-
-            // Inicio los plugins
-            let plugins = new Plugins()
-
-        }
-
         // Recupero el schema.
         let schema = new Schema()
 

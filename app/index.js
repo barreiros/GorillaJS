@@ -46,6 +46,12 @@ var Main = function () {
         // Inicio la licencia.
         _License.license.check(function (type) {
 
+            if (_License.license.type === 'PRO') {
+
+                // Instancio la clase Plugins
+                _this.plugins = new _Plugins2.default();
+            }
+
             // Continúo 
             _this.router();
         });
@@ -77,23 +83,20 @@ var Main = function () {
 
                 // Imprimo el logo.
 
-                if (_License.license.type === 'PRO') {
-
-                    // Instancio la clase Plugins
-                    var plugins = new _Plugins2.default();
+                if (this.plugins) {
 
                     if (_yargs.argv._[1] === 'add') {
 
-                        plugins.add(_yargs.argv._[2]);
+                        this.plugins.add(_yargs.argv._[2]);
                     } else if (_yargs.argv._[1] === 'remove') {
 
-                        plugins.remove(_yargs.argv._[2]);
+                        this.plugins.remove(_yargs.argv._[2]);
                     } else if (_yargs.argv._[1] === 'list') {
 
-                        console.log(plugins.list);
+                        console.log(this.plugins.list);
                     } else if (_yargs.argv._[1] === 'reinstall') {
 
-                        plugins.reinstall();
+                        this.plugins.reinstall();
                     }
                 } else {
 
