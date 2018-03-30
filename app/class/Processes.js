@@ -159,10 +159,10 @@ var Processes = function () {
                 if (docker.check()) {
 
                     // Detengo los contenedores del proyecto.
-                    docker.stop(_path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), config.project.domain);
+                    docker.stop(_path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), project.slug);
 
                     // Inicio los contenedores del proyecto.
-                    docker.start(_path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), config.project.domain);
+                    docker.start(_path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), project.slug);
 
                     // Detengo el contenedor del proxy.
                     docker.stop(_path2.default.join(_const.PROJECT_TEMPLATES_OFFICIAL, 'proxy', 'docker-compose.yml'), 'gorillajsproxy');

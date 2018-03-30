@@ -100,10 +100,10 @@ class Processes{
             if(docker.check()){
 
                 // Detengo los contenedores del proyecto.
-                docker.stop(path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), config.project.domain)
+                docker.stop(path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), project.slug)
 
                 // Inicio los contenedores del proyecto.
-                docker.start(path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), config.project.domain)
+                docker.start(path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), project.slug)
 
                 // Detengo el contenedor del proxy.
                 docker.stop(path.join(PROJECT_TEMPLATES_OFFICIAL, 'proxy', 'docker-compose.yml'), 'gorillajsproxy')
