@@ -1,0 +1,21 @@
+version: '3'
+
+services: 
+
+  proxy:
+    image: gorillajs/proxy
+    ports:  
+      - "80:80"
+    volumes:
+      - $HOME/gorillajs/proxy/template:/root/templates
+      - $HOME/gorillajs/proxy/sites-enabled:/etc/apache2/sites-enabled
+      - $HOME/gorillajs/proxy/sites-available:/etc/apache2/sites-available
+    entrypoint:
+      - bin/sh
+      - /root/templates/entrypoint-proxy.sh
+    container_name: gorillajsproxy
+
+networks:
+  default:
+    external:
+      name: gorillajs

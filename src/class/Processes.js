@@ -1,11 +1,17 @@
-import { PROJECT_PATH, DATA_PATH, PROJECT_ENV, PROJECT_IS_LOCAL, PROXY_PATH, SYSTEM_HOSTS_FILE } from '../const.js'
+import { PROJECT_PATH, DATA_PATH, PROJECT_ENV, PROJECT_IS_LOCAL, PROJECT_TEMPLATES_OFFICIAL, PROJECT_TEMPLATES_CUSTOM, PROXY_PATH, SYSTEM_HOSTS_FILE } from '../const.js'
 import Plugins from './Plugins.js'
 import Schema from './Schema.js'
 import Project from './Project.js'
 import Questions from './Questions.js'
+import Docker from './Docker.js'
 import { events } from './Tools.js'
 import { merge } from 'merge-json'
 import { license } from './License.js'
+import { lstatSync, readFileSync, writeFileSync } from 'fs'
+import { pathExistsSync, copySync } from 'fs-extra'
+import path from 'path'
+import JSPath from 'jspath'
+import glob from 'glob'
 
 class Processes{
 
@@ -35,7 +41,7 @@ class Processes{
             project.saveValue(jsonEnv)
 
             // Completo la configuración con otros valores necesarios, como el puerto del proxy, paths, etc.
-            jsonComplementary[PROJECT_ENV] = {
+            jsonComplementary = {
                 "proxy": {
                     "port": 80,
                     "userpath": PROXY_PATH
@@ -55,15 +61,63 @@ class Processes{
             config = merge(jsonComplementary, config)
             
             // Lanzo un evento con la configuración por si los plugins necesitan aplicar algún cambio. 
-            events.publish('PLUGINS_MODIFY_CONFIG', [config])
-
-            // console.log(config)
+            events.publish('CONFIG_FILE_CREATED', [config])
 
             // Muevo los archivos de la plantilla hasta su destino.
+            let templateSource = pathExistsSync(path.join(PROJECT_TEMPLATES_OFFICIAL, config.docker.template_type)) ? path.join(PROJECT_TEMPLATES_OFFICIAL, config.docker.template_type) : path.join(PROJECT_TEMPLATES_CUSTOM, config.docker.template_type)
+            let templateTarget = path.join(PROJECT_PATH, '.gorilla', 'template')
 
-            // Reemplazo las variables de las plantillas por su valor correspondiente del objeto con la configuración que le paso.
+            copySync(templateSource, templateTarget)
 
-            // Inicio las máquinas de Docker.
+            // Lanzo un evento antes de reemplazar los valores por si algún plugin necesita añadir archivos a la template. Le paso la ruta de la plantilla.
+            events.publish('BEFORE_REPLACE_VALUES', [templateTarget])
+
+            // Reemplazo las variables de la plantilla y del proxy por su valor correspondiente del objeto con la configuración que le paso.
+            for(let file of glob.sync('{' + templateTarget + '**/*,' + PROJECT_TEMPLATES_OFFICIAL + '/proxy/**/*}')){
+
+                if(!lstatSync(file).isDirectory()){
+
+                    // Cargo el contenido del archivo.
+                    let text = readFileSync(file).toString()
+
+                    // Creo una expresión regular en lazy mode para que coja todos los valores, aunque haya varios en la misma línea.
+                    text = text.replace(/{{(.*?)}}/g, (search, value) => {
+                    
+                        // Reemplazo las ocurrencias por su valor correspondiente de la configuración.
+                        return JSPath.apply('.' + value, config)[0]
+
+                    })
+
+                    // Vuelvo a guardar el contenido del archivo con los nuevos valores.
+                    writeFileSync(file, text)
+
+                }
+
+            }
+
+            let docker = new Docker()
+
+            if(docker.check()){
+
+                // Detengo los contenedores del proyecto.
+                docker.stop(path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), config.project.domain)
+
+                // Inicio los contenedores del proyecto.
+                docker.start(path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), config.project.domain)
+
+                // Detengo el contenedor del proxy.
+                docker.stop(path.join(PROJECT_TEMPLATES_OFFICIAL, 'proxy', 'docker-compose.yml'), 'gorillajsproxy')
+
+                // Inicio el contenedor del proxy.
+                docker.start(path.join(PROJECT_TEMPLATES_OFFICIAL, 'proxy', 'docker-compose.yml'), 'gorillajsproxy')
+                
+            }else{
+
+                // Error Docker no está arranco o no está instalado.
+
+            }
+
+            events.publish('PROJECT_BUILT')
 
             // Compruebo que el proyecto se haya iniciado correctamente.
 

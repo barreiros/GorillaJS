@@ -1,204 +1,178 @@
 import { PROJECT_ENV } from '../../const.js'
+import Project from '../../class/Project.js'
 import { argv } from 'yargs'
-import { events } from '../../class/Tools.js'
+import { exec } from 'child_process'
+import { pathExistsSync, ensureFileSync } from 'fs-extra'
+import JSPath from 'jspath'
+import path from 'path'
 
 class DBManager{
 
     constructor(){
 
-        events.subscribe('PLUGINS_MODIFY_CONFIG', (config) => {
-            
-            console.log('Este es el plugin DB Manager')
-                
-        })
+        this.init()
+
+    }
+
+    init(){
+
+        if(argv._[0] === 'db'){
+
+            if(argv._[1] === 'import'){
+
+                if(pathExistsSync(argv._[2])){
+
+                    this.import(argv._[2])
+
+                }else{
+
+                    // Error archivo no existe.
+
+                }
+
+            }else if(argv._[1] === 'replace'){
+
+                if(pathExistsSync(argv._[2])){
+
+                    this.replace(argv._[2])
+
+                }else{
+
+                    // Error archivo no existe.
+                    
+                }
+
+            }else if(argv._[1] === 'export'){
+
+                ensureFileSync(argv._[2])
+                this.export(argv._[2])
+
+            }
+
+        }else if(argv._[1] === 'clone'){
+
+            // Routemap
+
+        }
+
+    }
+
+    import(source){
+
+        let project = new Project()
+        let config = project.config[PROJECT_ENV]
+
+        // Como de momento solo es compatible con MySQL, busco el valor en el archivo de configuracion.
+        let engine = JSPath.apply('..config.ase.engine', config)
+
+        if(engine.indexOf('mysql'.toLowerCase())){
+
+            // Step iniciando el proceso de importación.
+
+            let command = 'docker exec -i ' + config.project.domain + '_mysql mysql --force -u' + config.database.username + ' -p' + config.database.password + ' ' + config.database.dbname + ' < "' + source + '"'
+
+            exec(command, (err, stdout, stderr) => {
+
+                console.log(err, stdout,stderr)
+
+                // Verbose err, stdout, stderr
+
+                if(err){
+
+                    // Error no se ha podido hacer la importación.
+                    // + stderr.
+
+                }else{
+
+                    // Step importación correcta.
+                }
+
+            })
+
+        }
+
+    }
+
+    export(target){
+
+        let project = new Project()
+        let config = project.config[PROJECT_ENV]
+
+        // Como de momento solo es compatible con MySQL, busco el valor en el archivo de configuracion.
+        let engine = JSPath.apply('..config.ase.engine', config)
+
+        console.log(config)
+
+        if(engine.indexOf('mysql'.toLowerCase())){
+
+            // Step iniciando el proceso de importación.
+
+            let command = 'docker exec -i ' + config.project.domain + '_mysql mysqldump -u' + config.database.username + ' -p' + config.database.password + ' ' + config.database.dbname + ' > ' + target
+
+            exec(command, (err, stdout, stderr) => {
+
+                console.log(err, stdout,stderr)
+
+                // Verbose err, stdout, stderr
+
+                if(err){
+
+                    // Error no se ha podido hacer la exportación.
+                    // + stderr.
+
+                }else{
+
+                    // Step exportación correcta.
+                }
+
+            })
+
+        }
+
+    }
+
+    replace(source){
+
+        let project = new Project()
+        let config = project.config[PROJECT_ENV]
+
+        // Como de momento solo es compatible con MySQL, busco el valor en el archivo de configuracion.
+        let engine = JSPath.apply('..config.ase.engine', config)
+
+        if(engine.indexOf('mysql'.toLowerCase())){
+
+            // Step iniciando el proceso de reemplazo
+
+            let command = ''
+            command = 'docker exec -i ' + config.project.domain + '_mysql mysql -u' + config.database.username + ' -p' + config.database.password + ' -e "DROP DATABASE ' + config.database.dbname + '"'
+            command += ' && '
+            command = 'docker exec -i ' + config.project.domain + '_mysql mysql -u' + config.database.username + ' -p' + config.database.password + ' -e "CREATE DATABASE ' + config.database.dbname + '"'
+            command += ' && '
+            command += 'docker exec -i ' + config.project.domain + '_mysql mysql --force -u' + config.database.username + ' -p' + config.database.password + ' ' + config.database.dbname + ' < "' + source + '"'
+
+            exec(command, (err, stdout, stderr) => {
+
+                console.log(err, stdout,stderr)
+
+                // Verbose err, stdout, stderr
+
+                if(err){
+
+                    // Error no se ha podido hacer el reemplazo
+                    // + stderr.
+
+                }else{
+
+                    // Step proceso de reemplazo correcto.
+
+                }
+
+            })
+
+        }
 
     }
 
 }
 
 export default new DBManager() 
-
-// 'use strict';
-//
-// var argv = require('minimist')(process.argv.slice(2));
-// var fs = require('fs');
-// var path = require('path');
-//
-// var events = require(path.join(envPaths.libraries, 'pubsub.js'));
-// var cross = require(path.join(envPaths.libraries, 'crossExec.js'));
-//
-// events.subscribe('INIT_PLUGINS', init);
-//
-// function init(gorillaFile){
-//
-//     var destiny, data;
-//
-//     if(fs.existsSync(gorillaFile)){
-//
-//         data = JSON.parse(fs.readFileSync(gorillaFile));
-//
-//         if(argv._[0] === 'db'){
-//
-//             if(argv._.hasOwnProperty(2)){
-//
-//                 switch(argv._[1]){
-//
-//                     case 'import':
-//
-//                         destiny = argv._.hasOwnProperty(2) ? argv._[2] : null;
-//
-//                         if(destiny && data.hasOwnProperty('local')){
-//
-//                             dbImport(data.local, destiny);
-//
-//                         }else{
-//
-//                             events.publish('ERROR', ['030']);
-//
-//                         }
-//
-//                         break;
-//
-//                     case 'replace':
-//
-//                         destiny = argv._.hasOwnProperty(2) ? argv._[2] : null;
-//
-//                         if(destiny && data.hasOwnProperty('local')){
-//
-//                             dbReplace(data.local, destiny);
-//
-//                         }else{
-//
-//                             events.publish('ERROR', ['030']);
-//
-//                         }
-//
-//                         break;
-//
-//                     case 'export':
-//
-//                         if(data.hasOwnProperty('local')){
-//
-//                             destiny = argv._.hasOwnProperty(2) ? argv._[2] : process.cwd() + '/' + Date.now() + '.sql';
-//                             dbExport(data.local, destiny);
-//
-//                         }else{
-//
-//                             events.publish('ERROR', ['030']);
-//
-//                         }
-//
-//                         break;
-//
-//                 }
-//
-//             }
-//
-//         }else if(argv._[1] === 'clone'){
-//
-//         }
-//
-//     }
-//
-// }
-//
-// function dbImport(data, file){
-//
-//     if(data.hasOwnProperty('project') && data.hasOwnProperty('database')){
-//
-//         events.publish('STEP', ['wordpress_database_import']);
-//
-//         cross.exec('docker exec -i ' + data.project.domain + '_mysql mysql --force -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' < "' + file + '"', function(err, stdout, stderr){
-//
-//             events.publish('VERBOSE', [stderr + err + stdout]);
-//             if (err) events.publish('ERROR', ['032']);
-//
-//             events.publish('STEP', ['wordpress_finish']);
-//
-//         });
-//
-//     }else{
-//
-//         events.publish('ERROR', ['030']);
-//
-//     }
-//
-// }
-//
-// function dbReplace(data, file){
-//
-//     if(data.hasOwnProperty('project') && data.hasOwnProperty('database')){
-//
-//         cross.exec('docker exec -i ' + data.project.domain + '_mysql mysql -u' + data.database.username + ' -p' + data.database.password + ' -e "DROP DATABASE ' + data.database.dbname + '"', function(err, stdout, stderr){
-//
-//             if (err) {
-//
-//                 events.publish('VERBOSE', [stderr + err + stdout]);
-//                 events.publish('ERROR', ['032']);
-//
-//             }else{
-//
-//                 events.publish('STEP', ['wordpress_database_replace']);
-//
-//                 cross.exec('docker exec -i ' + data.project.domain + '_mysql mysql -u' + data.database.username + ' -p' + data.database.password + ' -e "CREATE DATABASE ' + data.database.dbname + '"', function(err, stdout, stderr){
-//
-//                     if (err) {
-//
-//                         events.publish('VERBOSE', [stderr + err + stdout]);
-//                         events.publish('ERROR', ['032']);
-//
-//                     }else{
-//
-//                         cross.exec('docker exec -i ' + data.project.domain + '_mysql mysql --force -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' < "' + file + '"', function(err, stdout, stderr){
-//
-//                             events.publish('VERBOSE', [stderr + err + stdout]);
-//                             if (err) events.publish('ERROR', ['032']);
-//
-//                             events.publish('STEP', ['wordpress_finish']);
-//
-//                         });
-//
-//                     }
-//
-//                 });
-//
-//             }
-//
-//         });
-//
-//     }else{
-//
-//         events.publish('ERROR', ['030']);
-//
-//     }
-//
-// }
-//
-// function dbExport(data, destiny){
-//     
-//     if(data.hasOwnProperty('project') && data.hasOwnProperty('database')){
-//
-//         if(!fs.existsSync(path.dirname(destiny))){
-//
-//             fs.mkdirSync(path.dirname(destiny));
-//
-//         }
-//
-//         events.publish('STEP', ['wordpress_database_export']);
-//
-//         cross.exec('docker exec -i ' + data.project.domain + '_mysql mysqldump -u' + data.database.username + ' -p' + data.database.password + ' ' + data.database.dbname + ' > ' + destiny, function(err, stdout, stderr){
-//
-//             events.publish('VERBOSE', [stderr + err + stdout]);
-//             if (err) events.publish('ERROR', ['032']);
-//
-//             events.publish('STEP', ['wordpress_finish']);
-//
-//         });
-//
-//     }else{
-//
-//         events.publish('ERROR', ['030']);
-//
-//     }
-//
-// }

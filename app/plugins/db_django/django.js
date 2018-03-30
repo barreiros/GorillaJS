@@ -13,7 +13,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Django = function Django() {
     _classCallCheck(this, Django);
 
-    _Tools.events.subscribe('PLUGINS_MODIFY_CONFIG', function (config) {
+    _Tools.events.subscribe('CONFIG_FILE_CREATED', function (config) {
 
         console.log('Este es el plugin Django');
     });

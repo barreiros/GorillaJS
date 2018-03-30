@@ -24,11 +24,31 @@ var _Questions = require('./Questions.js');
 
 var _Questions2 = _interopRequireDefault(_Questions);
 
+var _Docker = require('./Docker.js');
+
+var _Docker2 = _interopRequireDefault(_Docker);
+
 var _Tools = require('./Tools.js');
 
 var _mergeJson = require('merge-json');
 
 var _License = require('./License.js');
+
+var _fs = require('fs');
+
+var _fsExtra = require('fs-extra');
+
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
+var _jspath = require('jspath');
+
+var _jspath2 = _interopRequireDefault(_jspath);
+
+var _glob = require('glob');
+
+var _glob2 = _interopRequireDefault(_glob);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -63,7 +83,7 @@ var Processes = function () {
                 project.saveValue(jsonEnv);
 
                 // Completo la configuración con otros valores necesarios, como el puerto del proxy, paths, etc.
-                jsonComplementary[_const.PROJECT_ENV] = {
+                jsonComplementary = {
                     "proxy": {
                         "port": 80,
                         "userpath": _const.PROXY_PATH
@@ -82,15 +102,80 @@ var Processes = function () {
                 };config = (0, _mergeJson.merge)(jsonComplementary, config);
 
                 // Lanzo un evento con la configuración por si los plugins necesitan aplicar algún cambio. 
-                _Tools.events.publish('PLUGINS_MODIFY_CONFIG', [config]);
-
-                // console.log(config)
+                _Tools.events.publish('CONFIG_FILE_CREATED', [config]);
 
                 // Muevo los archivos de la plantilla hasta su destino.
+                var templateSource = (0, _fsExtra.pathExistsSync)(_path2.default.join(_const.PROJECT_TEMPLATES_OFFICIAL, config.docker.template_type)) ? _path2.default.join(_const.PROJECT_TEMPLATES_OFFICIAL, config.docker.template_type) : _path2.default.join(_const.PROJECT_TEMPLATES_CUSTOM, config.docker.template_type);
+                var templateTarget = _path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template');
 
-                // Reemplazo las variables de las plantillas por su valor correspondiente del objeto con la configuración que le paso.
+                (0, _fsExtra.copySync)(templateSource, templateTarget);
 
-                // Inicio las máquinas de Docker.
+                // Lanzo un evento antes de reemplazar los valores por si algún plugin necesita añadir archivos a la template. Le paso la ruta de la plantilla.
+                _Tools.events.publish('BEFORE_REPLACE_VALUES', [templateTarget]);
+
+                // Reemplazo las variables de la plantilla y del proxy por su valor correspondiente del objeto con la configuración que le paso.
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
+
+                try {
+                    for (var _iterator = _glob2.default.sync('{' + templateTarget + '**/*,' + _const.PROJECT_TEMPLATES_OFFICIAL + '/proxy/**/*}')[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        var file = _step.value;
+
+
+                        if (!(0, _fs.lstatSync)(file).isDirectory()) {
+
+                            // Cargo el contenido del archivo.
+                            var text = (0, _fs.readFileSync)(file).toString();
+
+                            // Creo una expresión regular en lazy mode para que coja todos los valores, aunque haya varios en la misma línea.
+                            text = text.replace(/{{(.*?)}}/g, function (search, value) {
+
+                                // Reemplazo las ocurrencias por su valor correspondiente de la configuración.
+                                return _jspath2.default.apply('.' + value, config)[0];
+                            });
+
+                            // Vuelvo a guardar el contenido del archivo con los nuevos valores.
+                            (0, _fs.writeFileSync)(file, text);
+                        }
+                    }
+                } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion && _iterator.return) {
+                            _iterator.return();
+                        }
+                    } finally {
+                        if (_didIteratorError) {
+                            throw _iteratorError;
+                        }
+                    }
+                }
+
+                var docker = new _Docker2.default();
+
+                if (docker.check()) {
+
+                    // Detengo los contenedores del proyecto.
+                    docker.stop(_path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), config.project.domain);
+
+                    // Inicio los contenedores del proyecto.
+                    docker.start(_path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), config.project.domain);
+
+                    // Detengo el contenedor del proxy.
+                    docker.stop(_path2.default.join(_const.PROJECT_TEMPLATES_OFFICIAL, 'proxy', 'docker-compose.yml'), 'gorillajsproxy');
+
+                    // Inicio el contenedor del proxy.
+                    docker.start(_path2.default.join(_const.PROJECT_TEMPLATES_OFFICIAL, 'proxy', 'docker-compose.yml'), 'gorillajsproxy');
+                } else {
+
+                    // Error Docker no está arranco o no está instalado.
+
+                }
+
+                _Tools.events.publish('PROJECT_BUILT');
 
                 // Compruebo que el proyecto se haya iniciado correctamente.
             });

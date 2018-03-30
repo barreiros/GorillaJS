@@ -5,7 +5,7 @@ class Django{
 
     constructor(){
 
-        events.subscribe('PLUGINS_MODIFY_CONFIG', (config) => {
+        events.subscribe('CONFIG_FILE_CREATED', (config) => {
             
             console.log('Este es el plugin Django')
                 
