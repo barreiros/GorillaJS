@@ -86,7 +86,7 @@ var Processes = function () {
                 jsonComplementary = {
                     "proxy": {
                         "port": 80,
-                        "userpath": _const.PROXY_PATH
+                        "userpath": _path2.default.join(_const.HOME_USER_PATH_FOR_BASH, 'gorillajs', 'proxy')
                     },
                     "project": {
                         "slug": project.slug,
@@ -104,10 +104,13 @@ var Processes = function () {
                 // Lanzo un evento con la configuración por si los plugins necesitan aplicar algún cambio. 
                 _Tools.events.publish('CONFIG_FILE_CREATED', [config]);
 
-                // Muevo los archivos de la plantilla hasta su destino.
+                var proxySource = _path2.default.join(_const.PROJECT_TEMPLATES_OFFICIAL, 'proxy');
+                var proxyTarget = _path2.default.join(_const.PROXY_PATH, 'template');
                 var templateSource = (0, _fsExtra.pathExistsSync)(_path2.default.join(_const.PROJECT_TEMPLATES_OFFICIAL, config.docker.template_type)) ? _path2.default.join(_const.PROJECT_TEMPLATES_OFFICIAL, config.docker.template_type) : _path2.default.join(_const.PROJECT_TEMPLATES_CUSTOM, config.docker.template_type);
                 var templateTarget = _path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template');
 
+                // Muevo los archivos de la plantilla y el proxy hasta su destino.
+                (0, _fsExtra.copySync)(proxySource, proxyTarget);
                 (0, _fsExtra.copySync)(templateSource, templateTarget);
 
                 // Lanzo un evento antes de reemplazar los valores por si algún plugin necesita añadir archivos a la template. Le paso la ruta de la plantilla.
@@ -119,7 +122,7 @@ var Processes = function () {
                 var _iteratorError = undefined;
 
                 try {
-                    for (var _iterator = _glob2.default.sync('{' + templateTarget + '**/*,' + _const.PROJECT_TEMPLATES_OFFICIAL + '/proxy/**/*}')[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    for (var _iterator = _glob2.default.sync('{' + templateTarget + '**/*,' + proxyTarget + '/**/*}')[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                         var file = _step.value;
 
 
@@ -158,26 +161,39 @@ var Processes = function () {
 
                 if (docker.check()) {
 
+                    var composeFile = _path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml');
+
+                    // Me aseguro de que existe la red común de GorillaJS.
+                    docker.network();
+
+                    // Me aseguro de que todos los contenedores tengan nombre.
+                    docker.nameContainers(composeFile, config.project.domain);
+
+                    // Asigno los contenedores personalizados que he creado con commit.
+                    docker.assignCustomContainers(composeFile);
+
                     // Detengo los contenedores del proyecto.
-                    docker.stop(_path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), project.slug);
+                    docker.stop(composeFile, project.slug);
 
                     // Inicio los contenedores del proyecto.
-                    docker.start(_path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), project.slug);
+                    docker.start(composeFile, project.slug);
 
                     // Detengo el contenedor del proxy.
-                    docker.stop(_path2.default.join(_const.PROJECT_TEMPLATES_OFFICIAL, 'proxy', 'docker-compose.yml'), 'gorillajsproxy');
+                    docker.stop(_path2.default.join(_const.PROXY_PATH, 'template', 'docker-compose.yml'), 'gorillajsproxy');
 
                     // Inicio el contenedor del proxy.
-                    docker.start(_path2.default.join(_const.PROJECT_TEMPLATES_OFFICIAL, 'proxy', 'docker-compose.yml'), 'gorillajsproxy');
-                } else {
+                    docker.start(_path2.default.join(_const.PROXY_PATH, 'template', 'docker-compose.yml'), 'gorillajsproxy');
+                } else {}
 
-                    // Error Docker no está arranco o no está instalado.
+                // Error Docker no está arranco o no está instalado.
 
-                }
-
-                _Tools.events.publish('PROJECT_BUILT');
+                // Si es un proyecto local añado una nueva entrada al archivo hosts.
 
                 // Compruebo que el proyecto se haya iniciado correctamente.
+
+                // Si es un proyecto local, abro el navegador.
+
+                _Tools.events.publish('PROJECT_BUILT');
             });
         }
     }, {

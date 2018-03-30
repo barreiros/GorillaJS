@@ -18,7 +18,7 @@ var HOME_USER_PATH_FOR_SCRIPTS = exports.HOME_USER_PATH_FOR_SCRIPTS = process.en
 
 var GORILLAJS_PATH = exports.GORILLAJS_PATH = _path2.default.resolve(__dirname);
 var DATA_PATH = exports.DATA_PATH = _path2.default.join(HOME_USER_PATH_FOR_BASH, 'gorillajs', 'data');
-var PROXY_PATH = exports.PROXY_PATH = _path2.default.join(HOME_USER_PATH_FOR_BASH, 'gorillajs', 'proxy');
+var PROXY_PATH = exports.PROXY_PATH = _path2.default.join(HOME_USER_PATH_FOR_SCRIPTS, 'gorillajs', 'proxy');
 var PROJECT_PATH = exports.PROJECT_PATH = _yargs.argv.path ? _path2.default.resolve(_yargs.argv.path) : process.cwd();
 var LICENSE_PATH = exports.LICENSE_PATH = _path2.default.join(HOME_USER_PATH_FOR_SCRIPTS, 'gorillajs', 'license.txt');
 

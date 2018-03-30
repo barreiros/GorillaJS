@@ -10,9 +10,15 @@ var _const = require('../const.js');
 
 var _child_process = require('child_process');
 
+var _fs = require('fs');
+
 var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
+
+var _yamljs = require('yamljs');
+
+var _yamljs2 = _interopRequireDefault(_yamljs);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -97,6 +103,31 @@ var Docker = function () {
                 console.log(err.stderr.toString());
             }
         }
+    }, {
+        key: 'nameContainers',
+        value: function nameContainers(composeFile, name) {
+
+            var file = _yamljs2.default.load(composeFile);
+
+            for (var key in file.services) {
+
+                if (!file.services[key].hasOwnProperty('container_name')) {
+
+                    file.services[key].container_name = name + '_' + key;
+                }
+            }
+
+            (0, _fs.writeFileSync)(composeFile, _yamljs2.default.stringify(file, 6));
+        }
+    }, {
+        key: 'assignCustomContainers',
+        value: function assignCustomContainers(composeFile) {}
+    }, {
+        key: 'commit',
+        value: function commit() {}
+    }, {
+        key: 'network',
+        value: function network() {}
 
         // network: function(){
         //

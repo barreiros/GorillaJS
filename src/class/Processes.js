@@ -1,4 +1,4 @@
-import { PROJECT_PATH, DATA_PATH, PROJECT_ENV, PROJECT_IS_LOCAL, PROJECT_TEMPLATES_OFFICIAL, PROJECT_TEMPLATES_CUSTOM, PROXY_PATH, SYSTEM_HOSTS_FILE } from '../const.js'
+import { PROJECT_PATH, PROXY_PATH, DATA_PATH, PROJECT_ENV, PROJECT_IS_LOCAL, PROJECT_TEMPLATES_OFFICIAL, PROJECT_TEMPLATES_CUSTOM, SYSTEM_HOSTS_FILE, HOME_USER_PATH_FOR_BASH } from '../const.js'
 import Plugins from './Plugins.js'
 import Schema from './Schema.js'
 import Project from './Project.js'
@@ -44,7 +44,7 @@ class Processes{
             jsonComplementary = {
                 "proxy": {
                     "port": 80,
-                    "userpath": PROXY_PATH
+                    "userpath": path.join(HOME_USER_PATH_FOR_BASH, 'gorillajs', 'proxy')
                 },
                 "project": {
                     "slug": project.slug,
@@ -63,17 +63,20 @@ class Processes{
             // Lanzo un evento con la configuración por si los plugins necesitan aplicar algún cambio. 
             events.publish('CONFIG_FILE_CREATED', [config])
 
-            // Muevo los archivos de la plantilla hasta su destino.
+            let proxySource = path.join(PROJECT_TEMPLATES_OFFICIAL, 'proxy')
+            let proxyTarget = path.join(PROXY_PATH, 'template')
             let templateSource = pathExistsSync(path.join(PROJECT_TEMPLATES_OFFICIAL, config.docker.template_type)) ? path.join(PROJECT_TEMPLATES_OFFICIAL, config.docker.template_type) : path.join(PROJECT_TEMPLATES_CUSTOM, config.docker.template_type)
             let templateTarget = path.join(PROJECT_PATH, '.gorilla', 'template')
 
+            // Muevo los archivos de la plantilla y el proxy hasta su destino.
+            copySync(proxySource, proxyTarget)
             copySync(templateSource, templateTarget)
 
             // Lanzo un evento antes de reemplazar los valores por si algún plugin necesita añadir archivos a la template. Le paso la ruta de la plantilla.
             events.publish('BEFORE_REPLACE_VALUES', [templateTarget])
 
             // Reemplazo las variables de la plantilla y del proxy por su valor correspondiente del objeto con la configuración que le paso.
-            for(let file of glob.sync('{' + templateTarget + '**/*,' + PROJECT_TEMPLATES_OFFICIAL + '/proxy/**/*}')){
+            for(let file of glob.sync('{' + templateTarget + '**/*,' + proxyTarget + '/**/*}')){
 
                 if(!lstatSync(file).isDirectory()){
 
@@ -99,17 +102,28 @@ class Processes{
 
             if(docker.check()){
 
+                let composeFile = path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml')
+
+                // Me aseguro de que existe la red común de GorillaJS.
+                docker.network()
+
+                // Me aseguro de que todos los contenedores tengan nombre.
+                docker.nameContainers(composeFile, config.project.domain)
+
+                // Asigno los contenedores personalizados que he creado con commit.
+                docker.assignCustomContainers(composeFile)
+
                 // Detengo los contenedores del proyecto.
-                docker.stop(path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), project.slug)
+                docker.stop(composeFile, project.slug)
 
                 // Inicio los contenedores del proyecto.
-                docker.start(path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), project.slug)
+                docker.start(composeFile, project.slug)
 
                 // Detengo el contenedor del proxy.
-                docker.stop(path.join(PROJECT_TEMPLATES_OFFICIAL, 'proxy', 'docker-compose.yml'), 'gorillajsproxy')
+                docker.stop(path.join(PROXY_PATH, 'template', 'docker-compose.yml'), 'gorillajsproxy')
 
                 // Inicio el contenedor del proxy.
-                docker.start(path.join(PROJECT_TEMPLATES_OFFICIAL, 'proxy', 'docker-compose.yml'), 'gorillajsproxy')
+                docker.start(path.join(PROXY_PATH, 'template', 'docker-compose.yml'), 'gorillajsproxy')
                 
             }else{
 
@@ -117,9 +131,13 @@ class Processes{
 
             }
 
-            events.publish('PROJECT_BUILT')
+            // Si es un proyecto local añado una nueva entrada al archivo hosts.
 
             // Compruebo que el proyecto se haya iniciado correctamente.
+
+            // Si es un proyecto local, abro el navegador.
+
+            events.publish('PROJECT_BUILT')
 
         })
 

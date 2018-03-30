@@ -5,11 +5,11 @@ services:
   proxy:
     image: gorillajs/proxy
     ports:  
-      - "80:80"
+      - "{{proxy.port}}:80"
     volumes:
-      - $HOME/gorillajs/proxy/template:/root/templates
-      - $HOME/gorillajs/proxy/sites-enabled:/etc/apache2/sites-enabled
-      - $HOME/gorillajs/proxy/sites-available:/etc/apache2/sites-available
+      - {{proxy.userpath}}/template:/root/templates
+      - {{proxy.userpath}}/sites-enabled:/etc/apache2/sites-enabled
+      - {{proxy.userpath}}/sites-available:/etc/apache2/sites-available
     entrypoint:
       - bin/sh
       - /root/templates/entrypoint-proxy.sh

@@ -1,6 +1,8 @@
 import { PROJECT_PATH, PROJECT_ENV } from '../const.js'
 import { execSync, spawnSync } from 'child_process'
+import { writeFileSync } from 'fs'
 import path from 'path'
+import yaml from 'yamljs'
 
 class Docker{
 
@@ -85,6 +87,36 @@ class Docker{
             console.log(err.stderr.toString())
 
         }
+
+    }
+
+    nameContainers(composeFile, name){
+
+        let file = yaml.load(composeFile)
+
+        for(let key in file.services){
+
+            if(!file.services[key].hasOwnProperty('container_name')){
+
+                file.services[key].container_name = name + '_' + key;
+
+            }
+
+        }
+
+        writeFileSync(composeFile, yaml.stringify(file, 6)); 
+
+    }
+
+    assignCustomContainers(composeFile){
+
+    }
+
+    commit(){
+
+    }
+
+    network(){
 
     }
 

@@ -1,6 +1,6 @@
 #!/bin/bash 
 
-cp /root/templates/apache-proxy.conf /etc/apache2/sites-available/test.com.conf &&
+cp /root/templates/apache-proxy.conf /etc/apache2/sites-available/{{project.domain}}.conf &&
 rm -rf /var/www/localhost &&
 cp -r /root/templates/app-waiting /var/www/localhost &&
 
@@ -8,7 +8,7 @@ cp -r /root/templates/app-waiting /var/www/localhost &&
 cat /root/templates/evasive >> /etc/apache2/httpd.conf &&
 mkdir -p /var/log/mod_evasive && 
 
-ln -sf /etc/apache2/sites-available/test.com.conf /etc/apache2/sites-enabled/test.com.conf || true &&
+ln -sf /etc/apache2/sites-available/{{project.domain}}.conf /etc/apache2/sites-enabled/{{project.domain}}.conf || true &&
 
 # Reinicio apache y lo ejecuto en primer plano.
 apachectl stop && apachectl start -D FOREGROUND
