@@ -12,8 +12,6 @@ var _fsExtra = require('fs-extra');
 
 var _fs = require('fs');
 
-var _child_process = require('child_process');
-
 var _glob = require('glob');
 
 var _glob2 = _interopRequireDefault(_glob);

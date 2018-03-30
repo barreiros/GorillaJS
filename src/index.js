@@ -133,6 +133,13 @@ class Main {
             let processes = new Processes()
             processes.stop()
             
+        }else if(argv._[0] === 'commit'){
+
+            // Imprimo el logo.
+
+            let processes = new Processes()
+            processes.commit(argv._[1])
+
         }else if(argv._[0] === 'schema'){
 
             let schema = new Schema(argv.force)

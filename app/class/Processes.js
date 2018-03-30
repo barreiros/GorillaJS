@@ -28,6 +28,8 @@ var _Docker = require('./Docker.js');
 
 var _Docker2 = _interopRequireDefault(_Docker);
 
+var _Events = require('./Events.js');
+
 var _Tools = require('./Tools.js');
 
 var _mergeJson = require('merge-json');
@@ -49,6 +51,10 @@ var _jspath2 = _interopRequireDefault(_jspath);
 var _glob = require('glob');
 
 var _glob2 = _interopRequireDefault(_glob);
+
+var _open = require('open');
+
+var _open2 = _interopRequireDefault(_open);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -102,7 +108,7 @@ var Processes = function () {
                 };config = (0, _mergeJson.merge)(jsonComplementary, config);
 
                 // Lanzo un evento con la configuración por si los plugins necesitan aplicar algún cambio. 
-                _Tools.events.publish('CONFIG_FILE_CREATED', [config]);
+                _Events.events.publish('CONFIG_FILE_CREATED', [config]);
 
                 var proxySource = _path2.default.join(_const.PROJECT_TEMPLATES_OFFICIAL, 'proxy');
                 var proxyTarget = _path2.default.join(_const.PROXY_PATH, 'template');
@@ -114,7 +120,7 @@ var Processes = function () {
                 (0, _fsExtra.copySync)(templateSource, templateTarget);
 
                 // Lanzo un evento antes de reemplazar los valores por si algún plugin necesita añadir archivos a la template. Le paso la ruta de la plantilla.
-                _Tools.events.publish('BEFORE_REPLACE_VALUES', [templateTarget]);
+                _Events.events.publish('BEFORE_REPLACE_VALUES', [templateTarget]);
 
                 // Reemplazo las variables de la plantilla y del proxy por su valor correspondiente del objeto con la configuración que le paso.
                 var _iteratorNormalCompletion = true;
@@ -170,7 +176,7 @@ var Processes = function () {
                     docker.nameContainers(composeFile, config.project.domain);
 
                     // Asigno los contenedores personalizados que he creado con commit.
-                    docker.assignCustomContainers(composeFile);
+                    docker.assignCustomContainers(composeFile, config);
 
                     // Detengo los contenedores del proyecto.
                     docker.stop(composeFile, project.slug);
@@ -183,17 +189,27 @@ var Processes = function () {
 
                     // Inicio el contenedor del proxy.
                     docker.start(_path2.default.join(_const.PROXY_PATH, 'template', 'docker-compose.yml'), 'gorillajsproxy');
-                } else {}
 
-                // Error Docker no está arranco o no está instalado.
+                    // Si es un proyecto local añado una nueva entrada al archivo hosts.
+                    (0, _Tools.addToHosts)(config.project.domain, function () {
 
-                // Si es un proyecto local añado una nueva entrada al archivo hosts.
+                        // Compruebo que el proyecto se haya iniciado correctamente.
+                        (0, _Tools.checkHost)('http://' + config.project.domain + ':' + config.proxy.port, function () {
 
-                // Compruebo que el proyecto se haya iniciado correctamente.
+                            if (_const.PROJECT_IS_LOCAL) {
+                                // Si es un proyecto local, abro el navegador.
 
-                // Si es un proyecto local, abro el navegador.
+                                (0, _open2.default)('http://' + config.project.domain + ':' + config.proxy.port + '/gorilla-maintenance');
+                            }
 
-                _Tools.events.publish('PROJECT_BUILT');
+                            _Events.events.publish('PROJECT_BUILT');
+                        });
+                    });
+                } else {
+
+                    // Error Docker no está encendido o no está instalado.
+
+                }
             });
         }
     }, {
@@ -207,6 +223,14 @@ var Processes = function () {
         value: function stop() {
 
             console.log('Stop');
+        }
+    }, {
+        key: 'commit',
+        value: function commit(name) {
+
+            var docker = new _Docker2.default();
+
+            docker.commit(_path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), _path2.default.join(_const.PROJECT_PATH, '.gorilla', 'gorillafile'), name);
         }
     }]);
 

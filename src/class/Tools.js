@@ -1,88 +1,135 @@
-class Events {
+import { SYSTEM_HOSTS_FILE, DEBUG } from '../const.js'
+import { readFileSync } from 'fs'
+import { prompt } from 'inquirer'
+import { execSync as nativeExecSync } from 'child_process'
+import request from 'request'
 
-    constructor(){
+export const addToHosts = (domain, callback) => {
 
-        this.cache = {}
+    let file = readFileSync(SYSTEM_HOSTS_FILE).toString()
+    let text = '127.0.0.1 ' + domain + ' #GorillaJS \n' + '127.0.0.1 www.' + domain + ' #GorillaJS';
 
-    }
+    if(file.search(text) === -1){
+    
+        let options = {
+            type: 'password',
+            name: 'result',
+            message: 'Admin system password',
+        }
 
-    publish(topic, args, scope){
+        let attempt = () => {
 
-        if (this.cache[topic]) {
+            prompt([options]).then(answer => {
 
-            let thisTopic = this.cache[topic],
-                i = thisTopic.length - 1;
+                let query
 
-            for (i; i >= 0; i -= 1) {
+                if(process.platform === 'win32'){
 
-                if(typeof args === 'object'){
-
-                    thisTopic[i].apply( scope || this, args || []);
+                    query = execSync('ECHO ' + text + ' >> ' + SYSTEM_HOSTS_FILE)
 
                 }else{
 
-                    thisTopic[i](args);
+                    query = execSync('echo ' + answer.result + ' | sudo -S sh -c "echo \'' + text + '\' >> ' + SYSTEM_HOSTS_FILE + '"')
 
                 }
 
-            }
+                if(query.err){
 
-        }
+                    // Error query.err
 
-    }
+                    attempt()
 
-    subscribe(topic, callback){
+                }else{
 
-        if (!this.cache[topic]) {
-
-            this.cache[topic] = [];
-
-        }
-
-        this.cache[topic].push(callback);
-
-        return [topic, callback];
-
-    }
-
-    unsubscribe(handle, completly){
-
-        let t = handle;
-        let i;
-
-        if(this.cache[t]){
-
-            i = this.cache[t].length - 1;
-
-        }else{
-
-            i = 0;
-
-        }
-
-        if (this.cache[t]) {
-
-            for (i; i >= 0; i -= 1) {
-
-                if (this.cache[t][i] === completly) {
-
-                    this.cache[t].splice(i, 1);
-
-                    if(completly){ 
-                        
-                        delete this.cache[t]; 
-                    
-                    }
+                    callback()
 
                 }
 
-            }
+            })
 
         }
+
+        attempt()
+
+    }else{
+
+        callback()
 
     }
 
 }
 
-export let events = new Events() 
+export const checkHost = (url, callback) => {
+
+    let attempts = 0
+
+    let attempt = () => {
+        
+        request(url, (error, response, body) => {
+
+            if(!response || response.statusCode !== 200){
+
+                attempts += 1
+
+                if(attempts < 5){
+
+                    setTimeout(() => {
+
+                        attempt()
+
+                    }, 2000)
+
+                }
+
+            }else{
+
+                callback()
+
+            }
+
+        })
+
+    }
+
+    attempt()
+
+}
+
+export const execSync = (query, options = {}) => {
+
+    let output
+
+    try{
+
+        let response = nativeExecSync(query, options)
+
+        output = {
+
+            stdout: response.toString(),
+            stderr: false,
+            err: false
+
+        }
+
+    }catch(err){
+
+        output = {
+
+            stdout: err.stdout.toString(),
+            stderr: err.stderr.toString(),
+            err: err.stderr.toString()
+
+        }
+
+    }
+
+    if(DEBUG){
+
+        console.log(output)
+
+    }
+
+    return output
+
+}
 

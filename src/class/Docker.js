@@ -1,36 +1,28 @@
 import { PROJECT_PATH, PROJECT_ENV } from '../const.js'
-import { execSync, spawnSync } from 'child_process'
-import { writeFileSync } from 'fs'
+import { execSync } from './Tools.js'
+import { writeFileSync, readFileSync } from 'fs'
 import path from 'path'
 import yaml from 'yamljs'
 
 class Docker{
-
-    constructor(){
-
-    }
 
     check(){
 
         let query
 
         // Compruebo si docker está instalado y funcionando.
-        query = spawnSync('docker', ['ps'])
+        query = execSync('docker ps')
 
-        if(query.error || query.stderr.toString()){
-
-            // Debug query.error
+        if(query.err){
 
             return false
 
         }
 
         // Compruebo si docker está instalado y funcionando.
-        query = spawnSync('docker-compose', ['-v'])
+        query = execSync('docker-compose -v')
 
-        if(query.error || query.stderr.toString()){
-
-            // Debug query.error
+        if(query.err){
 
             return false
 
@@ -54,39 +46,15 @@ class Docker{
 
         }
 
-        try{
-
-            execSync(command)
-
-        }catch(err){
-
-            // Debug err.stderr.toString()
-
-            console.log(err.stderr.toString())
-
-        }
+        execSync(command)
 
     }
 
     stop(composeFile, slug){
 
-        let command 
-
-        command = 'docker-compose -p "' + slug + '" rm -f -s -v'
-
-        try{
-
-            execSync(command, {
-                cwd: path.dirname(composeFile)
-            })
-
-        }catch(err){
-
-            // Debug err.stderr.toString()
-
-            console.log(err.stderr.toString())
-
-        }
+        execSync('docker-compose -p "' + slug + '" rm -f -s -v', {
+            cwd: path.dirname(composeFile)
+        })
 
     }
 
@@ -96,7 +64,7 @@ class Docker{
 
         for(let key in file.services){
 
-            if(!file.services[key].hasOwnProperty('container_name')){
+            if(!file.services[key].container_name){
 
                 file.services[key].container_name = name + '_' + key;
 
@@ -108,46 +76,121 @@ class Docker{
 
     }
 
-    assignCustomContainers(composeFile){
+    assignCustomContainers(composeFile, config){
+
+        if(config.services){
+
+            let file = yaml.load(composeFile)
+
+            for(let key in config.services){
+
+                if(file.services[key]){
+
+                    file.services[key].image = config.services[key]
+
+                }
+
+            }
+
+            writeFileSync(composeFile, yaml.stringify(file, 6)); 
+
+        }
 
     }
 
-    commit(){
+    commit(composeFile, gorillaFile, name){
+
+        console.log(composeFile, gorillaFile, name)
+
+        if(name === 'gorillajsproxy'){
+
+            execSync('docker commit -p=false gorillajsproxy gorillajs/proxy')
+
+        }else{
+
+            let file = yaml.load(composeFile)
+            let config = JSON.parse(readFileSync(gorillaFile))
+            let service
+        
+            for(key in file.services){
+
+                if(file.services[key].container_name === name){
+
+                    service = key;
+
+                    break
+
+                }
+
+            }
+
+            if(service){
+
+                let image
+
+                if(config[PROJECT_ENV].services){
+
+                    for(var key in config[PROJECT_ENV].services){
+
+                        if(config[PROJECT_ENV].services[key] === service){
+
+                            image = config[PROJECT_ENV].services[key];
+
+                        }
+
+                    }
+
+                }else{
+
+                    config[PROJECT_ENV].services = {}
+
+                }
+
+                // Si no existía una imagen creada para este servicio, genero el nombre (project.ID* + service.name).
+                if(!image){
+
+                    image = config[PROJECT_ENV].project.id + '/' + service;
+
+                    // Actualizo el gorillafile con el nombre 
+                    config[PROJECT_ENV].services[service] = image
+
+                    writeFileSync(gorillaFile, JSON.stringify(config, null, '\t'));
+
+                }
+
+                // Creo el commit pasándole name e image.
+                execSync('docker commit -p=false ' + name + ' ' + image)
+
+            }else{
+
+                // Error no existe un contenedor con ese nombre.
+                
+            }
+
+        }
 
     }
 
     network(){
 
+        let containers = execSync('docker network ls --format="{{.Name}}"')
+
+        if(containers.stdout.search('gorillajs') === -1){
+
+            execSync('docker network create --driver bridge gorillajs')
+
+        }
+
     }
 
-    // network: function(){
-    //
-    //     var container; 
-    //
-    //     cross.exec('docker network ls --format="{{.Name}}"', function(err, stdout, stderr){
-    //
-    //         if (err) events.publish('ERROR', ['035']);
-    //
-    //         containers = getContainersName(stdout);
-    //
-    //         if(containers.indexOf('gorillajs') === -1){
-    //
-    //             cross.exec('docker network create --driver bridge gorillajs', function(err, stdout, stderr){
-    //
-    //                 events.publish('VERBOSE', [stderr + err + stdout]);
-    //                 events.publish('PROMISEME');
-    //
-    //             });
-    //
-    //         }else{
-    //
-    //             events.publish('PROMISEME');
-    //
-    //         }
-    //
-    //     });
-    //
-    // }
+    maintenance(){
+
+        // Elimino los contenedores, redes e imágenes que no se usan.
+        execSync('docker system prune -af')
+
+        // Estudiar si es viable usar esta librería para controlar el error de max depth exceed: https://github.com/goldmann/docker-squash
+
+    }
 
 }
 

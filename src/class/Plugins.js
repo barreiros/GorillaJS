@@ -1,7 +1,7 @@
 import { PROJECT_PLUGINS_OFFICIAL, PROJECT_PLUGINS_CUSTOM } from '../const.js'
 import { pathExistsSync, ensureFileSync, copySync, removeSync } from 'fs-extra'
 import { readFileSync, writeFileSync } from 'fs'
-import { execSync } from 'child_process'
+import { execSync } from './Tools.js'
 import JSPath from 'jspath'
 import glob from 'glob'
 import path from 'path'

@@ -4,7 +4,8 @@ import Schema from './Schema.js'
 import Project from './Project.js'
 import Questions from './Questions.js'
 import Docker from './Docker.js'
-import { events } from './Tools.js'
+import { events } from './Events.js'
+import { addToHosts, checkHost } from './Tools.js'
 import { merge } from 'merge-json'
 import { license } from './License.js'
 import { lstatSync, readFileSync, writeFileSync } from 'fs'
@@ -12,12 +13,9 @@ import { pathExistsSync, copySync } from 'fs-extra'
 import path from 'path'
 import JSPath from 'jspath'
 import glob from 'glob'
+import open from 'open'
 
 class Processes{
-
-    constructor(){
-
-    }
 
     build(){
 
@@ -111,7 +109,7 @@ class Processes{
                 docker.nameContainers(composeFile, config.project.domain)
 
                 // Asigno los contenedores personalizados que he creado con commit.
-                docker.assignCustomContainers(composeFile)
+                docker.assignCustomContainers(composeFile, config)
 
                 // Detengo los contenedores del proyecto.
                 docker.stop(composeFile, project.slug)
@@ -125,19 +123,29 @@ class Processes{
                 // Inicio el contenedor del proxy.
                 docker.start(path.join(PROXY_PATH, 'template', 'docker-compose.yml'), 'gorillajsproxy')
                 
+                // Si es un proyecto local añado una nueva entrada al archivo hosts.
+                addToHosts(config.project.domain, () => {
+
+                    // Compruebo que el proyecto se haya iniciado correctamente.
+                    checkHost('http://' + config.project.domain + ':' + config.proxy.port, () => {
+
+                        if(PROJECT_IS_LOCAL){ // Si es un proyecto local, abro el navegador.
+
+                            open('http://' + config.project.domain + ':' + config.proxy.port + '/gorilla-maintenance')
+
+                        }
+                       
+                        events.publish('PROJECT_BUILT')
+
+                    })
+
+                })
+
             }else{
 
-                // Error Docker no está arranco o no está instalado.
+                // Error Docker no está encendido o no está instalado.
 
             }
-
-            // Si es un proyecto local añado una nueva entrada al archivo hosts.
-
-            // Compruebo que el proyecto se haya iniciado correctamente.
-
-            // Si es un proyecto local, abro el navegador.
-
-            events.publish('PROJECT_BUILT')
 
         })
 
@@ -152,6 +160,14 @@ class Processes{
     stop(){
         
         console.log('Stop')
+
+    }
+
+    commit(name){
+
+        let docker = new Docker()
+
+        docker.commit(path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), path.join(PROJECT_PATH, '.gorilla', 'gorillafile'), name)
 
     }
 

@@ -1,5 +1,5 @@
 import { PROJECT_ENV } from '../../const.js'
-import { events } from '../../class/Tools.js'
+import { events } from '../../class/Events.js'
 
 class Django{
 

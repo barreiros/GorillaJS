@@ -1,7 +1,6 @@
 import { PROJECT_TEMPLATES_OFFICIAL, PROJECT_TEMPLATES_CUSTOM } from '../const.js'
 import { pathExistsSync, ensureFileSync, copySync, removeSync } from 'fs-extra'
 import { lstatSync, readFileSync, writeFileSync } from 'fs'
-import { execSync } from 'child_process'
 import glob from 'glob'
 import path from 'path'
 

@@ -12,7 +12,7 @@ var _fsExtra = require('fs-extra');
 
 var _fs = require('fs');
 
-var _child_process = require('child_process');
+var _Tools = require('./Tools.js');
 
 var _jspath = require('jspath');
 
@@ -52,7 +52,7 @@ var Plugins = function () {
 
                 (0, _fsExtra.copySync)(source, _path2.default.join(_const.PROJECT_PLUGINS_CUSTOM, _path2.default.basename(source)));
 
-                (0, _child_process.execSync)('npm install -s', {
+                (0, _Tools.execSync)('npm install -s', {
                     'cwd': _path2.default.join(_const.PROJECT_PLUGINS_CUSTOM, _path2.default.basename(source))
                 });
             } else {
@@ -123,7 +123,7 @@ var Plugins = function () {
                     // Instalo las dependencias.
                     if ((0, _fsExtra.pathExistsSync)(_path2.default.join(_path2.default.dirname(file), 'package.json'))) {
 
-                        (0, _child_process.execSync)('npm install', {
+                        (0, _Tools.execSync)('npm install', {
                             'cwd': _path2.default.dirname(file)
                         });
                     }
@@ -159,7 +159,7 @@ var Plugins = function () {
                     // Instalo las dependencias, si es necesario.
                     if (!(0, _fsExtra.pathExistsSync)(_path2.default.join(_path2.default.dirname(file), 'node_modules')) && (0, _fsExtra.pathExistsSync)(_path2.default.join(_path2.default.dirname(file), 'package.json'))) {
 
-                        (0, _child_process.execSync)('npm install -s', {
+                        (0, _Tools.execSync)('npm install -s', {
                             'cwd': _path2.default.dirname(file)
                         });
                     }

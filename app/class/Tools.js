@@ -3,88 +3,129 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.execSync = exports.checkHost = exports.addToHosts = undefined;
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _const = require('../const.js');
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _fs = require('fs');
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _inquirer = require('inquirer');
 
-var Events = function () {
-    function Events() {
-        _classCallCheck(this, Events);
+var _child_process = require('child_process');
 
-        this.cache = {};
-    }
+var _request = require('request');
 
-    _createClass(Events, [{
-        key: 'publish',
-        value: function publish(topic, args, scope) {
+var _request2 = _interopRequireDefault(_request);
 
-            if (this.cache[topic]) {
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-                var thisTopic = this.cache[topic],
-                    i = thisTopic.length - 1;
+var addToHosts = exports.addToHosts = function addToHosts(domain, callback) {
 
-                for (i; i >= 0; i -= 1) {
+    var file = (0, _fs.readFileSync)(_const.SYSTEM_HOSTS_FILE).toString();
+    var text = '127.0.0.1 ' + domain + ' #GorillaJS \n' + '127.0.0.1 www.' + domain + ' #GorillaJS';
 
-                    if ((typeof args === 'undefined' ? 'undefined' : _typeof(args)) === 'object') {
+    if (file.search(text) === -1) {
 
-                        thisTopic[i].apply(scope || this, args || []);
-                    } else {
+        var options = {
+            type: 'password',
+            name: 'result',
+            message: 'Admin system password'
+        };
 
-                        thisTopic[i](args);
-                    }
+        var attempt = function attempt() {
+
+            (0, _inquirer.prompt)([options]).then(function (answer) {
+
+                var query = void 0;
+
+                if (process.platform === 'win32') {
+
+                    query = execSync('ECHO ' + text + ' >> ' + _const.SYSTEM_HOSTS_FILE);
+                } else {
+
+                    query = execSync('echo ' + answer.result + ' | sudo -S sh -c "echo \'' + text + '\' >> ' + _const.SYSTEM_HOSTS_FILE + '"');
                 }
-            }
-        }
-    }, {
-        key: 'subscribe',
-        value: function subscribe(topic, callback) {
 
-            if (!this.cache[topic]) {
+                if (query.err) {
 
-                this.cache[topic] = [];
-            }
+                    // Error query.err
 
-            this.cache[topic].push(callback);
+                    attempt();
+                } else {
 
-            return [topic, callback];
-        }
-    }, {
-        key: 'unsubscribe',
-        value: function unsubscribe(handle, completly) {
+                    callback();
+                }
+            });
+        };
 
-            var t = handle;
-            var i = void 0;
+        attempt();
+    } else {
 
-            if (this.cache[t]) {
+        callback();
+    }
+};
 
-                i = this.cache[t].length - 1;
+var checkHost = exports.checkHost = function checkHost(url, callback) {
+
+    var attempts = 0;
+
+    var attempt = function attempt() {
+
+        (0, _request2.default)(url, function (error, response, body) {
+
+            if (!response || response.statusCode !== 200) {
+
+                attempts += 1;
+
+                if (attempts < 5) {
+
+                    setTimeout(function () {
+
+                        attempt();
+                    }, 2000);
+                }
             } else {
 
-                i = 0;
+                callback();
             }
+        });
+    };
 
-            if (this.cache[t]) {
+    attempt();
+};
 
-                for (i; i >= 0; i -= 1) {
+var execSync = exports.execSync = function execSync(query) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-                    if (this.cache[t][i] === completly) {
 
-                        this.cache[t].splice(i, 1);
+    var output = void 0;
 
-                        if (completly) {
+    try {
 
-                            delete this.cache[t];
-                        }
-                    }
-                }
-            }
-        }
-    }]);
+        var response = (0, _child_process.execSync)(query, options);
 
-    return Events;
-}();
+        output = {
 
-var events = exports.events = new Events();
+            stdout: response.toString(),
+            stderr: false,
+            err: false
+
+        };
+    } catch (err) {
+
+        output = {
+
+            stdout: err.stdout.toString(),
+            stderr: err.stderr.toString(),
+            err: err.stderr.toString()
+
+        };
+    }
+
+    if (_const.DEBUG) {
+
+        console.log(output);
+    }
+
+    return output;
+};

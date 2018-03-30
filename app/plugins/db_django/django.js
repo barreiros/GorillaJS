@@ -6,14 +6,14 @@ Object.defineProperty(exports, "__esModule", {
 
 var _const = require('../../const.js');
 
-var _Tools = require('../../class/Tools.js');
+var _Events = require('../../class/Events.js');
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Django = function Django() {
     _classCallCheck(this, Django);
 
-    _Tools.events.subscribe('CONFIG_FILE_CREATED', function (config) {
+    _Events.events.subscribe('CONFIG_FILE_CREATED', function (config) {
 
         console.log('Este es el plugin Django');
     });
