@@ -1,7 +1,7 @@
 import { PROJECT_ENV } from '../../const.js'
 import Project from '../../class/Project.js'
 import { argv } from 'yargs'
-import { exec } from 'child_process'
+import { execSync } from '../../class/Tools.js'
 import { pathExistsSync, ensureFileSync } from 'fs-extra'
 import JSPath from 'jspath'
 import path from 'path'
@@ -71,23 +71,13 @@ class DBManager{
 
             let command = 'docker exec -i ' + config.project.domain + '_mysql mysql --force -u' + config.database.username + ' -p' + config.database.password + ' ' + config.database.dbname + ' < "' + source + '"'
 
-            exec(command, (err, stdout, stderr) => {
+            let query = execSync(command)
 
-                console.log(err, stdout,stderr)
+            if(!query.err){
 
-                // Verbose err, stdout, stderr
+                // Step importación correcta.
 
-                if(err){
-
-                    // Error no se ha podido hacer la importación.
-                    // + stderr.
-
-                }else{
-
-                    // Step importación correcta.
-                }
-
-            })
+            }
 
         }
 
@@ -101,31 +91,19 @@ class DBManager{
         // Como de momento solo es compatible con MySQL, busco el valor en el archivo de configuracion.
         let engine = JSPath.apply('..config.ase.engine', config)
 
-        console.log(config)
-
         if(engine.indexOf('mysql'.toLowerCase())){
 
             // Step iniciando el proceso de importación.
 
             let command = 'docker exec -i ' + config.project.domain + '_mysql mysqldump -u' + config.database.username + ' -p' + config.database.password + ' ' + config.database.dbname + ' > ' + target
 
-            exec(command, (err, stdout, stderr) => {
+            let query = execSync(command)
 
-                console.log(err, stdout,stderr)
+            if(!query.err){
 
-                // Verbose err, stdout, stderr
+                // Step exportación correcta.
 
-                if(err){
-
-                    // Error no se ha podido hacer la exportación.
-                    // + stderr.
-
-                }else{
-
-                    // Step exportación correcta.
-                }
-
-            })
+            }
 
         }
 
@@ -144,30 +122,32 @@ class DBManager{
             // Step iniciando el proceso de reemplazo
 
             let command = ''
-            command = 'docker exec -i ' + config.project.domain + '_mysql mysql -u' + config.database.username + ' -p' + config.database.password + ' -e "DROP DATABASE ' + config.database.dbname + '"'
-            command += ' && '
-            command = 'docker exec -i ' + config.project.domain + '_mysql mysql -u' + config.database.username + ' -p' + config.database.password + ' -e "CREATE DATABASE ' + config.database.dbname + '"'
-            command += ' && '
-            command += 'docker exec -i ' + config.project.domain + '_mysql mysql --force -u' + config.database.username + ' -p' + config.database.password + ' ' + config.database.dbname + ' < "' + source + '"'
 
-            exec(command, (err, stdout, stderr) => {
+            command = 'docker exec -i ' + config.project.domain + '_mysql mysql -u' + config.database.username + ' -p' + config.database.password + ' -e "DROP DATABASE ' + config.database.dbname + '" '
 
-                console.log(err, stdout,stderr)
+            let query = execSync(command)
 
-                // Verbose err, stdout, stderr
+            if(!query.err){
 
-                if(err){
+                command = 'docker exec -i ' + config.project.domain + '_mysql mysql -u' + config.database.username + ' -p' + config.database.password + ' -e "CREATE DATABASE ' + config.database.dbname + '"'
+                
+                query = execSync(command)
 
-                    // Error no se ha podido hacer el reemplazo
-                    // + stderr.
+                if(!query.err){
 
-                }else{
+                    command = 'docker exec -i ' + config.project.domain + '_mysql mysql --force -u' + config.database.username + ' -p' + config.database.password + ' ' + config.database.dbname + ' < "' + source + '"'
 
-                    // Step proceso de reemplazo correcto.
+                    query = execSync(command)
+
+                    if(!query.err){
+
+                        // Step proceso de reemplazo correcto.
+                        
+                    }
 
                 }
 
-            })
+            }
 
         }
 

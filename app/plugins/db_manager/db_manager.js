@@ -14,7 +14,7 @@ var _Project2 = _interopRequireDefault(_Project);
 
 var _yargs = require('yargs');
 
-var _child_process = require('child_process');
+var _Tools = require('../../class/Tools.js');
 
 var _fsExtra = require('fs-extra');
 
@@ -90,22 +90,13 @@ var DBManager = function () {
 
                 var command = 'docker exec -i ' + config.project.domain + '_mysql mysql --force -u' + config.database.username + ' -p' + config.database.password + ' ' + config.database.dbname + ' < "' + source + '"';
 
-                (0, _child_process.exec)(command, function (err, stdout, stderr) {
+                var query = (0, _Tools.execSync)(command);
 
-                    console.log(err, stdout, stderr);
+                if (!query.err) {
 
-                    // Verbose err, stdout, stderr
+                    // Step importación correcta.
 
-                    if (err) {
-
-                        // Error no se ha podido hacer la importación.
-                        // + stderr.
-
-                    } else {
-
-                            // Step importación correcta.
-                        }
-                });
+                }
             }
         }
     }, {
@@ -118,30 +109,19 @@ var DBManager = function () {
             // Como de momento solo es compatible con MySQL, busco el valor en el archivo de configuracion.
             var engine = _jspath2.default.apply('..config.ase.engine', config);
 
-            console.log(config);
-
             if (engine.indexOf('mysql'.toLowerCase())) {
 
                 // Step iniciando el proceso de importación.
 
                 var command = 'docker exec -i ' + config.project.domain + '_mysql mysqldump -u' + config.database.username + ' -p' + config.database.password + ' ' + config.database.dbname + ' > ' + target;
 
-                (0, _child_process.exec)(command, function (err, stdout, stderr) {
+                var query = (0, _Tools.execSync)(command);
 
-                    console.log(err, stdout, stderr);
+                if (!query.err) {
 
-                    // Verbose err, stdout, stderr
+                    // Step exportación correcta.
 
-                    if (err) {
-
-                        // Error no se ha podido hacer la exportación.
-                        // + stderr.
-
-                    } else {
-
-                            // Step exportación correcta.
-                        }
-                });
+                }
             }
         }
     }, {
@@ -159,29 +139,30 @@ var DBManager = function () {
                 // Step iniciando el proceso de reemplazo
 
                 var command = '';
-                command = 'docker exec -i ' + config.project.domain + '_mysql mysql -u' + config.database.username + ' -p' + config.database.password + ' -e "DROP DATABASE ' + config.database.dbname + '"';
-                command += ' && ';
-                command = 'docker exec -i ' + config.project.domain + '_mysql mysql -u' + config.database.username + ' -p' + config.database.password + ' -e "CREATE DATABASE ' + config.database.dbname + '"';
-                command += ' && ';
-                command += 'docker exec -i ' + config.project.domain + '_mysql mysql --force -u' + config.database.username + ' -p' + config.database.password + ' ' + config.database.dbname + ' < "' + source + '"';
 
-                (0, _child_process.exec)(command, function (err, stdout, stderr) {
+                command = 'docker exec -i ' + config.project.domain + '_mysql mysql -u' + config.database.username + ' -p' + config.database.password + ' -e "DROP DATABASE ' + config.database.dbname + '" ';
 
-                    console.log(err, stdout, stderr);
+                var query = (0, _Tools.execSync)(command);
 
-                    // Verbose err, stdout, stderr
+                if (!query.err) {
 
-                    if (err) {
+                    command = 'docker exec -i ' + config.project.domain + '_mysql mysql -u' + config.database.username + ' -p' + config.database.password + ' -e "CREATE DATABASE ' + config.database.dbname + '"';
 
-                        // Error no se ha podido hacer el reemplazo
-                        // + stderr.
+                    query = (0, _Tools.execSync)(command);
 
-                    } else {
+                    if (!query.err) {
+
+                        command = 'docker exec -i ' + config.project.domain + '_mysql mysql --force -u' + config.database.username + ' -p' + config.database.password + ' ' + config.database.dbname + ' < "' + source + '"';
+
+                        query = (0, _Tools.execSync)(command);
+
+                        if (!query.err) {
 
                             // Step proceso de reemplazo correcto.
 
                         }
-                });
+                    }
+                }
             }
         }
     }]);
