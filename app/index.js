@@ -140,13 +140,19 @@ var Main = function () {
                 // Imprimo el logo.
 
                 var _processes2 = new _Processes2.default();
-                _processes2.stop();
-            } else if (_yargs.argv._[0] === 'commit') {
+                _processes2.stop(_yargs.argv.all);
+            } else if (_yargs.argv._[0] === 'remove') {
 
                 // Imprimo el logo.
 
                 var _processes3 = new _Processes2.default();
-                _processes3.commit(_yargs.argv._[1]);
+                _processes3.remove();
+            } else if (_yargs.argv._[0] === 'commit') {
+
+                // Imprimo el logo.
+
+                var _processes4 = new _Processes2.default();
+                _processes4.commit(_yargs.argv._[1]);
             } else if (_yargs.argv._[0] === 'schema') {
 
                 var schema = new _Schema2.default(_yargs.argv.force);

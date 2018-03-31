@@ -131,7 +131,14 @@ class Main {
             // Imprimo el logo.
             
             let processes = new Processes()
-            processes.stop()
+            processes.stop(argv.all)
+
+        }else if(argv._[0] === 'remove'){
+
+            // Imprimo el logo.
+            
+            let processes = new Processes()
+            processes.remove()
             
         }else if(argv._[0] === 'commit'){
 

@@ -75,9 +75,15 @@ var Docker = function () {
         key: 'stop',
         value: function stop(composeFile, slug) {
 
-            (0, _Tools.execSync)('docker-compose -p "' + slug + '" rm -f -s -v', {
-                cwd: _path2.default.dirname(composeFile)
-            });
+            if (!composeFile) {
+
+                (0, _Tools.execSync)('docker stop $(docker ps -aq) && docker rm $(docker ps -aq)');
+            } else {
+
+                (0, _Tools.execSync)('docker-compose -p "' + slug + '" rm -f -s -v', {
+                    cwd: _path2.default.dirname(composeFile)
+                });
+            }
         }
     }, {
         key: 'nameContainers',

@@ -5,7 +5,7 @@ export const HOME_USER_PATH_FOR_BASH = (process.env.APPDATA || '$HOME')
 export const HOME_USER_PATH_FOR_SCRIPTS = (process.env.APPDATA || process.env.HOME)
 
 export const GORILLAJS_PATH = path.resolve(__dirname)
-export const DATA_PATH = path.join(HOME_USER_PATH_FOR_BASH, 'gorillajs', 'data')
+export const DATA_PATH = path.join(HOME_USER_PATH_FOR_SCRIPTS, 'gorillajs', 'data')
 export const PROXY_PATH = path.join(HOME_USER_PATH_FOR_SCRIPTS, 'gorillajs', 'proxy')
 export const PROJECT_PATH = argv.path ? path.resolve(argv.path) : process.cwd()
 export const LICENSE_PATH = path.join(HOME_USER_PATH_FOR_SCRIPTS, 'gorillajs', 'license.txt')

@@ -52,10 +52,17 @@ class Docker{
 
     stop(composeFile, slug){
 
-        execSync('docker-compose -p "' + slug + '" rm -f -s -v', {
-            cwd: path.dirname(composeFile)
-        })
+        if(!composeFile){
 
+            execSync('docker stop $(docker ps -aq) && docker rm $(docker ps -aq)')
+
+        }else{
+
+            execSync('docker-compose -p "' + slug + '" rm -f -s -v', {
+                cwd: path.dirname(composeFile)
+            })
+
+        }
     }
 
     nameContainers(composeFile, name){

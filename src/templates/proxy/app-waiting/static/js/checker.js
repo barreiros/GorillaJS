@@ -1,4 +1,4 @@
-var xhrServer, xhrMessages, messagesInterval, serverInterval, isStatus, serverOkTimes;
+var xhrServer, xhrMessages, messagesInterval, messagesTimes, serverInterval, serverTimes, isStatus, serverOkTimes;
 
 serverTimes = 0;
 messagesTimes = 1; // Si quiero volver a activar los mensaje tengo que cambiar este valor a 0.
@@ -25,8 +25,6 @@ function checkServer(){
     }
 
     if(checkIt){
-
-        console.log('Hola, Bar');
 
         xhrServer = $.ajax({url: '/?cache=' + (Math.random() * 10),
             type: 'HEAD',

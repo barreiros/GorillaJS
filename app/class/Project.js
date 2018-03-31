@@ -176,23 +176,26 @@ var Project = function () {
                 var slug = config[_const.PROJECT_ENV].project.domain;
                 var separator = '';
 
-                if (slug.charAt(0) === '/') {
+                if (slug) {
 
-                    slug = slug.substr(1);
+                    if (slug.charAt(0) === '/') {
+
+                        slug = slug.substr(1);
+                    }
+
+                    slug = slug.replace(/^\s+|\s+$/g, ''); // trim
+                    slug = slug.toLowerCase();
+
+                    // remove accents, swap ñ for n, etc
+                    var from = "àáäâèéëêìíïîòóöôùúüûñç·/_-,:;";
+                    for (var i = 0, l = from.length; i < l; i++) {
+                        slug = slug.replace(new RegExp(from.charAt(i), 'g'), separator);
+                    }
+
+                    slug = slug.replace(/[^a-z0-9]/g, separator) // remove invalid chars
+                    .replace(/\s+/g, separator) // collapse whitespace and replace by -
+                    .replace(/-+/g, separator); // collapse dashes
                 }
-
-                slug = slug.replace(/^\s+|\s+$/g, ''); // trim
-                slug = slug.toLowerCase();
-
-                // remove accents, swap ñ for n, etc
-                var from = "àáäâèéëêìíïîòóöôùúüûñç·/_-,:;";
-                for (var i = 0, l = from.length; i < l; i++) {
-                    slug = slug.replace(new RegExp(from.charAt(i), 'g'), separator);
-                }
-
-                slug = slug.replace(/[^a-z0-9]/g, separator) // remove invalid chars
-                .replace(/\s+/g, separator) // collapse whitespace and replace by -
-                .replace(/-+/g, separator); // collapse dashes
 
                 this.domainSlug = slug;
             }

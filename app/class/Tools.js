@@ -43,7 +43,7 @@ var addToHosts = exports.addToHosts = function addToHosts(domain, callback) {
                     query = execSync('ECHO ' + text + ' >> ' + _const.SYSTEM_HOSTS_FILE);
                 } else {
 
-                    query = execSync('echo ' + answer.result + ' | sudo -S sh -c "echo \'' + text + '\' >> ' + _const.SYSTEM_HOSTS_FILE + '"');
+                    query = execSync('echo "' + answer.result + '" | sudo -S sh -c "echo \'' + text + '\' >> ' + _const.SYSTEM_HOSTS_FILE + '"');
                 }
 
                 if (query.err) {
@@ -77,12 +77,17 @@ var checkHost = exports.checkHost = function checkHost(url, callback) {
 
                 attempts += 1;
 
-                if (attempts < 5) {
+                if (attempts < 50) {
 
                     setTimeout(function () {
 
                         attempt();
                     }, 2000);
+                } else {
+
+                    console.log('Demasiados intentos');
+
+                    // Error demasiados intentos de conexión.
                 }
             } else {
 
@@ -115,9 +120,9 @@ var execSync = exports.execSync = function execSync(query) {
 
         output = {
 
-            stdout: err.stdout.toString(),
-            stderr: err.stderr.toString(),
-            err: err.stderr.toString()
+            stdout: err.stdout ? err.stdout.toString() : '',
+            stderr: err.stderr ? err.stderr.toString() : '',
+            err: err.stderr ? err.stderr.toString() : ''
 
         };
     }

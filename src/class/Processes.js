@@ -9,7 +9,7 @@ import { addToHosts, checkHost } from './Tools.js'
 import { merge } from 'merge-json'
 import { license } from './License.js'
 import { lstatSync, readFileSync, writeFileSync } from 'fs'
-import { pathExistsSync, copySync } from 'fs-extra'
+import { pathExistsSync, copySync, removeSync } from 'fs-extra'
 import path from 'path'
 import JSPath from 'jspath'
 import glob from 'glob'
@@ -51,7 +51,7 @@ class Processes{
                 },
                 "docker": {
                     "port": Math.floor(Math.random() * (4999 - 4000)) + 4000,
-                    "data_path": DATA_PATH 
+                    "data_path": path.join(HOME_USER_PATH_FOR_BASH, 'gorillajs', 'data')
                 }
             }
             
@@ -81,16 +81,23 @@ class Processes{
                     // Cargo el contenido del archivo.
                     let text = readFileSync(file).toString()
 
+                    let hasChange = false
+
                     // Creo una expresión regular en lazy mode para que coja todos los valores, aunque haya varios en la misma línea.
                     text = text.replace(/{{(.*?)}}/g, (search, value) => {
                     
+                        hasChange = true
                         // Reemplazo las ocurrencias por su valor correspondiente de la configuración.
                         return JSPath.apply('.' + value, config)[0]
 
                     })
 
                     // Vuelvo a guardar el contenido del archivo con los nuevos valores.
-                    writeFileSync(file, text)
+                    if(hasChange){
+
+                        writeFileSync(file, text)
+
+                    }
 
                 }
 
@@ -153,13 +160,73 @@ class Processes{
 
     run(){
 
-        console.log('Run')
+        let docker = new Docker()
+
+        if(docker.check()){
+
+            // Recupero el proyecto.
+            let project = new Project()
+
+            let composeFile = path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml')
+
+            // Inicio los contenedores del proyecto.
+            docker.start(composeFile, project.slug, false)
+
+            // Inicio el contenedor del proxy.
+            docker.start(path.join(PROXY_PATH, 'template', 'docker-compose.yml'), 'gorillajsproxy')
+
+        }
 
     }
 
-    stop(){
+    stop(all = false){
         
-        console.log('Stop')
+        let docker = new Docker()
+
+        if(docker.check()){
+
+            if(all){ // Detengo todos los proyectos
+
+                docker.stop(null)
+
+            }else{
+
+                // Recupero el proyecto.
+                let project = new Project()
+
+                let composeFile = path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml')
+
+                // Detengo los contenedores del proyecto.
+                docker.stop(composeFile, project.slug)
+
+            }
+
+        }
+
+    }
+
+    remove(){
+
+        let docker = new Docker()
+
+        if(docker.check()){
+
+            // Recupero el proyecto.
+            let project = new Project()
+
+            let composeFile = path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml')
+            let config = project.config[PROJECT_ENV]
+
+            // Detengo los contenedores del proyecto.
+            docker.stop(composeFile, project.slug)
+
+            // Elimino la carpeta de gorilla del proyecto.
+            removeSync(path.join(PROJECT_PATH, '.gorilla'))
+            
+            // Elimino la carpeta de la base de datos.
+            removeSync(path.join(DATA_PATH, config.project.id))
+
+        }
 
     }
 

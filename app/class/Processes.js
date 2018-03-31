@@ -101,7 +101,7 @@ var Processes = function () {
                     },
                     "docker": {
                         "port": Math.floor(Math.random() * (4999 - 4000)) + 4000,
-                        "data_path": _const.DATA_PATH
+                        "data_path": _path2.default.join(_const.HOME_USER_PATH_FOR_BASH, 'gorillajs', 'data')
                     }
 
                     // Unifico las variables complementarias con la configuración general.
@@ -137,15 +137,21 @@ var Processes = function () {
                             // Cargo el contenido del archivo.
                             var text = (0, _fs.readFileSync)(file).toString();
 
+                            var hasChange = false;
+
                             // Creo una expresión regular en lazy mode para que coja todos los valores, aunque haya varios en la misma línea.
                             text = text.replace(/{{(.*?)}}/g, function (search, value) {
 
+                                hasChange = true;
                                 // Reemplazo las ocurrencias por su valor correspondiente de la configuración.
                                 return _jspath2.default.apply('.' + value, config)[0];
                             });
 
                             // Vuelvo a guardar el contenido del archivo con los nuevos valores.
-                            (0, _fs.writeFileSync)(file, text);
+                            if (hasChange) {
+
+                                (0, _fs.writeFileSync)(file, text);
+                            }
                         }
                     }
                 } catch (err) {
@@ -216,13 +222,71 @@ var Processes = function () {
         key: 'run',
         value: function run() {
 
-            console.log('Run');
+            var docker = new _Docker2.default();
+
+            if (docker.check()) {
+
+                // Recupero el proyecto.
+                var project = new _Project2.default();
+
+                var composeFile = _path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml');
+
+                // Inicio los contenedores del proyecto.
+                docker.start(composeFile, project.slug, false);
+
+                // Inicio el contenedor del proxy.
+                docker.start(_path2.default.join(_const.PROXY_PATH, 'template', 'docker-compose.yml'), 'gorillajsproxy');
+            }
         }
     }, {
         key: 'stop',
         value: function stop() {
+            var all = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-            console.log('Stop');
+
+            var docker = new _Docker2.default();
+
+            if (docker.check()) {
+
+                if (all) {
+                    // Detengo todos los proyectos
+
+                    docker.stop(null);
+                } else {
+
+                    // Recupero el proyecto.
+                    var project = new _Project2.default();
+
+                    var composeFile = _path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml');
+
+                    // Detengo los contenedores del proyecto.
+                    docker.stop(composeFile, project.slug);
+                }
+            }
+        }
+    }, {
+        key: 'remove',
+        value: function remove() {
+
+            var docker = new _Docker2.default();
+
+            if (docker.check()) {
+
+                // Recupero el proyecto.
+                var project = new _Project2.default();
+
+                var composeFile = _path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml');
+                var config = project.config[_const.PROJECT_ENV];
+
+                // Detengo los contenedores del proyecto.
+                docker.stop(composeFile, project.slug);
+
+                // Elimino la carpeta de gorilla del proyecto.
+                (0, _fsExtra.removeSync)(_path2.default.join(_const.PROJECT_PATH, '.gorilla'));
+
+                // Elimino la carpeta de la base de datos.
+                (0, _fsExtra.removeSync)(_path2.default.join(_const.DATA_PATH, config.project.id));
+            }
         }
     }, {
         key: 'commit',

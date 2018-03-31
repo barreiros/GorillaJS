@@ -29,7 +29,7 @@ export const addToHosts = (domain, callback) => {
 
                 }else{
 
-                    query = execSync('echo ' + answer.result + ' | sudo -S sh -c "echo \'' + text + '\' >> ' + SYSTEM_HOSTS_FILE + '"')
+                    query = execSync('echo "' + answer.result + '" | sudo -S sh -c "echo \'' + text + '\' >> ' + SYSTEM_HOSTS_FILE + '"')
 
                 }
 
@@ -71,13 +71,19 @@ export const checkHost = (url, callback) => {
 
                 attempts += 1
 
-                if(attempts < 5){
+                if(attempts < 50){
 
                     setTimeout(() => {
 
                         attempt()
 
                     }, 2000)
+
+                }else{
+
+                    console.log('Demasiados intentos')
+
+                    // Error demasiados intentos de conexión.
 
                 }
 
@@ -115,9 +121,9 @@ export const execSync = (query, options = {}) => {
 
         output = {
 
-            stdout: err.stdout.toString(),
-            stderr: err.stderr.toString(),
-            err: err.stderr.toString()
+            stdout: err.stdout ? err.stdout.toString() : '',
+            stderr: err.stderr ? err.stderr.toString() : '',
+            err: err.stderr ? err.stderr.toString() : ''
 
         }
 
