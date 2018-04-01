@@ -202,13 +202,13 @@ var Processes = function () {
                         // Compruebo que el proyecto se haya iniciado correctamente.
                         (0, _Tools.checkHost)('http://' + config.project.domain + ':' + config.proxy.port, function () {
 
+                            _Events.events.publish('PROJECT_BUILT', [config]);
+
                             if (_const.PROJECT_IS_LOCAL) {
                                 // Si es un proyecto local, abro el navegador.
 
                                 (0, _open2.default)('http://' + config.project.domain + ':' + config.proxy.port + '/gorilla-maintenance');
                             }
-
-                            _Events.events.publish('PROJECT_BUILT');
                         });
                     });
                 } else {
@@ -286,6 +286,29 @@ var Processes = function () {
 
                 // Elimino la carpeta de la base de datos.
                 (0, _fsExtra.removeSync)(_path2.default.join(_const.DATA_PATH, config.project.id));
+
+                // Envío un evento por si algún plugin necesita eliminar algo.
+                _Events.events.publish('PROJECT_REMOVED', [config]);
+            }
+        }
+    }, {
+        key: 'maintenanace',
+        value: function maintenanace() {
+
+            var docker = new _Docker2.default();
+
+            if (docker.check()) {
+
+                // Recupero el proyecto.
+                var project = new _Project2.default();
+
+                var config = project.config[_const.PROJECT_ENV];
+
+                // Ejecuto el mantenimiento de Docker
+                docker.maintenance();
+
+                // Envío un evento por si algún plugin necesita hacer labores de mantenimiento.
+                _Events.events.publish('PROJECT_MAINTENANCE', [config]);
             }
         }
     }, {

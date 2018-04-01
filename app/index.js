@@ -147,12 +147,18 @@ var Main = function () {
 
                 var _processes3 = new _Processes2.default();
                 _processes3.remove();
-            } else if (_yargs.argv._[0] === 'commit') {
+            } else if (_yargs.argv._[0] === 'maintenance') {
 
                 // Imprimo el logo.
 
                 var _processes4 = new _Processes2.default();
-                _processes4.commit(_yargs.argv._[1]);
+                _processes4.maintenance();
+            } else if (_yargs.argv._[0] === 'commit') {
+
+                // Imprimo el logo.
+
+                var _processes5 = new _Processes2.default();
+                _processes5.commit(_yargs.argv._[1]);
             } else if (_yargs.argv._[0] === 'schema') {
 
                 var schema = new _Schema2.default(_yargs.argv.force);

@@ -1,5 +1,5 @@
 # Este archivo se tiene que ejecutar desde la raíz de GorillaJS.
-# docker build -t gorillajs/proxy . -f templates/common/dockerfile-alpine-proxy
+# docker build -t gorillajs/proxy . -f dockerfiles/dockerfile-alpine-proxy
 
 FROM gorillajs/lamp
 
@@ -12,8 +12,8 @@ RUN set -x \
     && git clone https://github.com/shivaas/mod_evasive mod_evasive && /usr/bin/apxs -i -a -c mod_evasive/mod_evasive24.c && rm -rf mod_evasive && sed -ie 's/lib\/apache2\/mod_evasive24.so/modules\/mod_evasive24.so/g' /etc/apache2/httpd.conf \
     && apk add apache2-proxy \ 
     && sed -i 's/^LoadModule proxy_fdpass_module/#LoadModule proxy_fdpass_module/' /etc/apache2/conf.d/proxy.conf \
-    && apk add libxml2=2.9.4-r4 && ln -s /usr/lib/libxml2.so.2.9.4 /usr/lib/libxml2.so \
+    && apk add openssl libxml2 && ln -s /usr/lib/libxml2.so.2.9.4 /usr/lib/libxml2.so \
     && apk del apache2-dev alpine-sdk \
     && rm -rf /var/cache/apk/*
 
-COPY templates/common/mod_evasive.conf /etc/apache2/conf.d/mod_evasive.conf
+COPY dockerfiles/mod_evasive.conf /etc/apache2/conf.d/mod_evasive.conf

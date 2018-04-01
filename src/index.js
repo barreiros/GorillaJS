@@ -139,6 +139,13 @@ class Main {
             
             let processes = new Processes()
             processes.remove()
+
+        }else if(argv._[0] === 'maintenance'){
+
+            // Imprimo el logo.
+            
+            let processes = new Processes()
+            processes.maintenance()
             
         }else if(argv._[0] === 'commit'){
 

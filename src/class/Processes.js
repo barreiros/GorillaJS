@@ -136,13 +136,13 @@ class Processes{
                     // Compruebo que el proyecto se haya iniciado correctamente.
                     checkHost('http://' + config.project.domain + ':' + config.proxy.port, () => {
 
+                        events.publish('PROJECT_BUILT', [config])
+
                         if(PROJECT_IS_LOCAL){ // Si es un proyecto local, abro el navegador.
 
                             open('http://' + config.project.domain + ':' + config.proxy.port + '/gorilla-maintenance')
 
                         }
-                       
-                        events.publish('PROJECT_BUILT')
 
                     })
 
@@ -225,6 +225,30 @@ class Processes{
             
             // Elimino la carpeta de la base de datos.
             removeSync(path.join(DATA_PATH, config.project.id))
+
+            // Envío un evento por si algún plugin necesita eliminar algo.
+            events.publish('PROJECT_REMOVED', [config])
+
+        }
+
+    }
+
+    maintenanace(){
+
+        let docker = new Docker()
+
+        if(docker.check()){
+
+            // Recupero el proyecto.
+            let project = new Project()
+
+            let config = project.config[PROJECT_ENV]
+
+            // Ejecuto el mantenimiento de Docker
+            docker.maintenance()
+
+            // Envío un evento por si algún plugin necesita hacer labores de mantenimiento.
+            events.publish('PROJECT_MAINTENANCE', [config])
 
         }
 

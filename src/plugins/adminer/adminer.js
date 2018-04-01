@@ -1,140 +1,117 @@
-// import { PROJECT_ENV, HOME_USER_PATH_FOR_SCRIPTS as HOME } from '../../const.js'
-// import { events } from '../../class/Tools.js'
-// import { load } from 'yamljs'
-//
-// class Adminer{
-//
-//     constructor(){
-//
-//         events.subscribe('PROJECT_BUILT', this.check)
-//
-//     }
-//
-//     check(){
-//
-//     }
-//
-//     add(){
-//
-//         // Cargo el archivo de configuración de Ademiner y compruebo si el proyecto actual ya existe.
-//
-//         // Si no existe, inicio el proceso.
-//             // Cargo el archivo docker-compose.
-//             // Creo un array con los motores de adminer.
-//             let engines = ['mysql', 'mariadb', 'sqlite', 'postgresql', 'mongodb', 'oracle', 'elasticsearch'];
-//             // Lo parseo en busca de servicios que tengan en el nombre alguna de las cadenas del array "engines"
-//             // Incluyo los servicios de base de datos que haya encontrado en el archivo de configuración de Adminer.
-//             // Copio los archivos de Adminer en el contenedor del proxy.
-//
-//         // Si existe, no hago nada.
-//
-//     }
-//
-// }
-//
-//
-// export default new Adminer() 
-//
-//     addAdminer(){
-//
-//         var list, listPath, composePath, dataPath, domain, output;
-//
-//         composePath = path.join(variables.projectPath, variables.gorillaFolder, variables.gorillaTemplateFolder, variables.composeFile);
-//         dataPath = path.join(variables.homeUserPathBash, variables.proxyName, 'data');
-//         domain = gorillaData.local.project.domain;
-//         listPath = path.join(variables.homeUserPathNodeJS, variables.proxyName, 'adminer', 'list.json');
-//
-//         // Recupero la ruta del archivo docker-compose.
-//         yaml.load(composePath, function(compose){
-//
-//             var engines = ['mysql', 'mariadb', 'sqlite', 'postgresql', 'mongodb', 'oracle', 'elasticsearch'];
-//
-//             if(compose.hasOwnProperty('services')){
-//
-//                 // Cargo el archivo con la lista de containers con base de datos de los dominios.
-//                 list = loadList(listPath);
-//                 list[domain] = {};
-//
-//                 // Parseo el archivo docker-compose y busco en cada servicio y si tiene un volumen apuntando a la carpeta data_path, incluyo el contenedor a la lista.
-//                 for(var service in compose.services){
-//
-//                     if(compose.services[service].hasOwnProperty('volumes')){
-//
-//                         for(var volume in compose.services[service].volumes){
-//
-//                             if(compose.services[service].volumes[volume].indexOf(dataPath) > -1){
-//
-//                                 // Busco el nombre del motor de base de datos. Para que funcione tiene que contener el nombre del motor en el nombre del contenedor.
-//                                 for(var engine in engines){
-//
-//                                     if(compose.services[service].container_name.search(engines[engine]) !== -1){
-//
-//                                         // Añado el contenedor al listado.
-//                                         list[domain][compose.services[service].container_name] = engines[engine];
-//
-//                                     }
-//
-//                                 }
-//
-//                                 break;
-//
-//                             }
-//
-//                         }
-//
-//                     }
-//
-//                 }
-//
-//             }
-//
-//             // Guardo el archivo de la lista en la carpeta global y en el directorio público que le voy a pasar al proxy.
-//             if(list.hasOwnProperty(domain)){
-//
-//                 output = JSON.stringify(list, null, '\t');
-//                 fs.writeFileSync(listPath, output);
-//                 fs.writeFileSync(envPaths.plugins + '/adminer/public/list.json', output);
-//
-//             }
-//
-//             // Copio los contenidos en el contenedor: script bash y carpeta pública.
-//             cross.exec('docker cp "' + envPaths.plugins + '/adminer/public/." gorillajsproxy:/var/www/adminer && docker cp "' + envPaths.plugins + '/adminer/server/." gorillajsproxy:/etc/adminer', function(err, stdout, stderr){
-//
-//                 if (err) events.publish('ERROR', ['Problem with Adminer Plugin configuration.']);
-//                 events.publish('VERBOSE', [err, stderr, stdout]);
-//
-//                 // Ejecuto el script de bash.
-//                 cross.exec('docker exec gorillajsproxy /bin/sh /etc/adminer/adminer.sh', function(err, stdout, stderr){
-//
-//                     if (err) events.publish('ERROR', ['Problem with Adminer Plugin configuration.']);
-//                     events.publish('VERBOSE', [err, stderr, stdout]);
-//
-//                     events.publish('PROMISEME');
-//
-//                 });
-//
-//             });
-//
-//         });
-//
-//     }
-//
-//     loadList(listPath){
-//
-//         var list;
-//
-//         fsx.ensureFileSync(listPath);
-//
-//         list = fs.readFileSync(listPath).toString();
-//
-//         if(list === ''){
-//
-//             return {};
-//
-//         }else{
-//
-//             return JSON.parse(list);
-//
-//         }
-//
-//     }
+import { PROJECT_PATH, PROJECT_ENV, PROXY_PATH, HOME_USER_PATH_FOR_SCRIPTS as HOME } from '../../const.js'
+import { events } from '../../class/Events.js'
+import { execSync } from '../../class/Tools.js'
+import { load } from 'yamljs'
+import { pathExistsSync, ensureDirSync, copySync } from 'fs-extra'
+import { readFileSync, writeFileSync } from 'fs'
+import yaml from 'yamljs'
+import path from 'path'
+
+
+class Adminer{
+
+    constructor(){
+
+        events.subscribe('PROJECT_BUILT', this.check.bind(this))
+        events.subscribe('PROJECT_REMOVED', this.remove.bind(this))
+        events.subscribe('PROJECT_MAINTENANCE', this.maintenance.bind(this))
+
+    }
+
+    check(config){
+
+        let adminerPath = path.join(PROXY_PATH, 'template', 'adminer')
+        let listFile = path.join(HOME, 'gorillajs', 'adminer.json')
+
+        if(!pathExistsSync(listFile)){ // Me aseguro de que el archivo de configuración existe.
+
+            writeFileSync(listFile, '{}')
+
+        }
+
+        // Cargo el archivo de configuración de Adminer.
+        let list = JSON.parse(readFileSync(listFile, 'utf8'))
+
+        ensureDirSync(adminerPath)
+
+        // Compruebo si el proyecto actual existe en el archivo.
+        if(!list[config.project.domain]){ // Si no existe, lo añado.
+
+            list[config.project.domain] = {}
+
+            this.add(list[config.project.domain])
+
+            // Guardo la lista actualizada.
+            writeFileSync(listFile, JSON.stringify(list, null, '\t'))
+
+            // Copio el listado en la carpeta pública de Adminer.
+            copySync(listFile, path.join(adminerPath, 'public', 'list.json'))
+
+        }else if(!pathExistsSync(path.join(adminerPath, 'public', 'list.json'))){ // Si no existe el archivo list en la carpeta pública, lo copio.
+            
+            // Copio el listado en la carpeta pública de Adminer.
+            copySync(listFile, path.join(adminerPath, 'public', 'list.json'))
+
+        } 
+
+        if(!pathExistsSync(path.join(adminerPath, 'public')) || !pathExistsSync(path.join(adminerPath, 'server'))){ // Si los archivos de Adminer no están en la carpeta del proxy, los añado.
+
+            ensureDirSync(adminerPath)
+
+            // Copio todos los archivos de Adminer en la carpeta de la template del proxy. Esto es nuevo y tengo que rectificar los archivos .sh
+            copySync(path.join(path.resolve(__dirname), 'public'), path.join(adminerPath, 'public'))
+            copySync(path.join(path.resolve(__dirname), 'server'), path.join(adminerPath, 'server'))
+
+            // Ejecuto el script de bash para terminar de configurar Adminer.
+            let query = execSync('docker exec gorillajsproxy /bin/sh /root/templates/adminer/server/adminer.sh')
+
+            console.log(query)
+            console.log('Hola, Bar')
+            
+        }
+
+    }
+
+    add(list){
+
+        let composeFile = path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml')
+
+        // Creo un array con los motores de adminer.
+        let engines = ['mysql', 'mariadb', 'sqlite', 'postgresql', 'mongodb', 'oracle', 'elasticsearch'];
+
+        // Cargo el archivo docker-compose.
+        let file = yaml.load(composeFile)
+
+        // Lo parseo en busca de servicios que tengan en el nombre alguna de las cadenas del array "engines"
+        for(var service in file.services){
+
+            let containerName = file.services[service].container_name
+
+            engines.map((engine) => {
+
+                // Si el nombre del contenedor incluye el nombre de una tecnología de base de datos, lo incluyo en la lista.
+                if(containerName.toLowerCase().search(engine) !== -1){ 
+
+                    list[containerName] = engine
+
+                }
+
+            })
+
+        }
+
+        console.log(list)
+
+    }
+
+    remove(config){
+
+    }
+
+    maintenance(){
+
+    }
+
+}
+
+export default new Adminer() 
