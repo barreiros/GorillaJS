@@ -86,9 +86,6 @@ var Adminer = function () {
 
                 // Ejecuto el script de bash para terminar de configurar Adminer.
                 var query = (0, _Tools.execSync)('docker exec gorillajsproxy /bin/sh /root/templates/adminer/server/adminer.sh');
-
-                console.log(query);
-                console.log('Hola, Bar');
             }
         }
     }, {
@@ -122,8 +119,6 @@ var Adminer = function () {
             for (var service in file.services) {
                 _loop();
             }
-
-            console.log(list);
         }
     }, {
         key: 'remove',

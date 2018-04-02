@@ -64,9 +64,6 @@ class Adminer{
 
             // Ejecuto el script de bash para terminar de configurar Adminer.
             let query = execSync('docker exec gorillajsproxy /bin/sh /root/templates/adminer/server/adminer.sh')
-
-            console.log(query)
-            console.log('Hola, Bar')
             
         }
 
@@ -99,8 +96,6 @@ class Adminer{
             })
 
         }
-
-        console.log(list)
 
     }
 
