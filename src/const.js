@@ -20,3 +20,4 @@ export const PROJECT_PLUGINS_CUSTOM = path.join(HOME_USER_PATH_FOR_SCRIPTS, 'gor
 export const SYSTEM_HOSTS_FILE = process.platform === 'win32' ? 'C:\\Windows\\System32\\drivers\\etc\\hosts' : '/etc/hosts'
 export const SCHEMA_PATH = path.join(HOME_USER_PATH_FOR_SCRIPTS, 'gorillajs', 'schema.json')
 export const DEBUG = argv.d ? true : false
+export const FORCE = argv.f ? true : false

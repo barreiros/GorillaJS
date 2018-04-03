@@ -4,179 +4,114 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _const = require('../../const.js');
 
 var _Events = require('../../class/Events.js');
 
+var _Tools = require('../../class/Tools.js');
+
+var _fsExtra = require('fs-extra');
+
+var _fs = require('fs');
+
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
+var _yamljs = require('yamljs');
+
+var _yamljs2 = _interopRequireDefault(_yamljs);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Django = function Django() {
-    _classCallCheck(this, Django);
+var Django = function () {
+    function Django() {
+        _classCallCheck(this, Django);
 
-    _Events.events.subscribe('CONFIG_FILE_CREATED', function (config) {
+        _Events.events.subscribe('BEFORE_REPLACE_VALUES', this.copyTemplate);
+        _Events.events.subscribe('AFTER_REPLACE_VALUES', this.configureEngine);
+        _Events.events.subscribe('PROJECT_BUILT', this.commitSettings);
+    }
 
-        console.log('Este es el plugin Django');
-    });
-};
+    _createClass(Django, [{
+        key: 'copyTemplate',
+        value: function copyTemplate(config, templateTarget) {
+
+            // Si la proyecto es de Django copio los archivos del motor de base de datos a la carpeta de la plantilla.
+            if (config.docker.template_type === 'django') {
+
+                var engine = config.database.engine.toLowerCase();
+
+                if (engine === 'postgresql') {
+
+                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-web.sh'), _path2.default.join(templateTarget, 'entrypoint-web.sh'));
+
+                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-postgresql.sh'), _path2.default.join(templateTarget, 'entrypoint-postgresql.sh'));
+                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'postgresql.conf'), _path2.default.join(templateTarget, 'postgresql.conf'));
+                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'docker-compose-postgresql.yml'), _path2.default.join(templateTarget, 'docker-compose-postgresql.yml'));
+                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'settings-postgresql'), _path2.default.join(templateTarget, 'settings-postgresql'));
+                } else if (engine === 'mysql') {
+
+                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-web.sh'), _path2.default.join(templateTarget, 'entrypoint-web.sh'));
+
+                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-mariadb.sh'), _path2.default.join(templateTarget, 'entrypoint-mariadb.sh'));
+                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'docker-compose-mariadb.yml'), _path2.default.join(templateTarget, 'docker-compose-mariadb.yml'));
+                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'settings-mariadb'), _path2.default.join(templateTarget, 'settings-mariadb'));
+                }
+            }
+        }
+    }, {
+        key: 'configureEngine',
+        value: function configureEngine(config, templateTarget) {
+
+            if (config.docker.template_type === 'django') {
+
+                var file = _yamljs2.default.load(_path2.default.join(templateTarget, 'docker-compose.yml'));
+                var engine = config.database.engine.toLowerCase();
+
+                if (!file.services['web'].dependes_on) {
+
+                    file.services['web'].depends_on = [];
+                }
+
+                if (engine === 'postgresql') {
+
+                    var engineFile = _yamljs2.default.load(_path2.default.join(templateTarget, 'docker-compose-postgresql.yml'));
+
+                    file.services['postgresql'] = engineFile.services.postgresql;
+                    file.services['web'].depends_on.push('postgresql');
+                    (0, _fs.writeFileSync)(_path2.default.join(templateTarget, 'docker-compose.yml'), _yamljs2.default.stringify(file, 6));
+                } else if (engine === 'mysql') {
+
+                    var _engineFile = _yamljs2.default.load(_path2.default.join(templateTarget, 'docker-compose-mysql.yml'));
+
+                    file.services['mysql'] = _engineFile.services.postgresql;
+                    file.services['web'].depends_on.push('mysql');
+                    (0, _fs.writeFileSync)(_path2.default.join(templateTarget, 'docker-compose.yml'), _yamljs2.default.stringify(file, 6));
+                }
+            }
+        }
+    }, {
+        key: 'commitSettings',
+        value: function commitSettings(config) {
+
+            // Creo el commit únicamente si todavía no existe la imagen de Docker personalizada o si el usuario ha elegido el parámetro -f (FORCE).
+            if (config.docker.template_type === 'django') {
+
+                if (!config.services || _const.FORCE) {
+                    // Si no he hecho ningún commit, lo creo para guardar la configuración.
+
+                    var query = (0, _Tools.execSync)('gorilla6 commit "' + config.project.domain + '" --path "' + _const.PROJECT_PATH + '"');
+                }
+            }
+        }
+    }]);
+
+    return Django;
+}();
 
 exports.default = new Django();
-
-// 'use strict';
-//
-// var argv = require('minimist')(process.argv.slice(2));
-// var fs = require('fs');
-// var fsx = require('fs-extra');
-// var path = require('path');
-// var yaml = require('yamljs');
-//
-// var variables = require(path.join(envPaths.libraries, 'variables.js'));
-// var events = require(path.join(envPaths.libraries, 'pubsub.js'));
-// var tools = require(path.join(envPaths.libraries, 'tools.js'));
-// var promises = require(path.join(envPaths.libraries, 'promises.js'));
-// var commit = require(path.join(envPaths.libraries, 'commit.js'));
-//
-// var template = '';
-//
-// events.subscribe('TEMPLATE_SELECTED', setTemplate);
-// events.subscribe('BEFORE_SET_TEMPLATE_VARIABLES', modifyComposeFileBefore);
-// events.subscribe('AFTER_SET_TEMPLATE_VARIABLES', modifyComposeFileAfter);
-// events.subscribe('DOCKER_STARTED', setConfiguration);
-//
-// function setTemplate(name){
-//
-//     template = name;
-//
-// }
-//
-// function modifyComposeFileBefore(gorillaFile, templatePath){
-//
-//     var settings, folder, promisesPack;
-//
-//     if(template == 'Django'){
-//
-//         settings = JSON.parse(fs.readFileSync(gorillaFile));
-//
-//         promisesPack = [
-//
-//             [tools.param, ['database', 'engine', ['SQLite', 'PostgreSQL', 'MySQL']], 'engine'],
-//             [events.publish, ['STEP', ['django_database_config']]],
-//             [configureEngine, [path.join(envPaths.plugins, 'db_django'), templatePath, '{{engine}}']]
-//
-//         ];
-//         promises.sandwich(promisesPack);
-//
-//     }
-//
-// }
-//
-//
-// function configureEngine(pluginPath, templatePath, engine){
-//
-//     if(engine === 'PostgreSQL'){
-//
-//         fsx.copySync(path.join(pluginPath, 'entrypoint-web.sh'), path.join(templatePath, 'entrypoint-web.sh'));
-//
-//         fsx.copySync(path.join(pluginPath, 'entrypoint-postgresql.sh'), path.join(templatePath, 'entrypoint-postgresql.sh'));
-//         fsx.copySync(path.join(pluginPath, 'postgresql.conf'), path.join(templatePath, 'postgresql.conf'));
-//         fsx.copySync(path.join(pluginPath, 'docker-compose-postgresql.yml'), path.join(templatePath, 'docker-compose-postgresql.yml'));
-//         fsx.copySync(path.join(pluginPath, 'settings-postgresql'), path.join(templatePath, 'settings-postgresql'));
-//
-//     }else if(engine === 'MySQL'){
-//
-//         fsx.copySync(path.join(pluginPath, 'entrypoint-web.sh'), path.join(templatePath, 'entrypoint-web.sh'));
-//
-//         fsx.copySync(path.join(pluginPath, 'entrypoint-mariadb.sh'), path.join(templatePath, 'entrypoint-mariadb.sh'));
-//         fsx.copySync(path.join(pluginPath, 'docker-compose-mariadb.yml'), path.join(templatePath, 'docker-compose-mariadb.yml'));
-//         fsx.copySync(path.join(pluginPath, 'settings-mariadb'), path.join(templatePath, 'settings-mariadb'));
-//
-//     }
-//
-//     events.publish('PROMISEME');
-//
-// }
-//
-// function modifyComposeFileAfter(gorillaFile, templatePath){
-//
-//     var settings, promisesPack;
-//
-//     if(template == 'Django'){
-//
-//         settings = JSON.parse(fs.readFileSync(gorillaFile));
-//
-//         promisesPack = [
-//
-//             [checkDatabaseEngine, [gorillaFile, templatePath]]
-//
-//         ];
-//         promises.sandwich(promisesPack);
-//
-//     }
-//
-// }
-//
-// function checkDatabaseEngine(gorillaFile, templatePath){
-//
-//     var settings, links, composeFile, engineFile;
-//
-//     settings = JSON.parse(fs.readFileSync(gorillaFile));
-//     composeFile = templatePath + '/docker-compose.yml';
-//
-//     yaml.load(composeFile, function(fileWeb){
-//
-//         if(!fileWeb.services['web'].hasOwnProperty('depends_on')){
-//
-//             fileWeb.services['web'].depends_on = [];
-//
-//         }
-//
-//         if(settings.local.database.engine === 'PostgreSQL'){
-//
-//             engineFile = templatePath + '/docker-compose-postgresql.yml';
-//             yaml.load(engineFile, function(fileEngine){
-//
-//                 fileWeb.services['postgresql'] = fileEngine.services.postgresql;
-//                 fileWeb.services['web'].depends_on.push('postgresql');
-//                 fs.writeFileSync(composeFile, yaml.stringify(fileWeb, 6)); 
-//
-//                 events.publish('PROMISEME');
-//
-//             });
-//
-//         }else if(settings.local.database.engine === 'MySQL'){
-//
-//             engineFile = templatePath + '/docker-compose-mariadb.yml';
-//             yaml.load(engineFile, function(fileEngine){
-//
-//                 fileWeb.services['mysql'] = fileEngine.services.mysql;
-//                 fileWeb.services['web'].depends_on.push('mysql');
-//                 fs.writeFileSync(composeFile, yaml.stringify(fileWeb, 6)); 
-//
-//                 events.publish('PROMISEME');
-//
-//             });
-//
-//         }else{
-//
-//             events.publish('PROMISEME');
-//
-//         }
-//
-//     });
-//
-// }
-//
-// function setConfiguration(){
-//
-//     var gorillaFile, settings;
-//
-//     if(template == 'Django'){
-//
-//         settings = JSON.parse(fs.readFileSync(path.join(variables.projectPath, variables.gorillaFolder, variables.gorillaFile)));
-//
-//         promises.sandwich([commit.create, settings.local.project.domain]);
-//
-//     }
-//
-//     events.publish('PROMISEME');
-// }
-//

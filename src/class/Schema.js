@@ -33,13 +33,9 @@ class Schema{
 
         for(let file of glob.sync(files)){
 
-            console.log(file)
-
             let json = JSON.parse(readFileSync(file, 'utf8'))
 
             if(json.schema){
-
-                console.log(json.schema)
 
                 if(!output){
 
@@ -47,92 +43,94 @@ class Schema{
                         "schema": json.schema
                     }
 
-                }
+                }else{
 
-                // Creo una función recursiva para ir añadiendo los campos y así fusionar los json.
-                let recursive = (base, data) => {
+                    // Creo una función recursiva para ir añadiendo los campos y así fusionar los json.
+                    let recursive = (base, data) => {
 
-                    // Recorro todos los nodos del objeto que recibo.
-                    for(let key in data){
+                        // Recorro todos los nodos del objeto que recibo.
+                        for(let key in data){
 
-                        if(data[key] instanceof Array && typeof data[key][0] === 'string'){ // Si es un array de cadenas...
+                            if(data[key] instanceof Array && typeof data[key][0] === 'string'){ // Si es un array de cadenas...
 
-                            if(!base[key]){ // ... y no existe el campo destino, creo el campo y le asigno el valor del array.
+                                if(!base[key]){ // ... y no existe el campo destino, creo el campo y le asigno el valor del array.
 
-                                base[key] = []
+                                    base[key] = []
 
-                            }else if(base[key] && base[key] instanceof Array){ // ... existe el campo destino y es un array, los fusiono. 
+                                }else if(base[key] && base[key] instanceof Array){ // ... existe el campo destino y es un array, los fusiono. 
 
-                                base[key] = base[key].concat(data[key])
+                                    base[key] = base[key].concat(data[key])
 
-                            }else{ // ... existe el campo destino y es una cadena, concateno los dos valores en un array.
+                                }else{ // ... existe el campo destino y es una cadena, concateno los dos valores en un array.
 
-                                if(!data[key].includes(base[key])){ // Solo si el valor no existe ya en el array.
+                                    if(!data[key].includes(base[key])){ // Solo si el valor no existe ya en el array.
 
-                                    base[key] = [base[key], data[key]]
+                                        base[key] = [base[key], data[key]]
+
+                                    }
 
                                 }
 
-                            }
+                                base[key].push(data[key])
 
-                            base[key].push(data[key])
+                            }else if(data[key] instanceof Array && typeof data[key][0] === 'object'){ // Si es un array de objetos
 
-                        }else if(data[key] instanceof Array && typeof data[key][0] === 'object'){ // Si es un array de objetos
+                                if(!base[key]){ // .. y no existe el campo destino, lo creo y vuelvo a ejecutar el proceso.
 
-                            if(!base[key]){ // .. y no existe el campo destino, lo creo y vuelvo a ejecutar el proceso.
+                                    base[key] = []
 
-                                base[key] = []
+                                    recursive(base[key], data[key])
+
+                                }else if(base[key] && base[key] instanceof Array){ 
+
+                                    base[key] = base[key].concat(data[key])
+
+                                }else if(base[key] && typeof base[key] === 'object'){
+
+                                    data[key].push(base[key])
+                                    base[key] = data[key]
+
+                                }
+
+                            }else if(typeof data[key] === 'object'){
+
+                                if(!base[key]){
+
+                                    base[key] = {}
+
+                                }
 
                                 recursive(base[key], data[key])
 
-                            }else if(base[key] && base[key] instanceof Array){ 
+                            }else{ // Doy por hecho que el valor que viene es una cadena.
 
-                                base[key] = base[key].concat(data[key])
+                                if(!base[key]){ // Si el campo de destin no existe, le asigno el valor.
 
-                            }else if(base[key] && typeof base[key] === 'object'){
+                                    base[key] = data[key]
 
-                                data[key].push(base[key])
-                                base[key] = data[key]
+                                }else if(base[key] && typeof data[key] === 'string'){ // Si el campo de destino existe y tiene una cadena, los uno en un array.
 
-                            }
+                                    if(base[key].toString() !== data[key].toString()){ // Solo si son distintas.
 
-                        }else if(typeof data[key] === 'object'){
+                                        base[key] = [base[key], data[key]]
 
-                            if(!base[key]){
+                                    }
 
-                                base[key] = {}
+                                }else{ // Si el campo de destino existe y es un array, añado el valor al array.
 
-                            }
-
-                            recursive(base[key], data[key])
-
-                        }else{ // Doy por hecho que el valor que viene es una cadena.
-
-                            if(!base[key]){ // Si el campo de destin no existe, le asigno el valor.
-
-                                base[key] = data[key]
-
-                            }else if(base[key] && typeof data[key] === 'string'){ // Si el campo de destino existe y tiene una cadena, los uno en un array.
-
-                                if(base[key].toString() !== data[key].toString()){ // Solo si son distintas.
-
-                                    base[key] = [base[key], data[key]]
+                                    base[key].push(data[key])
 
                                 }
-
-                            }else{ // Si el campo de destino existe y es un array, añado el valor al array.
-
-                                base[key].push(data[key])
 
                             }
 
                         }
-
+                        
                     }
-                    
-                }
 
-                recursive(output.schema, json.schema)
+                    recursive(output.schema, json.schema)
+
+                }
 
             }
 

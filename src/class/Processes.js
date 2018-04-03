@@ -71,7 +71,7 @@ class Processes{
             copySync(templateSource, templateTarget)
 
             // Lanzo un evento antes de reemplazar los valores por si algún plugin necesita añadir archivos a la template. Le paso la ruta de la plantilla.
-            events.publish('BEFORE_REPLACE_VALUES', [templateTarget])
+            events.publish('BEFORE_REPLACE_VALUES', [config, templateTarget])
 
             // Reemplazo las variables de la plantilla y del proxy por su valor correspondiente del objeto con la configuración que le paso.
             for(let file of glob.sync('{' + templateTarget + '**/*,' + proxyTarget + '/**/*}')){
@@ -102,6 +102,9 @@ class Processes{
                 }
 
             }
+
+            // Lanzo un evento antes de reemplazar los valores por si algún plugin necesita añadir archivos a la template. Le paso la ruta de la plantilla.
+            events.publish('AFTER_REPLACE_VALUES', [config, templateTarget])
 
             let docker = new Docker()
 

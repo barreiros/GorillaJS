@@ -120,7 +120,7 @@ var Processes = function () {
                 (0, _fsExtra.copySync)(templateSource, templateTarget);
 
                 // Lanzo un evento antes de reemplazar los valores por si algún plugin necesita añadir archivos a la template. Le paso la ruta de la plantilla.
-                _Events.events.publish('BEFORE_REPLACE_VALUES', [templateTarget]);
+                _Events.events.publish('BEFORE_REPLACE_VALUES', [config, templateTarget]);
 
                 // Reemplazo las variables de la plantilla y del proxy por su valor correspondiente del objeto con la configuración que le paso.
                 var _iteratorNormalCompletion = true;
@@ -154,6 +154,8 @@ var Processes = function () {
                             }
                         }
                     }
+
+                    // Lanzo un evento antes de reemplazar los valores por si algún plugin necesita añadir archivos a la template. Le paso la ruta de la plantilla.
                 } catch (err) {
                     _didIteratorError = true;
                     _iteratorError = err;
@@ -168,6 +170,8 @@ var Processes = function () {
                         }
                     }
                 }
+
+                _Events.events.publish('AFTER_REPLACE_VALUES', [config, templateTarget]);
 
                 var docker = new _Docker2.default();
 
