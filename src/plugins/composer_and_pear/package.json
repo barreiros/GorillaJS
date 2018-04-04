@@ -1,0 +1,18 @@
+{
+  "name": "composer_and_pear_dependencies_gorillajs_plugin",
+  "version": "0.0.1",
+  "description": "This is a plugin to manage PHP dependencies in GorillaJS created containers.",
+  "main": "composer_and_pear_dependencies.js",
+  "author": {
+    "name": "David Barreiros",
+    "email": "hola@davidbarreiros.es",
+    "url": "davidbarreiros.es"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^0.26.2",
+    "minimist": "^1.2.0",
+    "pty.js": "^0.3.1",
+    "yamljs": "^0.2.8"
+  }
+}

@@ -1,0 +1,11 @@
+{
+
+    "plugin": {
+
+        "name": "Composer & PEAR",
+        "version": "0.0.1",
+        "main": "composer_and_pear.js"
+
+    }
+
+}
