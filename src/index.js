@@ -147,7 +147,7 @@ class Main {
             let processes = new Processes()
             processes.maintenance()
             
-        }else if(argv._[0] === 'commit'){
+        }else if(argv._[0] === 'commit' || argv._[0] === 'save'){
 
             // Imprimo el logo.
 

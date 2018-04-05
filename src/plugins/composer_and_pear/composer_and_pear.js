@@ -20,30 +20,47 @@ class ComposerAndPear{
             let project = new Project()
             let config = project.config[PROJECT_ENV]
 
-            this.installDependencies(config)
-            this.executeCommand(config, argv._[0], process.argv.slice(3).join(' '))
+            if(!this.checkDependencies(config.project.domain) || FORCE){
+
+                this.installDependencies(config.project.domain)
+
+            }
+
+            this.executeCommand(config.project.domain, argv._[0], process.argv.slice(3).join(' '))
 
         }
 
     }
 
-    checkDependencies(){
+    checkDependencies(container){
+
+        let query = execSync('docker exec ' + container + ' [ -e /etc/composer_and_pear ] && echo "OK" || echo "KO"')
+
+        if(query.stdout.search('OK') !== -1){
+
+            return true
+
+        }else{
+
+            return false
+
+        }
 
     }
 
-    installDependencies(config){
+    installDependencies(container){
 
         let query
 
         // Copio los archivos de configuración al contenedor.
-        query = execSync('docker cp "' + path.join(__dirname, 'server', '.') + '" ' + config.project.domain + ':/etc/composer_and_pear')
+        query = execSync('docker cp "' + path.join(__dirname, 'server', '.') + '" ' + container + ':/etc/composer_and_pear')
 
         // Ejecuto el archivo de configuración.
-        query = execSync('docker exec ' + config.project.domain + ' /bin/sh /etc/composer_and_pear/dependencies.sh')
+        query = execSync('docker exec ' + container + ' /bin/sh /etc/composer_and_pear/dependencies.sh')
 
     }
 
-    executeCommand(config, type, args){
+    executeCommand(container, type, args){
 
         let stdin = process.openStdin();
 
@@ -51,11 +68,11 @@ class ComposerAndPear{
 
         if(type === 'composer'){
 
-            command = ['exec', '-i', config.project.domain, '/usr/local/bin/composer', '--working-dir=' + path.join('/', 'var', 'www', config.project.domain, 'application')].concat(args.split(" "))
+            command = ['exec', '-i', container, '/usr/local/bin/composer', '--working-dir=' + path.join('/', 'var', 'www', container, 'application')].concat(args.split(" "))
 
         }else{
 
-            command = ['exec', '-i', config.project.domain, type].concat(args.split(" "))
+            command = ['exec', '-i', container, type].concat(args.split(" "))
 
         }
 
@@ -75,9 +92,6 @@ class ComposerAndPear{
 
         query.on('exit', (code) => {
 
-            // ¿Commit?
-            this.commitSettings(config)
-
             process.stdin.destroy();
             process.exit();
 
@@ -88,21 +102,6 @@ class ComposerAndPear{
             query.stdin.write(data.toString())
 
         })
-
-    }
-
-    commitSettings(config){
-
-        // Creo el commit únicamente si todavía no existe la imagen de Docker personalizada o si el usuario ha elegido el parámetro -f (FORCE).
-        if(config.docker.template_type === 'django'){
-
-            if(!config.services || FORCE){ // Si no he hecho ningún commit, lo creo para guardar la configuración.
-
-                let query = execSync('gorilla6 commit "' + config.project.domain + '" --path "' + PROJECT_PATH + '"')
-
-            }
-
-        }
 
     }
 

@@ -42,29 +42,43 @@ var ComposerAndPear = function () {
                 var project = new _Project2.default();
                 var config = project.config[_const.PROJECT_ENV];
 
-                this.installDependencies(config);
-                this.executeCommand(config, _yargs.argv._[0], process.argv.slice(3).join(' '));
+                if (!this.checkDependencies(config.project.domain) || _const.FORCE) {
+
+                    this.installDependencies(config.project.domain);
+                }
+
+                this.executeCommand(config.project.domain, _yargs.argv._[0], process.argv.slice(3).join(' '));
             }
         }
     }, {
         key: 'checkDependencies',
-        value: function checkDependencies() {}
+        value: function checkDependencies(container) {
+
+            var query = (0, _Tools.execSync)('docker exec ' + container + ' [ -e /etc/composer_and_pear ] && echo "OK" || echo "KO"');
+
+            if (query.stdout.search('OK') !== -1) {
+
+                return true;
+            } else {
+
+                return false;
+            }
+        }
     }, {
         key: 'installDependencies',
-        value: function installDependencies(config) {
+        value: function installDependencies(container) {
 
             var query = void 0;
 
             // Copio los archivos de configuración al contenedor.
-            query = (0, _Tools.execSync)('docker cp "' + _path2.default.join(__dirname, 'server', '.') + '" ' + config.project.domain + ':/etc/composer_and_pear');
+            query = (0, _Tools.execSync)('docker cp "' + _path2.default.join(__dirname, 'server', '.') + '" ' + container + ':/etc/composer_and_pear');
 
             // Ejecuto el archivo de configuración.
-            query = (0, _Tools.execSync)('docker exec ' + config.project.domain + ' /bin/sh /etc/composer_and_pear/dependencies.sh');
+            query = (0, _Tools.execSync)('docker exec ' + container + ' /bin/sh /etc/composer_and_pear/dependencies.sh');
         }
     }, {
         key: 'executeCommand',
-        value: function executeCommand(config, type, args) {
-            var _this = this;
+        value: function executeCommand(container, type, args) {
 
             var stdin = process.openStdin();
 
@@ -72,10 +86,10 @@ var ComposerAndPear = function () {
 
             if (type === 'composer') {
 
-                command = ['exec', '-i', config.project.domain, '/usr/local/bin/composer', '--working-dir=' + _path2.default.join('/', 'var', 'www', config.project.domain, 'application')].concat(args.split(" "));
+                command = ['exec', '-i', container, '/usr/local/bin/composer', '--working-dir=' + _path2.default.join('/', 'var', 'www', container, 'application')].concat(args.split(" "));
             } else {
 
-                command = ['exec', '-i', config.project.domain, type].concat(args.split(" "));
+                command = ['exec', '-i', container, type].concat(args.split(" "));
             }
 
             var query = (0, _child_process.spawn)('docker', command);
@@ -92,9 +106,6 @@ var ComposerAndPear = function () {
 
             query.on('exit', function (code) {
 
-                // ¿Commit?
-                _this.commitSettings(config);
-
                 process.stdin.destroy();
                 process.exit();
             });
@@ -103,20 +114,6 @@ var ComposerAndPear = function () {
 
                 query.stdin.write(data.toString());
             });
-        }
-    }, {
-        key: 'commitSettings',
-        value: function commitSettings(config) {
-
-            // Creo el commit únicamente si todavía no existe la imagen de Docker personalizada o si el usuario ha elegido el parámetro -f (FORCE).
-            if (config.docker.template_type === 'django') {
-
-                if (!config.services || _const.FORCE) {
-                    // Si no he hecho ningún commit, lo creo para guardar la configuración.
-
-                    var query = (0, _Tools.execSync)('gorilla6 commit "' + config.project.domain + '" --path "' + PROJECT_PATH + '"');
-                }
-            }
         }
     }]);
 

@@ -153,7 +153,7 @@ var Main = function () {
 
                 var _processes4 = new _Processes2.default();
                 _processes4.maintenance();
-            } else if (_yargs.argv._[0] === 'commit') {
+            } else if (_yargs.argv._[0] === 'commit' || _yargs.argv._[0] === 'save') {
 
                 // Imprimo el logo.
 
