@@ -1,0 +1,15 @@
+{
+    "name": "django_gorillajs_plugin",
+    "version": "0.0.1",
+    "description": "This is a plugin to manage Django and Phyton dependencies in GorillaJS created containers.",
+    "main": "django.js",
+    "author": {
+        "name": "David Barreiros",
+        "email": "hola@davidbarreiros.es",
+        "url": "davidbarreiros.es"
+    },
+    "license": "ISC",
+    "dependencies": {
+        "pty.js": "^0.3.1"
+    }
+}
