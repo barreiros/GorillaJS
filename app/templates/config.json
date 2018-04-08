@@ -23,7 +23,7 @@
                     },
                     {
                         "option": "PHP 7",
-                        "value": "php-7"
+                        "value": "php7"
                     },
                     {
                         "option": "Opencart",

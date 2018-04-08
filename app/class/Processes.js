@@ -327,11 +327,9 @@ var Processes = function () {
                 name = config.project.domain;
             }
 
-            console.log(name);
+            var docker = new _Docker2.default();
 
-            // let docker = new Docker()
-            //
-            // docker.commit(path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), path.join(PROJECT_PATH, '.gorilla', 'gorillafile'), name)
+            docker.commit(_path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), _path2.default.join(_const.PROJECT_PATH, '.gorilla', 'gorillafile'), name);
         }
     }]);
 

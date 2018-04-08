@@ -268,11 +268,9 @@ class Processes{
 
         }
 
-        console.log(name)
+        let docker = new Docker()
 
-        // let docker = new Docker()
-        //
-        // docker.commit(path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), path.join(PROJECT_PATH, '.gorilla', 'gorillafile'), name)
+        docker.commit(path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml'), path.join(PROJECT_PATH, '.gorilla', 'gorillafile'), name)
 
     }
 

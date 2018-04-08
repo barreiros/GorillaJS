@@ -1,0 +1,90 @@
+{
+
+    "plugin": {
+
+        "name": "DB for PHP 7",
+        "version": "0.0.1",
+        "main": "db_php7.js"
+
+    },
+
+    "schema": {
+
+        "database": {
+
+            "engine_php7": {
+
+                "question": "Select the database engine",
+                "values": [
+
+                    {
+                        "option": "No, thanks!",
+                        "value": "no"
+                    },
+                    {
+                        "option": "MongoDB",
+                        "value": "mongodb"
+                    },
+                    {
+                        "option": "PostgreSQL",
+                        "value": "postgresql"
+                    },
+                    {
+                        "option": "MySQL",
+                        "value": "mysql"
+                    }
+
+                ],
+                "depends_on": [{
+
+                    "path": ".docker.template_type",
+                    "value": "php7"
+
+                }],
+                "default": "no"
+
+            },
+
+            "dbname": {
+
+                "question": "Database name",
+                "default": "gorilladb",
+                "depends_on": [{
+
+                    "path": ".database.engine_php7",
+                    "value": ["mongodb", "postgresql", "mysql"]
+
+                }]
+
+            },
+
+            "username": {
+
+                "question": "Database user name",
+                "default": "gorilla",
+                "depends_on": {
+
+                    "path": ".database.engine_php7",
+                    "value": ["mongodb", "postgresql", "mysql"]
+
+                }
+
+            },
+
+            "password": {
+
+                "question": "Database password",
+                "default": "gorilla_598565",
+                "depends_on": {
+
+                    "path": ".database.engine_php7",
+                    "value": ["mongodb", "postgresql", "mysql"]
+
+                }
+            }
+
+        }
+
+    }
+
+}

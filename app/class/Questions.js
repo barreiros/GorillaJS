@@ -107,62 +107,60 @@ var Questions = function () {
                 // Compruebo si la pregunta depende de algún otro valor.
                 if (data.question.depends_on) {
 
-                    var dependencies = _jspath2.default.apply(data.question.depends_on.path, _this.config);
+                    if (data.question.depends_on instanceof Array === false) {
 
-                    if (!dependencies.length) {
-                        // Si el nodo no existe en el archivo de configuración...
-
-                        if (!data.waiting) {
-                            // ... y es la primera vez que recibo esta pregunta, la devuelvo a la cola.
-
-                            data.waiting = true;
-                            questions.push(data);
-                        }
-
-                        check();
-
-                        return;
-                    } else {
-                        // Si el nodo existe compruebo si su valor aparece dentro de las dependencias necesarias para mostrar la pregunta.
-
-                        if (_typeof(data.question.depends_on.value) === 'object') {
-                            // Si es un objeto doy por hecho que es un array.
-
-                            if (data.question.depends_on.value.indexOf(dependencies[0]) === -1) {
-
-                                check();
-
-                                return;
-                            }
-                        } else {
-                            // Si no, es una cadena.
-
-                            if (data.question.depends_on.value !== dependencies[0]) {
-
-                                check();
-
-                                return;
-                            }
-                        }
+                        data.question.depends_on = [data.question.depends_on];
                     }
-                }
 
-                // Si llego aquí es porque he pasado todos los filtros y puedo hacer la pregunta.
-                if (data.question.values && _typeof(data.question.values) === 'object') {
-                    // Si hay más de una opción, muestro el prompt con el selector.
-
-                    var list = [];
+                    var ignore = void 0;
 
                     var _iteratorNormalCompletion = true;
                     var _didIteratorError = false;
                     var _iteratorError = undefined;
 
                     try {
-                        for (var _iterator = data.question.values[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                            var value = _step.value;
+                        for (var _iterator = data.question.depends_on[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                            var dependency = _step.value;
 
 
-                            list.push(value.option);
+                            var dependencies = _jspath2.default.apply(dependency.path, _this.config);
+
+                            if (!dependencies.length) {
+                                // Si el nodo no existe en el archivo de configuración...
+
+                                data.waiting = true;
+                                questions.push(data);
+
+                                ignore = true;
+                            } else {
+                                // Si el nodo existe compruebo si su valor aparece dentro de las dependencias necesarias para mostrar la pregunta.
+
+                                if (_typeof(dependency.value) === 'object') {
+                                    // Si es un objeto doy por hecho que es un array.
+
+                                    if (dependency.value.indexOf(dependencies[0]) !== -1) {
+
+                                        ignore = false;
+
+                                        break;
+                                    } else {
+
+                                        ignore = true;
+                                    }
+                                } else {
+                                    // Si no, es una cadena.
+
+                                    if (dependency.value !== dependencies[0]) {
+
+                                        ignore = true;
+                                    } else {
+
+                                        ignore = false;
+
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     } catch (err) {
                         _didIteratorError = true;
@@ -175,6 +173,49 @@ var Questions = function () {
                         } finally {
                             if (_didIteratorError) {
                                 throw _iteratorError;
+                            }
+                        }
+                    }
+
+                    if (ignore) {
+
+                        check();
+
+                        return;
+                    }
+                }
+
+                // Si llego aquí es porque he pasado todos los filtros y puedo hacer la pregunta.
+                if (data.question.values && _typeof(data.question.values) === 'object') {
+                    // Si hay más de una opción, muestro el prompt con el selector.
+
+                    var list = [];
+
+                    var _iteratorNormalCompletion2 = true;
+                    var _didIteratorError2 = false;
+                    var _iteratorError2 = undefined;
+
+                    try {
+                        for (var _iterator2 = data.question.values[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                            var value = _step2.value;
+
+
+                            if (list.indexOf(value.option) === -1) {
+
+                                list.push(value.option);
+                            }
+                        }
+                    } catch (err) {
+                        _didIteratorError2 = true;
+                        _iteratorError2 = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                                _iterator2.return();
+                            }
+                        } finally {
+                            if (_didIteratorError2) {
+                                throw _iteratorError2;
                             }
                         }
                     }

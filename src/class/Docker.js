@@ -38,11 +38,11 @@ class Docker{
 
         if(force){
 
-            command = 'docker-compose -f "' + composeFile + '" -p "' + slug + '" up --force-recreate -d'
+            command = 'docker-compose -f "' + composeFile + '" -p "' + slug + '" up --remove-orphans --force-recreate -d'
 
         }else{
 
-            command = 'docker-compose -f "' + composeFile + '" -p "' + slug + '" up -d'
+            command = 'docker-compose -f "' + composeFile + '" -p "' + slug + '" up --remove-orphans -d'
 
         }
 
@@ -106,8 +106,6 @@ class Docker{
     }
 
     commit(composeFile, gorillaFile, name){
-
-        console.log(composeFile, gorillaFile, name)
 
         if(name === 'gorillajsproxy'){
 

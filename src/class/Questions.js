@@ -96,40 +96,55 @@ class Questions {
             // Compruebo si la pregunta depende de algún otro valor.
             if(data.question.depends_on){
 
-                let dependencies = JSPath.apply(data.question.depends_on.path, this.config)
+                if(data.question.depends_on instanceof Array === false){
 
-                if(!dependencies.length){ // Si el nodo no existe en el archivo de configuración...
-                    
-                    if(!data.waiting){ // ... y es la primera vez que recibo esta pregunta, la devuelvo a la cola.
+                    data.question.depends_on = [data.question.depends_on]
+
+                }
+
+                let ignore
+
+                for(let dependency of data.question.depends_on){
+
+                    let dependencies = JSPath.apply(dependency.path, this.config)
+
+                    if(!dependencies.length){ // Si el nodo no existe en el archivo de configuración...
 
                         data.waiting = true
                         questions.push(data)
 
-                    }
+                        ignore = true
 
-                    check()
+                    }else{ // Si el nodo existe compruebo si su valor aparece dentro de las dependencias necesarias para mostrar la pregunta.
 
-                    return
+                        if(typeof dependency.value === 'object'){ // Si es un objeto doy por hecho que es un array.
 
-                }else{ // Si el nodo existe compruebo si su valor aparece dentro de las dependencias necesarias para mostrar la pregunta.
+                            if(dependency.value.indexOf(dependencies[0]) !== -1){
 
-                    if(typeof data.question.depends_on.value === 'object'){ // Si es un objeto doy por hecho que es un array.
+                                ignore = false
 
-                        if(data.question.depends_on.value.indexOf(dependencies[0]) === -1){
+                                break
 
-                            check()
+                            }else{
 
-                            return
+                                ignore = true
 
-                        }
 
-                    }else{ // Si no, es una cadena.
+                            }
 
-                        if(data.question.depends_on.value !== dependencies[0]){
+                        }else{ // Si no, es una cadena.
 
-                            check()
+                            if(dependency.value !== dependencies[0]){
 
-                            return
+                                ignore = true
+
+                            }else{
+
+                                ignore = false
+
+                                break
+
+                            }
 
                         }
 
@@ -137,6 +152,14 @@ class Questions {
 
                 }
                 
+                if(ignore){
+
+                    check()
+
+                    return
+
+                }
+
             }
 
             // Si llego aquí es porque he pasado todos los filtros y puedo hacer la pregunta.
@@ -146,7 +169,11 @@ class Questions {
 
                 for(let value of data.question.values){
 
-                    list.push(value.option)
+                    if(list.indexOf(value.option) === -1){
+
+                        list.push(value.option)
+
+                    }
 
                 }
 
