@@ -1,0 +1,11 @@
+{
+
+    "plugin": {
+
+        "name": "Extra packages",
+        "version": "0.0.1",
+        "main": "extra_packages.js"
+
+    }
+
+}
