@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+
+  varnish:
+    image: gorillajs/alpine
+    expose: 
+      - 80
+    volumes:
+      - ../template:/root/templates
+      - ../../varnish:/etc/varnish_files
+    entrypoint:
+      - bin/sh
+      - /root/templates/entrypoint-varnish.sh
+      

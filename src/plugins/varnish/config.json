@@ -1,0 +1,37 @@
+{
+
+    "plugin": {
+
+        "name": "Varnish cache",
+        "version": "0.0.1",
+        "main": "varnish.js"
+
+    },
+
+    "schema": {
+
+        "varnish": {
+
+            "enable": {
+
+                "question": "Do you want to activate Varnish cache?",
+                "values": [
+
+                    {
+                        "option": "No",
+                        "value": "no"
+                    },
+                    {
+                        "option": "Yes",
+                        "value": "yes"
+                    }
+                ],
+                "default": "no"
+
+            }
+
+        }
+
+    }
+
+}
