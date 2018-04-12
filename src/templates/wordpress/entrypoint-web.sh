@@ -54,15 +54,11 @@ replace_domain || true &&
 
 mkdir -p /var/www/{{project.domain}}_mirror/ &&
 
-inotifywait -m -r -e moved_to,create,modify,delete /var/www/{{project.domain}}_mirror/ |
+unison /var/www/{{project.domain}}_mirror/ /var/www/{{project.domain}}/ -repeat watch -prefer newer -silent &
 
-  while read response; do
-
-    chown -R apache:apache /var/www/{{project.domain}}_mirror/ 
-    
-done &
-
-unison /var/www/{{project.domain}}_mirror/ /var/www/{{project.domain}}/ -repeat watch -prefer newer &
+chown -R apache:apache /var/www/{{project.domain}}_mirror/ &&
+chmod +x /root/templates/inotify.sh &&
+/root/templates/inotify.sh &
 
 rm /var/www/{{project.domain}}/application/gorilla-status.txt &&
 
