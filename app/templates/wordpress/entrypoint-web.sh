@@ -52,11 +52,17 @@ done
 
 replace_domain || true &&
 
-# Inicio el directorio espejo para la carpeta del host.
-/etc/bimirror/bimirror.sh "/var/www/{{project.domain}}/" "/var/www/{{project.domain}}_mirror/" "apache:apache" "main" &
+mkdir -p /var/www/{{project.domain}}_mirror/ &&
 
-# Inicio el directorio espejo para la carpeta del guest.
-/etc/bimirror/bimirror.sh "/var/www/{{project.domain}}_mirror/" "/var/www/{{project.domain}}/" &
+inotifywait -m -r -e moved_to,create,modify,delete /var/www/{{project.domain}}_mirror/ |
+
+  while read response; do
+
+    chown -R apache:apache /var/www/{{project.domain}}_mirror/ 
+    
+done &
+
+unison /var/www/{{project.domain}}_mirror/ /var/www/{{project.domain}}/ -repeat watch -prefer newer &
 
 rm /var/www/{{project.domain}}/application/gorilla-status.txt &&
 
