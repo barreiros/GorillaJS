@@ -13,6 +13,7 @@ import Processes from './class/Processes.js'
 import Schema from './class/Schema.js'
 import Project from './class/Project.js'
 import { license } from './class/License.js'
+import SocketGuest from './class/SocketGuest.js'
 
 class Main {
 
@@ -169,6 +170,10 @@ class Main {
 
             // Devuelvo el json.
             console.log(JSON.stringify(json))
+
+        }else if(argv._[0] === 'guest'){
+
+            let guest = new SocketGuest()
 
         }
 

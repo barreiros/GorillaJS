@@ -21,3 +21,6 @@ export const SYSTEM_HOSTS_FILE = process.platform === 'win32' ? 'C:\\Windows\\Sy
 export const SCHEMA_PATH = path.join(HOME_USER_PATH_FOR_SCRIPTS, 'gorillajs', 'schema.json')
 export const DEBUG = argv.d ? true : false
 export const FORCE = argv.f ? true : false
+
+export const SOCKET_HOST = 'http://127.0.0.1'
+export const SOCKET_PORT = 3003

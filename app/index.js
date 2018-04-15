@@ -33,6 +33,10 @@ var _Project2 = _interopRequireDefault(_Project);
 
 var _License = require('./class/License.js');
 
+var _SocketGuest = require('./class/SocketGuest.js');
+
+var _SocketGuest2 = _interopRequireDefault(_SocketGuest);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -174,6 +178,9 @@ var Main = function () {
 
                 // Devuelvo el json.
                 console.log(JSON.stringify(json));
+            } else if (_yargs.argv._[0] === 'guest') {
+
+                var guest = new _SocketGuest2.default();
             }
         }
     }]);

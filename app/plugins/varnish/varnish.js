@@ -8,6 +8,10 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _const = require('../../const.js');
 
+var _Project = require('../../class/Project.js');
+
+var _Project2 = _interopRequireDefault(_Project);
+
 var _Events = require('../../class/Events.js');
 
 var _Tools = require('../../class/Tools.js');
@@ -16,6 +20,8 @@ var _fsExtra = require('fs-extra');
 
 var _fs = require('fs');
 
+var _yargs = require('yargs');
+
 var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
@@ -23,6 +29,10 @@ var _path2 = _interopRequireDefault(_path);
 var _yamljs = require('yamljs');
 
 var _yamljs2 = _interopRequireDefault(_yamljs);
+
+var _pty = require('pty.js');
+
+var _pty2 = _interopRequireDefault(_pty);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -35,9 +45,29 @@ var Varnish = function () {
         _Events.events.subscribe('BEFORE_REPLACE_VALUES', this.copyTemplate);
         _Events.events.subscribe('AFTER_REPLACE_VALUES', this.configureEngine);
         _Events.events.subscribe('PROJECT_BUILT', this.commitSettings);
+
+        this.init();
     }
 
     _createClass(Varnish, [{
+        key: 'init',
+        value: function init() {
+
+            if (_yargs.argv._[0] === 'varnish') {
+
+                var project = new _Project2.default();
+                var config = project.config[_const.PROJECT_ENV];
+
+                if (_yargs.argv._[1] === 'reload') {
+
+                    this.reloadConfig(config);
+                } else if (_yargs.argv._[1] === 'admin') {
+
+                    this.executeCommand(config.project.domain + '_varnish', 'varnishadm');
+                }
+            }
+        }
+    }, {
         key: 'copyTemplate',
         value: function copyTemplate(config, templateTarget, proxyTarget) {
 
@@ -95,6 +125,66 @@ var Varnish = function () {
                     var query = (0, _Tools.execSync)('gorilla6 commit "' + config.project.domain + '" --path "' + _const.PROJECT_PATH + '"');
                 }
             }
+        }
+    }, {
+        key: 'reloadConfig',
+        value: function reloadConfig(config) {
+
+            if (config.varnish.enable === 'yes') {
+
+                var rand = Math.floor(Math.random() * (1000 - 0 + 1) + 0);
+
+                var query = (0, _Tools.execSync)('docker exec ' + config.project.domain + '_varnish varnishadm vcl.load reload_' + rand + ' /etc/varnish/default.vcl');
+
+                if (!query.err) {
+
+                    query = (0, _Tools.execSync)('docker exec ' + config.project.domain + '_varnish varnishadm vcl.use reload_' + rand);
+
+                    console.log('Varnish caché reloaded!');
+                } else {
+
+                    console.log(query);
+                }
+            }
+        }
+    }, {
+        key: 'executeCommand',
+        value: function executeCommand(container, type, args) {
+
+            var stdin = process.openStdin();
+            var command = void 0;
+
+            if (type === 'varnishadm') {
+
+                command = ['exec', '-it', container, type];
+            } else {
+
+                command = ['exec', '-it', container, type].concat(args.split(" "));
+            }
+
+            var term = _pty2.default.spawn('docker', command, {
+                name: 'xterm-color',
+                cols: 80,
+                rows: 30,
+                cwd: process.env.HOME,
+                env: process.env
+            });
+
+            term.on('data', function (data) {
+
+                process.stdout.write(data);
+            });
+
+            term.on('close', function (code) {
+
+                process.exit();
+                process.stdin.destroy();
+            });
+
+            stdin.addListener('data', function (data) {
+
+                term.write(data.toString());
+            });
         }
     }]);
 

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.FORCE = exports.DEBUG = exports.SCHEMA_PATH = exports.SYSTEM_HOSTS_FILE = exports.PROJECT_PLUGINS_CUSTOM = exports.PROJECT_PLUGINS_OFFICIAL = exports.PROJECT_TEMPLATES_CUSTOM = exports.PROJECT_TEMPLATES_OFFICIAL = exports.PROJECT_IS_LOCAL = exports.PROJECT_ENV = exports.LICENSE_PATH = exports.PROJECT_PATH = exports.PROXY_PATH = exports.DATA_PATH = exports.GORILLAJS_PATH = exports.HOME_USER_PATH_FOR_SCRIPTS = exports.HOME_USER_PATH_FOR_BASH = undefined;
+exports.SOCKET_PORT = exports.SOCKET_HOST = exports.FORCE = exports.DEBUG = exports.SCHEMA_PATH = exports.SYSTEM_HOSTS_FILE = exports.PROJECT_PLUGINS_CUSTOM = exports.PROJECT_PLUGINS_OFFICIAL = exports.PROJECT_TEMPLATES_CUSTOM = exports.PROJECT_TEMPLATES_OFFICIAL = exports.PROJECT_IS_LOCAL = exports.PROJECT_ENV = exports.LICENSE_PATH = exports.PROJECT_PATH = exports.PROXY_PATH = exports.DATA_PATH = exports.GORILLAJS_PATH = exports.HOME_USER_PATH_FOR_SCRIPTS = exports.HOME_USER_PATH_FOR_BASH = undefined;
 
 var _yargs = require('yargs');
 
@@ -33,3 +33,6 @@ var SYSTEM_HOSTS_FILE = exports.SYSTEM_HOSTS_FILE = process.platform === 'win32'
 var SCHEMA_PATH = exports.SCHEMA_PATH = _path2.default.join(HOME_USER_PATH_FOR_SCRIPTS, 'gorillajs', 'schema.json');
 var DEBUG = exports.DEBUG = _yargs.argv.d ? true : false;
 var FORCE = exports.FORCE = _yargs.argv.f ? true : false;
+
+var SOCKET_HOST = exports.SOCKET_HOST = 'http://127.0.0.1';
+var SOCKET_PORT = exports.SOCKET_PORT = 3003;
