@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SOCKET_PORT = exports.SOCKET_HOST = exports.FORCE = exports.DEBUG = exports.SCHEMA_PATH = exports.SYSTEM_HOSTS_FILE = exports.PROJECT_PLUGINS_CUSTOM = exports.PROJECT_PLUGINS_OFFICIAL = exports.PROJECT_TEMPLATES_CUSTOM = exports.PROJECT_TEMPLATES_OFFICIAL = exports.PROJECT_IS_LOCAL = exports.PROJECT_ENV = exports.LICENSE_PATH = exports.PROJECT_PATH = exports.PROXY_PATH = exports.DATA_PATH = exports.GORILLAJS_PATH = exports.HOME_USER_PATH_FOR_SCRIPTS = exports.HOME_USER_PATH_FOR_BASH = undefined;
+exports.GUEST_GORILLAJS_PATH = exports.SOCKET_PORT = exports.SOCKET_HOST = exports.FORCE = exports.DEBUG = exports.SCHEMA_PATH = exports.SYSTEM_HOSTS_FILE = exports.PROJECT_PLUGINS_CUSTOM = exports.PROJECT_PLUGINS_OFFICIAL = exports.PROJECT_TEMPLATES_CUSTOM = exports.PROJECT_TEMPLATES_OFFICIAL = exports.PROJECT_IS_LOCAL = exports.PROJECT_ENV = exports.LICENSE_PATH = exports.PROJECT_PATH = exports.PROXY_PATH = exports.DATA_PATH = exports.GORILLAJS_PATH = exports.HOME_USER_PATH_FOR_SCRIPTS = exports.HOME_USER_PATH_FOR_BASH = undefined;
 
 var _yargs = require('yargs');
 
@@ -36,3 +36,4 @@ var FORCE = exports.FORCE = _yargs.argv.f ? true : false;
 
 var SOCKET_HOST = exports.SOCKET_HOST = 'http://127.0.0.1';
 var SOCKET_PORT = exports.SOCKET_PORT = 3003;
+var GUEST_GORILLAJS_PATH = exports.GUEST_GORILLAJS_PATH = '/home/gorilla/projects';

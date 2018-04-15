@@ -1,0 +1,10 @@
+#!/sbin/openrc-run
+
+start() {
+        ebegin "Starting GorillaJS Guest"
+        start-stop-daemon --start \
+        --exec gorilla6 guest \
+        -u gorilla
+        eend $?
+}
+

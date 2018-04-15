@@ -24,3 +24,4 @@ export const FORCE = argv.f ? true : false
 
 export const SOCKET_HOST = 'http://127.0.0.1'
 export const SOCKET_PORT = 3003
+export const GUEST_GORILLAJS_PATH = '/home/gorilla/projects'

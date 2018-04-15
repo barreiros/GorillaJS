@@ -1,4 +1,4 @@
-import { SOCKET_PORT } from '../const.js'
+import { SOCKET_PORT, GUEST_GORILLAJS_PATH } from '../const.js'
 import http from 'http'
 import socketio from 'socket.io'
 import * as child from 'child_process'
@@ -7,6 +7,8 @@ import path from 'path'
 class SocketGuest {
 
     constructor(){
+
+        console.log('Inicio el socket del Guest')
 
         let app, io
 
@@ -30,11 +32,33 @@ class SocketGuest {
 
     socketConnected(client){
 
-        client.on('logging', function(id){
+        console.log('Se conecta un nuevo cliente')
+
+        client.on('global', (command) => {
+
+            child.exec(command, (err, stdout, stderr) => {
+
+                if(err){
+
+                    client.emit('message', {status: 'error', message: stderr.toString()})
+
+                }else{
+
+                    client.emit('message', {status: 'ok', message: stdout.toString()})
+
+                }
+
+            })
+
+            client.emit('connect', 'Conectado!!!')
 
         })
 
-        client.on('project', function(id){
+        client.on('logging', (id) => {
+
+        })
+
+        client.on('project', (id) => {
 
             let roomProcess, commandArgs, commandProcess
 
@@ -42,7 +66,7 @@ class SocketGuest {
 
             client.join(id)
 
-            client.on('message', function(message){
+            client.on('message', (message) => {
 
                 if(!roomProcess){
 
@@ -53,23 +77,23 @@ class SocketGuest {
 
                     roomProcess = child.spawn(commandProcess, commandArgs, {
 
-                        // cwd: path.join(process.cwd(), id)
+                        cwd: path.join(GUEST_GORILLAJS_PATH, id)
 
                     })
 
-                    roomProcess.stdout.on('data', function(message){
+                    roomProcess.stdout.on('data', (message) => {
                         
                         client.emit('message', message.toString())
 
                     })
 
-                    roomProcess.stderr.on('data', function(error){
+                    roomProcess.stderr.on('data', (error) => {
                         
                         client.emit('error', error.toString())
 
                     })
 
-                    roomProcess.on('exit', function(){
+                    roomProcess.on('exit', () => {
                         
                         client.emit('terminated')
 
@@ -84,7 +108,7 @@ class SocketGuest {
 
             })
 
-            client.on('disconnect', function(){
+            client.on('disconnect', () => {
                 
                 console.log('Se ha desconectado el proyecto', id)
 
@@ -92,7 +116,7 @@ class SocketGuest {
 
             })
 
-            client.on('error', function(error){
+            client.on('error', (error) => {
                 
                 console.log('Error en el proyecto', id, error.toString())
 

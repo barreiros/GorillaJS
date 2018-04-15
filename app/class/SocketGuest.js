@@ -34,6 +34,8 @@ var SocketGuest = function () {
     function SocketGuest() {
         _classCallCheck(this, SocketGuest);
 
+        console.log('Inicio el socket del Guest');
+
         var app = void 0,
             io = void 0;
 
@@ -58,6 +60,24 @@ var SocketGuest = function () {
         key: 'socketConnected',
         value: function socketConnected(client) {
 
+            console.log('Se conecta un nuevo cliente');
+
+            client.on('global', function (command) {
+
+                child.exec(command, function (err, stdout, stderr) {
+
+                    if (err) {
+
+                        client.emit('message', { status: 'error', message: stderr.toString() });
+                    } else {
+
+                        client.emit('message', { status: 'ok', message: stdout.toString() });
+                    }
+                });
+
+                client.emit('connect', 'Conectado!!!');
+            });
+
             client.on('logging', function (id) {});
 
             client.on('project', function (id) {
@@ -81,7 +101,7 @@ var SocketGuest = function () {
 
                         roomProcess = child.spawn(commandProcess, commandArgs, {
 
-                            // cwd: path.join(process.cwd(), id)
+                            cwd: _path2.default.join(_const.GUEST_GORILLAJS_PATH, id)
 
                         });
 
