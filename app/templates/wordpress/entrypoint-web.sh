@@ -53,12 +53,10 @@ done
 replace_domain || true &&
 
 mkdir -p /var/www/{{project.domain}}_mirror/ &&
+chown -R apache:apache /var/www/ &&
+chmod -R g+s /var/www/ &&
 
-unison /var/www/{{project.domain}}_mirror/ /var/www/{{project.domain}}/ -repeat watch -prefer newer -silent &
-
-chown -R apache:apache /var/www/{{project.domain}}_mirror/ &&
-chmod +x /root/templates/inotify.sh &&
-/root/templates/inotify.sh &
+su apache -s /bin/sh -c "unison /var/www/{{project.domain}}_mirror/ /var/www/{{project.domain}}/ -repeat watch -prefer newer -silent" &
 
 rm /var/www/{{project.domain}}/application/gorilla-status.txt &&
 

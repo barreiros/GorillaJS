@@ -1,5 +1,5 @@
 # Este archivo se tiene que ejecutar desde la raíz de GorillaJS.
-# docker build -t gorillajs/wordpress . -f templates/common/dockerfile-alpine-wordpress
+# docker build -t gorillajs/wordpress . -f dockerfiles/dockerfile-alpine-wordpress
 
 FROM gorillajs/lamp
 

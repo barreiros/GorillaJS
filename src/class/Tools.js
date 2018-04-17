@@ -71,7 +71,7 @@ export const checkHost = (url, callback) => {
 
                 attempts += 1
 
-                if(attempts < 50){
+                if(attempts < 100){
 
                     setTimeout(() => {
 
