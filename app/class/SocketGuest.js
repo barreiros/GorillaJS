@@ -34,8 +34,6 @@ var SocketGuest = function () {
     function SocketGuest() {
         _classCallCheck(this, SocketGuest);
 
-        console.log('Inicio el socket del Guest');
-
         var app = void 0,
             io = void 0;
 
@@ -48,12 +46,6 @@ var SocketGuest = function () {
         io.on('connection', this.socketConnected);
 
         io.on('error', this.socketError);
-
-        // events.subscribe('TUNNEL_SEND_MESSAGE', function(id, message){
-        //     
-        //     io.sockets.in(id).emit('message', message)
-        //
-        // })
     }
 
     _createClass(SocketGuest, [{
@@ -62,84 +54,65 @@ var SocketGuest = function () {
 
             console.log('Se conecta un nuevo cliente');
 
-            client.on('global', function (command) {
+            var query = void 0;
 
-                child.exec(command, function (err, stdout, stderr) {
+            client.on('command', function (params) {
 
-                    if (err) {
+                if (params.type === 'persistent') {
 
-                        client.emit('message', { status: 'error', message: stderr.toString() });
-                    } else {
+                    var commandArgs = void 0,
+                        commandProcess = void 0;
 
-                        client.emit('message', { status: 'ok', message: stdout.toString() });
-                    }
-                });
+                    commandArgs = params.command.split(' ');
+                    commandProcess = commandArgs.shift();
 
-                client.emit('connect', 'Conectado!!!');
+                    query = child.spawn(commandProcess, commandArgs);
+
+                    query.stdout.on('data', function (message) {
+
+                        client.emit('message', { type: 'data', 'message': message.toString() });
+                    });
+
+                    query.stderr.on('data', function (error) {
+
+                        client.emit('message', { type: 'error', 'message': error.toString() });
+                    });
+
+                    query.on('exit', function () {
+
+                        client.emit('message', { type: 'exit', 'message': '' });
+
+                        query.kill();
+                        query = null;
+                    });
+                } else {
+
+                    child.exec(params.command, function (err, stdout, stderr) {
+
+                        if (err) {
+
+                            client.emit('message', { type: 'error', message: stderr.toString() });
+                        } else {
+
+                            client.emit('message', { type: 'ok', message: stdout.toString() });
+                        }
+                    });
+                }
             });
 
-            client.on('logging', function (id) {});
+            client.on('message', function (message) {
 
-            client.on('project', function (id) {
+                query.stdin.write(message + '\n');
+            });
 
-                var roomProcess = void 0,
-                    commandArgs = void 0,
-                    commandProcess = void 0;
+            client.on('disconnect', function () {
 
-                console.log('Se ha conectado el proyecto', id);
+                console.log('Se ha desconectado el proyecto', id);
+            });
 
-                client.join(id);
+            client.on('error', function (error) {
 
-                client.on('message', function (message) {
-
-                    if (!roomProcess) {
-
-                        console.log('Inicio el proceso', id);
-
-                        commandArgs = message.split(' ');
-                        commandProcess = commandArgs.shift();
-
-                        roomProcess = child.spawn(commandProcess, commandArgs, {
-
-                            cwd: _path2.default.join(_const.GUEST_GORILLAJS_PATH, id)
-
-                        });
-
-                        roomProcess.stdout.on('data', function (message) {
-
-                            client.emit('message', message.toString());
-                        });
-
-                        roomProcess.stderr.on('data', function (error) {
-
-                            client.emit('error', error.toString());
-                        });
-
-                        roomProcess.on('exit', function () {
-
-                            client.emit('terminated');
-
-                            roomProcess.kill();
-                            roomProcess = null;
-                        });
-                    }
-
-                    roomProcess.stdin.write(message + '\n');
-                });
-
-                client.on('disconnect', function () {
-
-                    console.log('Se ha desconectado el proyecto', id);
-
-                    // events.publish('TUNNEL_TERMINATE', [id])
-                });
-
-                client.on('error', function (error) {
-
-                    console.log('Error en el proyecto', id, error.toString());
-
-                    // events.publish('TUNNEL_ERROR', [id, error.toString()])
-                });
+                console.log('Error en el proyecto', id, error.toString());
             });
         }
     }, {

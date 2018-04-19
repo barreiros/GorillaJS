@@ -8,8 +8,6 @@ class SocketGuest {
 
     constructor(){
 
-        console.log('Inicio el socket del Guest')
-
         let app, io
 
         app = http.createServer()
@@ -22,109 +20,83 @@ class SocketGuest {
 
         io.on('error', this.socketError) 
 
-        // events.subscribe('TUNNEL_SEND_MESSAGE', function(id, message){
-        //     
-        //     io.sockets.in(id).emit('message', message)
-        //
-        // })
-
     }
 
     socketConnected(client){
 
         console.log('Se conecta un nuevo cliente')
 
-        client.on('global', (command) => {
+        let query
 
-            child.exec(command, (err, stdout, stderr) => {
+        client.on('command', (params) => {
 
-                if(err){
+            if(params.type === 'persistent'){
 
-                    client.emit('message', {status: 'error', message: stderr.toString()})
+                let commandArgs, commandProcess
 
-                }else{
+                commandArgs = params.command.split(' ')
+                commandProcess = commandArgs.shift() 
 
-                    client.emit('message', {status: 'ok', message: stdout.toString()})
+                query = child.spawn(commandProcess, commandArgs)
 
-                }
+                query.stdout.on('data', (message) => {
+                    
+                    client.emit('message', {type: 'data', 'message': message.toString()})
 
-            })
+                })
 
-            client.emit('connect', 'Conectado!!!')
+                query.stderr.on('data', (error) => {
+                    
+                    client.emit('message', {type: 'error', 'message': error.toString()})
+
+                })
+
+                query.on('exit', () => {
+                    
+                    client.emit('message', {type: 'exit', 'message': ''})
+
+                    query.kill()
+                    query = null
+                    
+                })
+
+            }else{
+
+                child.exec(params.command, (err, stdout, stderr) => {
+
+                    if(err){
+
+                        client.emit('message', {type: 'error', message: stderr.toString()})
+
+                    }else{
+
+                        client.emit('message', {type: 'ok', message: stdout.toString()})
+
+                    }
+
+                })
+
+            }
+
+        })
+
+        client.on('message', (message) => {
+
+            query.stdin.write(message + '\n');
 
         })
 
-        client.on('logging', (id) => {
+        client.on('disconnect', () => {
+            
+            console.log('Se ha desconectado el proyecto', id)
 
         })
 
-        client.on('project', (id) => {
+        client.on('error', (error) => {
+            
+            console.log('Error en el proyecto', id, error.toString())
 
-            let roomProcess, commandArgs, commandProcess
-
-            console.log('Se ha conectado el proyecto', id)
-
-            client.join(id)
-
-            client.on('message', (message) => {
-
-                if(!roomProcess){
-
-                    console.log('Inicio el proceso', id)
-
-                    commandArgs = message.split(' ')
-                    commandProcess = commandArgs.shift() 
-
-                    roomProcess = child.spawn(commandProcess, commandArgs, {
-
-                        cwd: path.join(GUEST_GORILLAJS_PATH, id)
-
-                    })
-
-                    roomProcess.stdout.on('data', (message) => {
-                        
-                        client.emit('message', message.toString())
-
-                    })
-
-                    roomProcess.stderr.on('data', (error) => {
-                        
-                        client.emit('error', error.toString())
-
-                    })
-
-                    roomProcess.on('exit', () => {
-                        
-                        client.emit('terminated')
-
-                        roomProcess.kill()
-                        roomProcess = null
-                        
-                    })
-
-                }
-
-                roomProcess.stdin.write(message + '\n');
-
-            })
-
-            client.on('disconnect', () => {
-                
-                console.log('Se ha desconectado el proyecto', id)
-
-                // events.publish('TUNNEL_TERMINATE', [id])
-
-            })
-
-            client.on('error', (error) => {
-                
-                console.log('Error en el proyecto', id, error.toString())
-
-                // events.publish('TUNNEL_ERROR', [id, error.toString()])
-
-            }) 
-
-        })
+        }) 
 
     }
 
