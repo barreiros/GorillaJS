@@ -44,6 +44,11 @@ var addToHosts = exports.addToHosts = function addToHosts(domain, callback) {
                 } else {
 
                     query = execSync('echo "' + answer.result + '" | sudo -S sh -c "echo \'' + text + '\' >> ' + _const.SYSTEM_HOSTS_FILE + '"');
+
+                    if (query.err) {
+
+                        query = execSync('echo "' + answer.result + '" | su -s /bin/sh -c "echo \'' + text + '\' >> ' + _const.SYSTEM_HOSTS_FILE + '"');
+                    }
                 }
 
                 if (query.err) {

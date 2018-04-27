@@ -31,6 +31,12 @@ export const addToHosts = (domain, callback) => {
 
                     query = execSync('echo "' + answer.result + '" | sudo -S sh -c "echo \'' + text + '\' >> ' + SYSTEM_HOSTS_FILE + '"')
 
+                    if(query.err){
+
+                        query = execSync('echo "' + answer.result + '" | su -s /bin/sh -c "echo \'' + text + '\' >> ' + SYSTEM_HOSTS_FILE + '"')
+
+                    }
+
                 }
 
                 if(query.err){

@@ -125,7 +125,7 @@ var Questions = function () {
 
                             var dependencies = _jspath2.default.apply(dependency.path, _this.config);
 
-                            if (!dependencies.length) {
+                            if (!dependencies.length && !data.waiting) {
                                 // Si el nodo no existe en el archivo de configuración...
 
                                 data.waiting = true;

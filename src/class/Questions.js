@@ -93,6 +93,7 @@ class Questions {
 
             }
 
+
             // Compruebo si la pregunta depende de algún otro valor.
             if(data.question.depends_on){
 
@@ -108,7 +109,7 @@ class Questions {
 
                     let dependencies = JSPath.apply(dependency.path, this.config)
 
-                    if(!dependencies.length){ // Si el nodo no existe en el archivo de configuración...
+                    if(!dependencies.length && !data.waiting){ // Si el nodo no existe en el archivo de configuración...
 
                         data.waiting = true
                         questions.push(data)
