@@ -319,7 +319,7 @@ var Processes = function () {
         key: 'commit',
         value: function commit(name) {
 
-            if (name === '') {
+            if (typeof name === 'undefined' || name === '') {
 
                 var project = new _Project2.default();
                 var config = project.config[_const.PROJECT_ENV];

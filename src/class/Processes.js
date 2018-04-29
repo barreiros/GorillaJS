@@ -259,7 +259,7 @@ class Processes{
 
     commit(name){
 
-        if(name === ''){
+        if(typeof name === 'undefined' || name === ''){
 
             let project = new Project()
             let config = project.config[PROJECT_ENV]
