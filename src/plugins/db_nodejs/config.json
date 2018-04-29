@@ -1,0 +1,90 @@
+{
+
+    "plugin": {
+
+        "name": "Add db for NodeJS projects",
+        "version": "0.0.1",
+        "main": "db_nodejs.js"
+
+    },
+
+    "schema": {
+
+        "database": {
+
+            "engine_nodejs": {
+
+                "question": "Select the database engine",
+                "values": [
+
+                    {
+                        "option": "No, thanks!",
+                        "value": "no"
+                    },
+                    {
+                        "option": "MongoDB",
+                        "value": "mongodb"
+                    },
+                    {
+                        "option": "PostgreSQL",
+                        "value": "postgresql"
+                    },
+                    {
+                        "option": "MySQL",
+                        "value": "mysql"
+                    }
+
+                ],
+                "depends_on": [{
+
+                    "path": ".docker.template_type",
+                    "value": "nodejs"
+
+                }],
+                "default": "no"
+
+            },
+
+            "dbname": {
+
+                "question": "Database name",
+                "default": "gorilladb",
+                "depends_on": [{
+
+                    "path": ".database.engine_nodejs",
+                    "value": ["mongodb", "postgresql", "mysql"]
+
+                }]
+
+            },
+
+            "username": {
+
+                "question": "Database user name",
+                "default": "gorilla",
+                "depends_on": {
+
+                    "path": ".database.engine_nodejs",
+                    "value": ["mongodb", "postgresql", "mysql"]
+
+                }
+
+            },
+
+            "password": {
+
+                "question": "Database password",
+                "default": "gorilla_598565",
+                "depends_on": {
+
+                    "path": ".database.engine_nodejs",
+                    "value": ["mongodb", "postgresql", "mysql"]
+
+                }
+            }
+
+        }
+
+    }
+
+}

@@ -6,7 +6,7 @@ import { writeFileSync } from 'fs'
 import path from 'path'
 import yaml from 'yamljs'
 
-class DBforPHP7{
+class DBforNodeJS{
 
     constructor(){
 
@@ -18,35 +18,32 @@ class DBforPHP7{
 
     copyTemplate(config, templateTarget){
 
-        // Si el proyecto es de PHP7, copio los archivos del motor de base de datos a la carpeta de la plantilla.
-        if(config.docker.template_type === 'php7'){
+        // Si el proyecto es de NodeJS, copio los archivos del motor de base de datos a la carpeta de la plantilla.
+        if(config.docker.template_type === 'nodejs'){
 
-            let engine = config.database.engine_php7.toLowerCase()
+            let engine = config.database.engine_nodejs.toLowerCase()
 
             if(engine === 'postgresql'){
 
-                copySync(path.join(__dirname, 'entrypoint-web.sh'), path.join(templateTarget, 'entrypoint-web.sh'));
+                // copySync(path.join(__dirname, 'entrypoint-web.sh'), path.join(templateTarget, 'entrypoint-web.sh'));
 
                 copySync(path.join(__dirname, 'entrypoint-postgresql.sh'), path.join(templateTarget, 'entrypoint-postgresql.sh'));
                 copySync(path.join(__dirname, 'postgresql.conf'), path.join(templateTarget, 'postgresql.conf'));
-                copySync(path.join(__dirname, 'index-postgresql.php'), path.join(templateTarget, 'index.php'));
                 copySync(path.join(__dirname, 'docker-compose-postgresql.yml'), path.join(templateTarget, 'docker-compose-postgresql.yml'));
 
             }else if(engine === 'mysql'){
 
-                copySync(path.join(__dirname, 'entrypoint-web.sh'), path.join(templateTarget, 'entrypoint-web.sh'));
+                // copySync(path.join(__dirname, 'entrypoint-web.sh'), path.join(templateTarget, 'entrypoint-web.sh'));
 
                 copySync(path.join(__dirname, 'entrypoint-mariadb.sh'), path.join(templateTarget, 'entrypoint-mariadb.sh'));
-                copySync(path.join(__dirname, 'index-mariadb.php'), path.join(templateTarget, 'index.php'));
                 copySync(path.join(__dirname, 'docker-compose-mariadb.yml'), path.join(templateTarget, 'docker-compose-mariadb.yml'));
 
             }else if(engine === 'mongodb'){
 
-                copySync(path.join(__dirname, 'entrypoint-web.sh'), path.join(templateTarget, 'entrypoint-web.sh'));
+                // copySync(path.join(__dirname, 'entrypoint-web.sh'), path.join(templateTarget, 'entrypoint-web.sh'));
 
                 copySync(path.join(__dirname, 'entrypoint-mongo.sh'), path.join(templateTarget, 'entrypoint-mongo.sh'));
                 copySync(path.join(__dirname, 'mongo-create-user'), path.join(templateTarget, 'mongo-create-user'));
-                copySync(path.join(__dirname, 'index-mongo.php'), path.join(templateTarget, 'index.php'));
                 copySync(path.join(__dirname, 'docker-compose-mongo.yml'), path.join(templateTarget, 'docker-compose-mongo.yml'));
 
             }
@@ -57,10 +54,10 @@ class DBforPHP7{
 
     configureEngine(config, templateTarget){
 
-        if(config.docker.template_type === 'php7'){
+        if(config.docker.template_type === 'nodejs'){
 
             let file = yaml.load(path.join(templateTarget, 'docker-compose.yml'))
-            let engine = config.database.engine_php7.toLowerCase()
+            let engine = config.database.engine_nodejs.toLowerCase()
 
             if(!file.services['web'].dependes_on){
 
@@ -101,7 +98,7 @@ class DBforPHP7{
     commitSettings(config){
 
         // Creo el commit únicamente si todavía no existe la imagen de Docker personalizada o si el usuario ha elegido el parámetro -f (FORCE).
-        if(config.docker.template_type === 'php7'){
+        if(config.docker.template_type === 'nodejs'){
 
             if(!config.services || FORCE){ // Si no he hecho ningún commit, lo creo para guardar la configuración.
 
@@ -115,4 +112,4 @@ class DBforPHP7{
 
 }
 
-export default new DBforPHP7() 
+export default new DBforNodeJS() 

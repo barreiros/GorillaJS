@@ -28,46 +28,43 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var DBforPHP7 = function () {
-    function DBforPHP7() {
-        _classCallCheck(this, DBforPHP7);
+var DBforNodeJS = function () {
+    function DBforNodeJS() {
+        _classCallCheck(this, DBforNodeJS);
 
         _Events.events.subscribe('BEFORE_REPLACE_VALUES', this.copyTemplate);
         _Events.events.subscribe('AFTER_REPLACE_VALUES', this.configureEngine);
         _Events.events.subscribe('PROJECT_BUILT', this.commitSettings);
     }
 
-    _createClass(DBforPHP7, [{
+    _createClass(DBforNodeJS, [{
         key: 'copyTemplate',
         value: function copyTemplate(config, templateTarget) {
 
-            // Si el proyecto es de PHP7, copio los archivos del motor de base de datos a la carpeta de la plantilla.
-            if (config.docker.template_type === 'php7') {
+            // Si el proyecto es de NodeJS, copio los archivos del motor de base de datos a la carpeta de la plantilla.
+            if (config.docker.template_type === 'nodejs') {
 
-                var engine = config.database.engine_php7.toLowerCase();
+                var engine = config.database.engine_nodejs.toLowerCase();
 
                 if (engine === 'postgresql') {
 
-                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-web.sh'), _path2.default.join(templateTarget, 'entrypoint-web.sh'));
+                    // copySync(path.join(__dirname, 'entrypoint-web.sh'), path.join(templateTarget, 'entrypoint-web.sh'));
 
                     (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-postgresql.sh'), _path2.default.join(templateTarget, 'entrypoint-postgresql.sh'));
                     (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'postgresql.conf'), _path2.default.join(templateTarget, 'postgresql.conf'));
-                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'index-postgresql.php'), _path2.default.join(templateTarget, 'index.php'));
                     (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'docker-compose-postgresql.yml'), _path2.default.join(templateTarget, 'docker-compose-postgresql.yml'));
                 } else if (engine === 'mysql') {
 
-                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-web.sh'), _path2.default.join(templateTarget, 'entrypoint-web.sh'));
+                    // copySync(path.join(__dirname, 'entrypoint-web.sh'), path.join(templateTarget, 'entrypoint-web.sh'));
 
                     (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-mariadb.sh'), _path2.default.join(templateTarget, 'entrypoint-mariadb.sh'));
-                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'index-mariadb.php'), _path2.default.join(templateTarget, 'index.php'));
                     (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'docker-compose-mariadb.yml'), _path2.default.join(templateTarget, 'docker-compose-mariadb.yml'));
                 } else if (engine === 'mongodb') {
 
-                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-web.sh'), _path2.default.join(templateTarget, 'entrypoint-web.sh'));
+                    // copySync(path.join(__dirname, 'entrypoint-web.sh'), path.join(templateTarget, 'entrypoint-web.sh'));
 
                     (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-mongo.sh'), _path2.default.join(templateTarget, 'entrypoint-mongo.sh'));
                     (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'mongo-create-user'), _path2.default.join(templateTarget, 'mongo-create-user'));
-                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'index-mongo.php'), _path2.default.join(templateTarget, 'index.php'));
                     (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'docker-compose-mongo.yml'), _path2.default.join(templateTarget, 'docker-compose-mongo.yml'));
                 }
             }
@@ -76,10 +73,10 @@ var DBforPHP7 = function () {
         key: 'configureEngine',
         value: function configureEngine(config, templateTarget) {
 
-            if (config.docker.template_type === 'php7') {
+            if (config.docker.template_type === 'nodejs') {
 
                 var file = _yamljs2.default.load(_path2.default.join(templateTarget, 'docker-compose.yml'));
-                var engine = config.database.engine_php7.toLowerCase();
+                var engine = config.database.engine_nodejs.toLowerCase();
 
                 if (!file.services['web'].dependes_on) {
 
@@ -115,7 +112,7 @@ var DBforPHP7 = function () {
         value: function commitSettings(config) {
 
             // Creo el commit únicamente si todavía no existe la imagen de Docker personalizada o si el usuario ha elegido el parámetro -f (FORCE).
-            if (config.docker.template_type === 'php7') {
+            if (config.docker.template_type === 'nodejs') {
 
                 if (!config.services || _const.FORCE) {
                     // Si no he hecho ningún commit, lo creo para guardar la configuración.
@@ -126,7 +123,7 @@ var DBforPHP7 = function () {
         }
     }]);
 
-    return DBforPHP7;
+    return DBforNodeJS;
 }();
 
-exports.default = new DBforPHP7();
+exports.default = new DBforNodeJS();
