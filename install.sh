@@ -1,3 +1,9 @@
 #! /bin/bash
 
-npm install -g gorillajs
+pip install docker-compose &&
+
+npm install -g gorillajs && 
+
+gorillajs license [USER_LICENSE]
+
+
