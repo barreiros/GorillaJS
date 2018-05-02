@@ -1,9 +1,10 @@
 #! /bin/bash
 
-pip install docker-compose &&
+sudo pip install docker-compose &&
 
-npm install -g gorillajs && 
+sudo npm install -g gorillajs && 
 
-gorillajs license [USER_LICENSE]
+# gorillajs license [USER_LICENSE]
+gorillajs license "123456789abcd"
 
 
