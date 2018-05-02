@@ -1,18 +1,18 @@
 var user;
 
-use {{database.dbname_mongo}} 
+use {{database.dbname}} 
 
-user = db.getUser("{{database.username_mongo}}");
+user = db.getUser("{{database.username}}");
 
 if(!user){
 
     db.createUser(
         {
-            user: "{{database.username_mongo}}",
-            pwd: "{{database.password_mongo}}",
+            user: "{{database.username}}",
+            pwd: "{{database.password}}",
             roles: [{ 
                 role: "dbOwner", 
-                db: "{{database.dbname_mongo}}"
+                db: "{{database.dbname}}"
             }]
         }
     )
