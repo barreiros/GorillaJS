@@ -91,7 +91,7 @@ var Processes = function () {
                 // Completo la configuración con otros valores necesarios, como el puerto del proxy, paths, etc.
                 jsonComplementary = {
                     "proxy": {
-                        "port": 80,
+                        "port": _const.PROJECT_PORT,
                         "userpath": _path2.default.join(_const.HOME_USER_PATH_FOR_BASH, 'gorillajs', 'proxy')
                     },
                     "project": {

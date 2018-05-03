@@ -4,7 +4,7 @@ sudo pip install docker-compose &&
 
 npm install -g gorillajs && 
 
-# gorillajs license [USER_LICENSE]
-gorillajs license "123456789abcd"
+# gorilla license [USER_LICENSE]
+gorilla license "123456789abcd"
 
 

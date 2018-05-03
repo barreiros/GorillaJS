@@ -12,6 +12,7 @@ export const LICENSE_PATH = path.join(HOME_USER_PATH_FOR_SCRIPTS, 'gorillajs', '
 
 export const PROJECT_ENV = argv.env ? argv.env : 'local'
 export const PROJECT_IS_LOCAL = argv.public ? false: true
+export const PROJECT_PORT = argv.port ? argv.port : 80
 export const PROJECT_TEMPLATES_OFFICIAL = path.join(GORILLAJS_PATH, 'templates')
 export const PROJECT_TEMPLATES_CUSTOM = path.join(HOME_USER_PATH_FOR_SCRIPTS, 'gorillajs', 'templates')
 export const PROJECT_PLUGINS_OFFICIAL = path.join(GORILLAJS_PATH, 'plugins')

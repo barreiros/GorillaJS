@@ -1,4 +1,4 @@
-import { PROJECT_PATH, PROXY_PATH, DATA_PATH, PROJECT_ENV, PROJECT_IS_LOCAL, PROJECT_TEMPLATES_OFFICIAL, PROJECT_TEMPLATES_CUSTOM, SYSTEM_HOSTS_FILE, HOME_USER_PATH_FOR_BASH } from '../const.js'
+import { PROJECT_PATH, PROXY_PATH, DATA_PATH, PROJECT_ENV, PROJECT_PORT, PROJECT_IS_LOCAL, PROJECT_TEMPLATES_OFFICIAL, PROJECT_TEMPLATES_CUSTOM, SYSTEM_HOSTS_FILE, HOME_USER_PATH_FOR_BASH } from '../const.js'
 import Plugins from './Plugins.js'
 import Schema from './Schema.js'
 import Project from './Project.js'
@@ -41,7 +41,7 @@ class Processes{
             // Completo la configuración con otros valores necesarios, como el puerto del proxy, paths, etc.
             jsonComplementary = {
                 "proxy": {
-                    "port": 80,
+                    "port": PROJECT_PORT,
                     "userpath": path.join(HOME_USER_PATH_FOR_BASH, 'gorillajs', 'proxy')
                 },
                 "project": {
