@@ -135,7 +135,7 @@ elif [ "$ENGINE" == "MySQL" ]; then
 
     fi
 
-    echo "$(cat /root/templates/settings-mariadb)" >> /var/www/{{project.domain}}/{{project.slug}}/settings.py
+    echo "$(cat /root/templates/settings-mysql)" >> /var/www/{{project.domain}}/{{project.slug}}/settings.py
 
 else
 

@@ -58,9 +58,9 @@ var DBforPHP7 = function () {
 
                     (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-web.sh'), _path2.default.join(templateTarget, 'entrypoint-web.sh'));
 
-                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-mariadb.sh'), _path2.default.join(templateTarget, 'entrypoint-mariadb.sh'));
-                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'index-mariadb.php'), _path2.default.join(templateTarget, 'index.php'));
-                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'docker-compose-mariadb.yml'), _path2.default.join(templateTarget, 'docker-compose-mariadb.yml'));
+                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-mysql.sh'), _path2.default.join(templateTarget, 'entrypoint-mysql.sh'));
+                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'index-mysql.php'), _path2.default.join(templateTarget, 'index.php'));
+                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'docker-compose-mysql.yml'), _path2.default.join(templateTarget, 'docker-compose-mysql.yml'));
                 } else if (engine === 'mongodb') {
 
                     (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-web.sh'), _path2.default.join(templateTarget, 'entrypoint-web.sh'));

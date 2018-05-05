@@ -35,8 +35,8 @@ class DBforNodeJS{
 
                 // copySync(path.join(__dirname, 'entrypoint-web.sh'), path.join(templateTarget, 'entrypoint-web.sh'));
 
-                copySync(path.join(__dirname, 'entrypoint-mariadb.sh'), path.join(templateTarget, 'entrypoint-mariadb.sh'));
-                copySync(path.join(__dirname, 'docker-compose-mariadb.yml'), path.join(templateTarget, 'docker-compose-mariadb.yml'));
+                copySync(path.join(__dirname, 'entrypoint-mysql.sh'), path.join(templateTarget, 'entrypoint-mysql.sh'));
+                copySync(path.join(__dirname, 'docker-compose-mysql.yml'), path.join(templateTarget, 'docker-compose-mysql.yml'));
 
             }else if(engine === 'mongodb'){
 

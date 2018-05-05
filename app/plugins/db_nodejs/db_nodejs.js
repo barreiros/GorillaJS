@@ -57,8 +57,8 @@ var DBforNodeJS = function () {
 
                     // copySync(path.join(__dirname, 'entrypoint-web.sh'), path.join(templateTarget, 'entrypoint-web.sh'));
 
-                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-mariadb.sh'), _path2.default.join(templateTarget, 'entrypoint-mariadb.sh'));
-                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'docker-compose-mariadb.yml'), _path2.default.join(templateTarget, 'docker-compose-mariadb.yml'));
+                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-mysql.sh'), _path2.default.join(templateTarget, 'entrypoint-mysql.sh'));
+                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'docker-compose-mysql.yml'), _path2.default.join(templateTarget, 'docker-compose-mysql.yml'));
                 } else if (engine === 'mongodb') {
 
                     // copySync(path.join(__dirname, 'entrypoint-web.sh'), path.join(templateTarget, 'entrypoint-web.sh'));

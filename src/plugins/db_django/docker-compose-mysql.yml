@@ -11,4 +11,4 @@ services:
       - {{docker.data_path}}/{{project.id}}/mysql:/var/lib/mysql
     entrypoint:
       - bin/sh
-      - /root/templates/entrypoint-mariadb.sh
+      - /root/templates/entrypoint-mysql.sh
