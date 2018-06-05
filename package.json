@@ -21,7 +21,7 @@
     "license": "CC-BY-NC-SA-4.0",
     "preferGlobal": true,
     "bin": {
-        "gorilla6": "app/index.js"
+        "gorilla": "app/index.js"
     },
     "files": [
         "app",
