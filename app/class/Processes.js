@@ -112,8 +112,16 @@ var Processes = function () {
 
                 var proxySource = _path2.default.join(_const.PROJECT_TEMPLATES_OFFICIAL, 'proxy');
                 var proxyTarget = _path2.default.join(_const.PROXY_PATH, 'template');
-                var templateSource = (0, _fsExtra.pathExistsSync)(_path2.default.join(_const.PROJECT_TEMPLATES_OFFICIAL, config.docker.template_type)) ? _path2.default.join(_const.PROJECT_TEMPLATES_OFFICIAL, config.docker.template_type) : _path2.default.join(_const.PROJECT_TEMPLATES_CUSTOM, config.docker.template_type);
                 var templateTarget = _path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template');
+                var templateSource = '';
+
+                if (config.docker.template_type === 'custom') {
+
+                    templateSource = config.docker.template_path;
+                } else {
+
+                    templateSource = (0, _fsExtra.pathExistsSync)(_path2.default.join(_const.PROJECT_TEMPLATES_OFFICIAL, config.docker.template_type)) ? _path2.default.join(_const.PROJECT_TEMPLATES_OFFICIAL, config.docker.template_type) : _path2.default.join(_const.PROJECT_TEMPLATES_CUSTOM, config.docker.template_type);
+                }
 
                 // Muevo los archivos de la plantilla y el proxy hasta su destino.
                 (0, _fsExtra.copySync)(proxySource, proxyTarget);

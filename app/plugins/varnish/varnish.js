@@ -79,19 +79,19 @@ var Varnish = function () {
                 (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'docker-compose-varnish.yml'), _path2.default.join(templateTarget, 'docker-compose-varnish.yml'));
 
                 // Cambio la configuración del virtualhost en el proxy para que apunte al contenedor de Varnish en lugar de al front del proyecto.
-                var proxyFile = (0, _fs.readFileSync)(_path2.default.join(proxyTarget, 'apache-proxy.conf'), 'utf8');
+                var proxyFile = void 0;
 
-                if (proxyFile) {
+                if ((0, _fs.existsSync)(_path2.default.join(proxyTarget, 'apache-proxy.conf'))) {
 
+                    proxyFile = (0, _fs.readFileSync)(_path2.default.join(proxyTarget, 'apache-proxy.conf'), 'utf8');
                     proxyFile = proxyFile.replace(/ProxyPass \/ http:\/\/\{\{project.domain\}\}\//g, 'ProxyPass \/ http:\/\/\{\{project.domain\}\}_varnish\/');
                     proxyFile = proxyFile.replace(/ProxyPassReverse \/ http:\/\/\{\{project.domain\}\}\//g, 'ProxyPassReverse \/ http:\/\/\{\{project.domain\}\}_varnish\/');
                     (0, _fs.writeFileSync)(_path2.default.join(proxyTarget, 'apache-proxy.conf'), proxyFile);
                 }
 
-                proxyFile = (0, _fs.readFileSync)(_path2.default.join(proxyTarget, 'apache-proxy-ssl.conf'), 'utf8');
+                if ((0, _fs.existsSync)(_path2.default.join(proxyTarget, 'apache-proxy-ssl.conf'))) {
 
-                if (proxyFile) {
-
+                    proxyFile = (0, _fs.readFileSync)(_path2.default.join(proxyTarget, 'apache-proxy-ssl.conf'), 'utf8');
                     proxyFile = proxyFile.replace(/ProxyPass \/ http:\/\/\{\{project.domain\}\}\//g, 'ProxyPass \/ http:\/\/\{\{project.domain\}\}_varnish\/');
                     proxyFile = proxyFile.replace(/ProxyPassReverse \/ http:\/\/\{\{project.domain\}\}\//g, 'ProxyPassReverse \/ http:\/\/\{\{project.domain\}\}_varnish\/');
                     (0, _fs.writeFileSync)(_path2.default.join(proxyTarget, 'apache-proxy-ssl.conf'), proxyFile);

@@ -63,8 +63,18 @@ class Processes{
 
             let proxySource = path.join(PROJECT_TEMPLATES_OFFICIAL, 'proxy')
             let proxyTarget = path.join(PROXY_PATH, 'template')
-            let templateSource = pathExistsSync(path.join(PROJECT_TEMPLATES_OFFICIAL, config.docker.template_type)) ? path.join(PROJECT_TEMPLATES_OFFICIAL, config.docker.template_type) : path.join(PROJECT_TEMPLATES_CUSTOM, config.docker.template_type)
             let templateTarget = path.join(PROJECT_PATH, '.gorilla', 'template')
+            let templateSource = ''
+
+            if(config.docker.template_type === 'custom'){
+
+                templateSource = config.docker.template_path 
+
+            }else{
+
+                templateSource = pathExistsSync(path.join(PROJECT_TEMPLATES_OFFICIAL, config.docker.template_type)) ? path.join(PROJECT_TEMPLATES_OFFICIAL, config.docker.template_type) : path.join(PROJECT_TEMPLATES_CUSTOM, config.docker.template_type)
+
+            }
 
             // Muevo los archivos de la plantilla y el proxy hasta su destino.
             copySync(proxySource, proxyTarget)

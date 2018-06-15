@@ -3,7 +3,7 @@ import Project from '../../class/Project.js'
 import { events } from '../../class/Events.js'
 import { execSync } from '../../class/Tools.js'
 import { copySync } from 'fs-extra'
-import { readFileSync, writeFileSync } from 'fs'
+import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { argv } from 'yargs'
 import path from 'path'
 import yaml from 'yamljs'
@@ -52,20 +52,20 @@ class Varnish{
             copySync(path.join(__dirname, 'docker-compose-varnish.yml'), path.join(templateTarget, 'docker-compose-varnish.yml'));
 
             // Cambio la configuración del virtualhost en el proxy para que apunte al contenedor de Varnish en lugar de al front del proyecto.
-            let proxyFile = readFileSync(path.join(proxyTarget, 'apache-proxy.conf'), 'utf8')
+            let proxyFile
 
-            if(proxyFile){
+            if(existsSync(path.join(proxyTarget, 'apache-proxy.conf'))){
 
+                proxyFile = readFileSync(path.join(proxyTarget, 'apache-proxy.conf'), 'utf8')
                 proxyFile = proxyFile.replace(/ProxyPass \/ http:\/\/\{\{project.domain\}\}\//g, 'ProxyPass \/ http:\/\/\{\{project.domain\}\}_varnish\/')
                 proxyFile = proxyFile.replace(/ProxyPassReverse \/ http:\/\/\{\{project.domain\}\}\//g, 'ProxyPassReverse \/ http:\/\/\{\{project.domain\}\}_varnish\/')
                 writeFileSync(path.join(proxyTarget, 'apache-proxy.conf'), proxyFile)
 
             }
 
-            proxyFile = readFileSync(path.join(proxyTarget, 'apache-proxy-ssl.conf'), 'utf8')
+            if(existsSync(path.join(proxyTarget, 'apache-proxy-ssl.conf'))){
 
-            if(proxyFile){
-
+                proxyFile = readFileSync(path.join(proxyTarget, 'apache-proxy-ssl.conf'), 'utf8')
                 proxyFile = proxyFile.replace(/ProxyPass \/ http:\/\/\{\{project.domain\}\}\//g, 'ProxyPass \/ http:\/\/\{\{project.domain\}\}_varnish\/')
                 proxyFile = proxyFile.replace(/ProxyPassReverse \/ http:\/\/\{\{project.domain\}\}\//g, 'ProxyPassReverse \/ http:\/\/\{\{project.domain\}\}_varnish\/')
                 writeFileSync(path.join(proxyTarget, 'apache-proxy-ssl.conf'), proxyFile)

@@ -28,7 +28,14 @@
                     {
                         "option": "Opencart",
                         "value": "opencart"
+                    },
+                    {
+                        "option": "Custom",
+                        "value": "custom"
                     }
+                ]
+
+            }
 
                 ],
                 "default": "wordpress"

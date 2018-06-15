@@ -23,15 +23,31 @@
                     },
                     {
                         "option": "PHP 7",
-                        "value": "php7"
+                        "value": "php-7"
                     },
                     {
                         "option": "Opencart",
                         "value": "opencart"
+                    },
+                    {
+                        "option": "Custom",
+                        "value": "custom"
                     }
 
                 ],
                 "default": "wordpress"
+
+            },
+
+            "template_path": {
+
+                "question": "Select your custom template path",
+                "depends_on": {
+
+                    "path": ".docker.template_type",
+                    "value": "custom"
+
+                }
 
             }
 
