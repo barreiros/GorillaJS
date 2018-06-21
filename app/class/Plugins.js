@@ -200,7 +200,13 @@ var Plugins = function () {
                         var main = _path2.default.join(_path2.default.dirname(file), json.plugin.main);
 
                         // Incluyo el archivo en el proyecto.
-                        require(main);
+                        try {
+
+                            require(main);
+                        } catch (e) {
+
+                            console.log(e);
+                        }
                     }
                 }
             } catch (err) {
