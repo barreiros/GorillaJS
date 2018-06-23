@@ -1,7 +1,7 @@
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+        value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -16,76 +16,74 @@ var _yargs = require('yargs');
 
 var _child_process = require('child_process');
 
-var _path = require('path');
-
-var _path2 = _interopRequireDefault(_path);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var ExtraPackages = function () {
-    function ExtraPackages() {
-        _classCallCheck(this, ExtraPackages);
+        function ExtraPackages() {
+                _classCallCheck(this, ExtraPackages);
 
-        this.init();
-    }
+                if (process.platform !== 'win32') {
 
-    _createClass(ExtraPackages, [{
-        key: 'init',
-        value: function init() {
-
-            if (_yargs.argv._[0] === 'apk' || _yargs.argv._[0].search('apt') !== -1 || _yargs.argv._[0] === 'pacman' || _yargs.argv._[0] === 'rpm' || _yargs.argv._[0] === 'yum') {
-
-                var project = new _Project2.default();
-                var config = project.config[_const.PROJECT_ENV];
-                var container = void 0;
-
-                if (_yargs.argv.c) {
-
-                    container = _yargs.argv.c;
-                } else {
-
-                    container = config.project.domain;
+                        this.init();
                 }
-
-                this.executeCommand(container, _yargs.argv._[0], process.argv.slice(3).join(' '));
-            }
         }
-    }, {
-        key: 'executeCommand',
-        value: function executeCommand(container, type, args) {
 
-            var stdin = process.openStdin();
+        _createClass(ExtraPackages, [{
+                key: 'init',
+                value: function init() {
 
-            var command = ['exec', '-i', container, type].concat(args.split(" "));
+                        if (_yargs.argv._[0] === 'apk' || _yargs.argv._[0].search('apt') !== -1 || _yargs.argv._[0] === 'pacman' || _yargs.argv._[0] === 'rpm' || _yargs.argv._[0] === 'yum') {
 
-            var query = (0, _child_process.spawn)('docker', command);
+                                var project = new _Project2.default();
+                                var config = project.config[_const.PROJECT_ENV];
+                                var container = void 0;
 
-            query.stdout.on('data', function (data) {
+                                if (_yargs.argv.c) {
 
-                process.stdout.write(data);
-            });
+                                        container = _yargs.argv.c;
+                                } else {
 
-            query.stderr.on('data', function (err) {
+                                        container = config.project.domain;
+                                }
 
-                console.log(err.toString());
-            });
+                                this.executeCommand(container, _yargs.argv._[0], process.argv.slice(3).join(' '));
+                        }
+                }
+        }, {
+                key: 'executeCommand',
+                value: function executeCommand(container, type, args) {
 
-            query.on('exit', function (code) {
+                        var pty = require('pty.js');
+                        var stdin = process.openStdin();
+                        var command = ['exec', '-i', container, type].concat(args.split(" "));
+                        var query = (0, _child_process.spawn)('docker', command);
 
-                process.stdin.destroy();
-                process.exit();
-            });
+                        query.stdout.on('data', function (data) {
 
-            stdin.addListener('data', function (data) {
+                                process.stdout.write(data);
+                        });
 
-                query.stdin.write(data.toString());
-            });
-        }
-    }]);
+                        query.stderr.on('data', function (err) {
 
-    return ExtraPackages;
+                                console.log(err.toString());
+                        });
+
+                        query.on('exit', function (code) {
+
+                                process.stdin.destroy();
+                                process.exit();
+                        });
+
+                        stdin.addListener('data', function (data) {
+
+                                query.stdin.write(data.toString());
+                        });
+                }
+        }]);
+
+        return ExtraPackages;
 }();
 
 exports.default = new ExtraPackages();

@@ -52,11 +52,11 @@ done
 
 replace_domain || true &&
 
-mkdir -p /var/www/{{project.domain}}_mirror/ &&
+mkdir -p /var/www/{{project.domain}}/ &&
 chown -R apache:apache /var/www/ &&
 chmod -R g+s /var/www/ &&
 
-su apache -s /bin/sh -c "unison /var/www/{{project.domain}}_mirror/ /var/www/{{project.domain}}/ -repeat watch -prefer newer -silent" &
+# su apache -s /bin/sh -c "unison /var/www/{{project.domain}}_mirror/ /var/www/{{project.domain}}/ -repeat watch -prefer newer -silent" &
 
 rm /var/www/{{project.domain}}/application/gorilla-status.txt &&
 

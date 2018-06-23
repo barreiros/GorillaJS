@@ -17,6 +17,7 @@ services:
     image: gorillajs/wordpress
     ports:  
       - "{{docker.port}}:80"
+      - "22:22"
     volumes:
       - ../template:/root/templates
       - ../../application:/var/www/{{project.domain}}/application

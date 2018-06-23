@@ -2,13 +2,16 @@ import { PROJECT_ENV, FORCE } from '../../const.js'
 import Project from '../../class/Project.js'
 import { argv } from 'yargs'
 import { spawn } from 'child_process'
-import path from 'path'
 
 class ExtraPackages{
 
     constructor(){
 
-        this.init()
+        if(process.platform !== 'win32'){
+
+            this.init()
+
+        }
 
     }
 
@@ -37,10 +40,9 @@ class ExtraPackages{
 
     executeCommand(container, type, args){
 
+        let pty = require('pty.js')
         let stdin = process.openStdin();
-
         let command = ['exec', '-i', container, type].concat(args.split(" "))
-
         let query = spawn('docker', command)
 
         query.stdout.on('data', (data) => {

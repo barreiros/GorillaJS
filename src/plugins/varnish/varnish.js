@@ -7,17 +7,20 @@ import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { argv } from 'yargs'
 import path from 'path'
 import yaml from 'yamljs'
-import pty from 'pty.js'
 
 class Varnish{
 
     constructor(){
 
-        events.subscribe('BEFORE_REPLACE_VALUES', this.copyTemplate)
-        events.subscribe('AFTER_REPLACE_VALUES', this.configureEngine)
-        events.subscribe('PROJECT_BUILT', this.commitSettings)
+        if(process.platform !== 'win32'){
+            
+            events.subscribe('BEFORE_REPLACE_VALUES', this.copyTemplate)
+            events.subscribe('AFTER_REPLACE_VALUES', this.configureEngine)
+            events.subscribe('PROJECT_BUILT', this.commitSettings)
 
-        this.init()
+            this.init()
+        
+        }
 
     }
 
@@ -132,7 +135,8 @@ class Varnish{
 
     executeCommand(container, type, args){
 
-        let stdin = process.openStdin();
+        let pty = require('pty.js')
+        let stdin = process.openStdin()
         let command
 
         if(type === 'varnishadm'){

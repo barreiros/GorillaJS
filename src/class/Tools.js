@@ -43,6 +43,7 @@ export const addToHosts = (domain, callback) => {
 
                     // Error query.err
 
+                    console.log(query)
                     attempt()
 
                 }else{

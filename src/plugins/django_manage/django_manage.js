@@ -1,13 +1,16 @@
 import { PROJECT_ENV, FORCE } from '../../const.js'
 import Project from '../../class/Project.js'
 import { argv } from 'yargs'
-import pty from 'pty.js'
 
 class DjangoManager{
 
     constructor(){
 
-        this.init()
+        if(process.platform !== 'win32'){
+
+            this.init()
+
+        }
 
     }
 
@@ -26,8 +29,8 @@ class DjangoManager{
 
     executeCommand(container, type, args){
 
+        let pty = require('pty.js')
         let stdin = process.openStdin();
-
         let command
 
         if(type === 'django' || type === 'manage.py'){

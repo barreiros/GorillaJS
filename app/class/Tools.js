@@ -55,6 +55,7 @@ var addToHosts = exports.addToHosts = function addToHosts(domain, callback) {
 
                     // Error query.err
 
+                    console.log(query);
                     attempt();
                 } else {
 
