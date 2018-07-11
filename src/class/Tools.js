@@ -7,27 +7,36 @@ import request from 'request'
 export const addToHosts = (domain, callback) => {
 
     let file = readFileSync(SYSTEM_HOSTS_FILE).toString()
-    let text = '127.0.0.1 ' + domain + ' #GorillaJS \n' + '127.0.0.1 www.' + domain + ' #GorillaJS';
+    let text = '127.0.0.1 ' + domain + ' #GorillaJS';
 
     if(file.search(text) === -1){
     
-        let options = {
-            type: 'password',
-            name: 'result',
-            message: 'Admin system password',
-        }
+        if(process.platform === 'win32'){
 
-        let attempt = () => {
+            let query
 
-            prompt([options]).then(answer => {
+            query = execSync('ECHO ' + text + ' >> ' + SYSTEM_HOSTS_FILE)
+            
+            // Añado el registro también con www en una llamada diferente para no tener problemas con el retorno de carro.
+            text = '127.0.0.1 www.' + domain + ' #GorillaJS';
+            query = execSync('ECHO ' + text + ' >> ' + SYSTEM_HOSTS_FILE)
 
-                let query
+        }else{
+            
+            // Añado el registro también con www en la misma llamada.
+            text += '\n127.0.0.1 www.' + domain + ' #GorillaJS';
 
-                if(process.platform === 'win32'){
+            let options = {
+                type: 'password',
+                name: 'result',
+                message: 'Admin system password',
+            }
 
-                    query = execSync('ECHO ' + text + ' >> ' + SYSTEM_HOSTS_FILE)
+            let attempt = () => {
 
-                }else{
+                prompt([options]).then(answer => {
+
+                    let query
 
                     query = execSync('echo "' + answer.result + '" | sudo -S sh -c "echo \'' + text + '\' >> ' + SYSTEM_HOSTS_FILE + '"')
 
@@ -37,27 +46,27 @@ export const addToHosts = (domain, callback) => {
 
                     }
 
-                }
+                    if(query.err){
 
-                if(query.err){
+                        // Error query.err
 
-                    // Error query.err
+                        console.log(query)
+                        attempt()
 
-                    console.log(query)
-                    attempt()
+                    }else{
 
-                }else{
+                        callback()
 
-                    callback()
+                    }
 
-                }
+                })
 
-            })
+            }
+
+            attempt()
 
         }
-
-        attempt()
-
+        
     }else{
 
         callback()
