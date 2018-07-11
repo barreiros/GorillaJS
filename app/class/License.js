@@ -1,7 +1,7 @@
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+        value: true
 });
 exports.license = undefined;
 
@@ -16,59 +16,59 @@ var _fsExtra = require('fs-extra');
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var License = function () {
-    function License() {
-        _classCallCheck(this, License);
+        function License() {
+                _classCallCheck(this, License);
 
-        this.licenseType = 'BASIC';
-    }
-
-    _createClass(License, [{
-        key: 'check',
-        value: function check(callback) {
-
-            // Recupero el archivo de licencia.
-            var license = this.license;
-
-            // En este punto hago unas comprobaciones básicas de formato. Sin más.
-            if (license.length > 20) {
-
-                this.licenseType = 'PRO';
-            }
-
-            callback(this.licenseType);
+                this.licenseType = 'BASIC';
         }
-    }, {
-        key: 'add',
-        value: function add(license) {
 
-            // Guardo la licencia en el archivo de licencia.
-            (0, _fs.writeFileSync)(_const.LICENSE_PATH, license);
-        }
-    }, {
-        key: 'type',
-        get: function get() {
+        _createClass(License, [{
+                key: 'check',
+                value: function check(callback) {
 
-            return this.licenseType;
-        }
-    }, {
-        key: 'license',
-        get: function get() {
+                        // Recupero el archivo de licencia.
+                        var license = this.license;
 
-            var license = void 0;
+                        // En este punto hago unas comprobaciones básicas de formato. Sin más.
+                        if (license.length > 20) {
 
-            if ((0, _fsExtra.pathExistsSync)(_const.LICENSE_PATH)) {
+                                this.licenseType = 'PRO';
+                        }
 
-                license = (0, _fs.readFileSync)(_const.LICENSE_PATH, 'utf8');
-            } else {
+                        callback(this.licenseType);
+                }
+        }, {
+                key: 'add',
+                value: function add(license) {
 
-                license = '';
-            }
+                        // Guardo la licencia en el archivo de licencia.
+                        (0, _fs.writeFileSync)(_const.LICENSE_PATH, license);
+                }
+        }, {
+                key: 'type',
+                get: function get() {
 
-            return license;
-        }
-    }]);
+                        return this.licenseType;
+                }
+        }, {
+                key: 'license',
+                get: function get() {
 
-    return License;
+                        var license = void 0;
+
+                        if ((0, _fsExtra.pathExistsSync)(_const.LICENSE_PATH)) {
+
+                                license = (0, _fs.readFileSync)(_const.LICENSE_PATH, 'utf8');
+                        } else {
+
+                                license = '';
+                        }
+
+                        return license;
+                }
+        }]);
+
+        return License;
 }();
 
 var license = exports.license = new License();
