@@ -22,26 +22,35 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var addToHosts = exports.addToHosts = function addToHosts(domain, callback) {
 
     var file = (0, _fs.readFileSync)(_const.SYSTEM_HOSTS_FILE).toString();
-    var text = '127.0.0.1 ' + domain + ' #GorillaJS \n' + '127.0.0.1 www.' + domain + ' #GorillaJS';
+    var text = '127.0.0.1 ' + domain + ' #GorillaJS';
 
     if (file.search(text) === -1) {
 
-        var options = {
-            type: 'password',
-            name: 'result',
-            message: 'Admin system password'
-        };
+        if (process.platform === 'win32') {
 
-        var attempt = function attempt() {
+            var query = void 0;
 
-            (0, _inquirer.prompt)([options]).then(function (answer) {
+            query = execSync('ECHO ' + text + ' >> ' + _const.SYSTEM_HOSTS_FILE);
 
-                var query = void 0;
+            // Añado el registro también con www en una llamada diferente para no tener problemas con el retorno de carro.
+            text = '127.0.0.1 www.' + domain + ' #GorillaJS';
+            query = execSync('ECHO ' + text + ' >> ' + _const.SYSTEM_HOSTS_FILE);
+        } else {
 
-                if (process.platform === 'win32') {
+            // Añado el registro también con www en la misma llamada.
+            text += '\n127.0.0.1 www.' + domain + ' #GorillaJS';
 
-                    query = execSync('ECHO ' + text + ' >> ' + _const.SYSTEM_HOSTS_FILE);
-                } else {
+            var options = {
+                type: 'password',
+                name: 'result',
+                message: 'Admin system password'
+            };
+
+            var attempt = function attempt() {
+
+                (0, _inquirer.prompt)([options]).then(function (answer) {
+
+                    var query = void 0;
 
                     query = execSync('echo "' + answer.result + '" | sudo -S sh -c "echo \'' + text + '\' >> ' + _const.SYSTEM_HOSTS_FILE + '"');
 
@@ -49,22 +58,22 @@ var addToHosts = exports.addToHosts = function addToHosts(domain, callback) {
 
                         query = execSync('echo "' + answer.result + '" | su -s /bin/sh -c "echo \'' + text + '\' >> ' + _const.SYSTEM_HOSTS_FILE + '"');
                     }
-                }
 
-                if (query.err) {
+                    if (query.err) {
 
-                    // Error query.err
+                        // Error query.err
 
-                    console.log(query);
-                    attempt();
-                } else {
+                        console.log(query);
+                        attempt();
+                    } else {
 
-                    callback();
-                }
-            });
-        };
+                        callback();
+                    }
+                });
+            };
 
-        attempt();
+            attempt();
+        }
     } else {
 
         callback();

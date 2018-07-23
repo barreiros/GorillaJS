@@ -1,7 +1,7 @@
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-                value: true
+    value: true
 });
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -19,276 +19,276 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Questions = function () {
-                function Questions(schema, config) {
-                                _classCallCheck(this, Questions);
+    function Questions(schema, config) {
+        _classCallCheck(this, Questions);
 
-                                this.schema = schema;
-                                this.config = config;
+        this.schema = schema;
+        this.config = config;
+    }
+
+    _createClass(Questions, [{
+        key: 'process',
+        value: function process(callback) {
+
+            var unanswered = [];
+
+            // Creo una función recursiva para ir haciendo las preguntas y guardando los valores en el objeto config.
+            var recursive = function recursive(base, data) {
+
+                // Recorro todos los nodos del objeto que recibo.
+                for (var key in data) {
+
+                    if (data[key].question) {
+                        // Si el objeto contiene una pregunta...
+
+                        if (!base[key] || base[key] === '') {
+                            // ... y no está contestada todavía, la añado al array de preguntas.
+
+                            // Almaceno la pregunta y la referencia al objeto global porque las preguntas las tengo que hacer al final de manera asíncrona.
+                            unanswered.push({
+                                'base': base,
+                                'key': key,
+                                'question': data[key]
+                            });
+                        }
+                    } else if (_typeof(data[key]) === 'object') {
+                        // Si es un objeto...
+
+                        if (!base[key]) {
+                            // ... y no existe, lo creo.
+
+                            if (data[key] instanceof Array) {
+
+                                base[key] = [];
+                            } else {
+
+                                base[key] = {};
+                            }
+                        }
+
+                        // Continúo recorriendo el objeto.
+                        recursive(base[key], data[key]);
+                    } // Si no es nada de lo anterior, lo ignoro.
+                }
+            };
+
+            recursive(this.config, this.schema.schema);
+
+            // Le muestro las preguntas al usuario.
+            this.showToUser(unanswered, callback);
+        }
+    }, {
+        key: 'showToUser',
+        value: function showToUser(questions, callback) {
+            var _this = this;
+
+            var check = function check() {
+
+                if (questions.length) {
+
+                    question(questions.shift());
+                } else {
+
+                    callback(_this.config);
+                }
+            };
+
+            // Le muestro las preguntas al usuario de forma asíncrona. Así que creo una función que pueda volver a llamar, si es necesario, en el callback de la pregunta. 
+            var question = function question(data) {
+
+                // Compruebo si la pregunta ya había sido contestada.
+                if (data.base[data.key]) {
+
+                    check();
+
+                    return;
                 }
 
-                _createClass(Questions, [{
-                                key: 'process',
-                                value: function process(callback) {
+                // Compruebo si la pregunta depende de algún otro valor.
+                if (data.question.depends_on) {
 
-                                                var unanswered = [];
+                    if (data.question.depends_on instanceof Array === false) {
 
-                                                // Creo una función recursiva para ir haciendo las preguntas y guardando los valores en el objeto config.
-                                                var recursive = function recursive(base, data) {
+                        data.question.depends_on = [data.question.depends_on];
+                    }
 
-                                                                // Recorro todos los nodos del objeto que recibo.
-                                                                for (var key in data) {
+                    var ignore = void 0;
 
-                                                                                if (data[key].question) {
-                                                                                                // Si el objeto contiene una pregunta...
+                    var _iteratorNormalCompletion = true;
+                    var _didIteratorError = false;
+                    var _iteratorError = undefined;
 
-                                                                                                if (!base[key] || base[key] === '') {
-                                                                                                                // ... y no está contestada todavía, la añado al array de preguntas.
+                    try {
+                        for (var _iterator = data.question.depends_on[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                            var dependency = _step.value;
 
-                                                                                                                // Almaceno la pregunta y la referencia al objeto global porque las preguntas las tengo que hacer al final de manera asíncrona.
-                                                                                                                unanswered.push({
-                                                                                                                                'base': base,
-                                                                                                                                'key': key,
-                                                                                                                                'question': data[key]
-                                                                                                                });
-                                                                                                }
-                                                                                } else if (_typeof(data[key]) === 'object') {
-                                                                                                // Si es un objeto...
 
-                                                                                                if (!base[key]) {
-                                                                                                                // ... y no existe, lo creo.
+                            var dependencies = _jspath2.default.apply(dependency.path, _this.config);
 
-                                                                                                                if (data[key] instanceof Array) {
+                            if (!dependencies.length && !data.waiting) {
+                                // Si el nodo no existe en el archivo de configuración...
 
-                                                                                                                                base[key] = [];
-                                                                                                                } else {
+                                data.waiting = true;
+                                questions.push(data);
 
-                                                                                                                                base[key] = {};
-                                                                                                                }
-                                                                                                }
+                                ignore = true;
+                            } else {
+                                // Si el nodo existe compruebo si su valor aparece dentro de las dependencias necesarias para mostrar la pregunta.
 
-                                                                                                // Continúo recorriendo el objeto.
-                                                                                                recursive(base[key], data[key]);
-                                                                                } // Si no es nada de lo anterior, lo ignoro.
-                                                                }
-                                                };
+                                if (_typeof(dependency.value) === 'object') {
+                                    // Si es un objeto doy por hecho que es un array.
 
-                                                recursive(this.config, this.schema.schema);
+                                    if (dependency.value.indexOf(dependencies[0]) !== -1) {
 
-                                                // Le muestro las preguntas al usuario.
-                                                this.showToUser(unanswered, callback);
+                                        ignore = false;
+
+                                        break;
+                                    } else {
+
+                                        ignore = true;
+                                    }
+                                } else {
+                                    // Si no, es una cadena.
+
+                                    if (dependency.value !== dependencies[0]) {
+
+                                        ignore = true;
+                                    } else {
+
+                                        ignore = false;
+
+                                        break;
+                                    }
                                 }
-                }, {
-                                key: 'showToUser',
-                                value: function showToUser(questions, callback) {
-                                                var _this = this;
+                            }
+                        }
+                    } catch (err) {
+                        _didIteratorError = true;
+                        _iteratorError = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion && _iterator.return) {
+                                _iterator.return();
+                            }
+                        } finally {
+                            if (_didIteratorError) {
+                                throw _iteratorError;
+                            }
+                        }
+                    }
 
-                                                var check = function check() {
+                    if (ignore) {
 
-                                                                if (questions.length) {
+                        check();
 
-                                                                                question(questions.shift());
-                                                                } else {
+                        return;
+                    }
+                }
 
-                                                                                callback(_this.config);
-                                                                }
-                                                };
+                // Si llego aquí es porque he pasado todos los filtros y puedo hacer la pregunta.
+                if (data.question.values && _typeof(data.question.values) === 'object') {
+                    // Si hay más de una opción, muestro el prompt con el selector.
 
-                                                // Le muestro las preguntas al usuario de forma asíncrona. Así que creo una función que pueda volver a llamar, si es necesario, en el callback de la pregunta. 
-                                                var question = function question(data) {
+                    var list = [];
 
-                                                                // Compruebo si la pregunta ya había sido contestada.
-                                                                if (data.base[data.key]) {
+                    var _iteratorNormalCompletion2 = true;
+                    var _didIteratorError2 = false;
+                    var _iteratorError2 = undefined;
 
-                                                                                check();
-
-                                                                                return;
-                                                                }
-
-                                                                // Compruebo si la pregunta depende de algún otro valor.
-                                                                if (data.question.depends_on) {
-
-                                                                                if (data.question.depends_on instanceof Array === false) {
-
-                                                                                                data.question.depends_on = [data.question.depends_on];
-                                                                                }
-
-                                                                                var ignore = void 0;
-
-                                                                                var _iteratorNormalCompletion = true;
-                                                                                var _didIteratorError = false;
-                                                                                var _iteratorError = undefined;
-
-                                                                                try {
-                                                                                                for (var _iterator = data.question.depends_on[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                                                                                                                var dependency = _step.value;
+                    try {
+                        for (var _iterator2 = data.question.values[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                            var value = _step2.value;
 
 
-                                                                                                                var dependencies = _jspath2.default.apply(dependency.path, _this.config);
+                            if (list.indexOf(value.option) === -1) {
 
-                                                                                                                if (!dependencies.length && !data.waiting) {
-                                                                                                                                // Si el nodo no existe en el archivo de configuración...
+                                list.push(value.option);
+                            }
+                        }
+                    } catch (err) {
+                        _didIteratorError2 = true;
+                        _iteratorError2 = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                                _iterator2.return();
+                            }
+                        } finally {
+                            if (_didIteratorError2) {
+                                throw _iteratorError2;
+                            }
+                        }
+                    }
 
-                                                                                                                                data.waiting = true;
-                                                                                                                                questions.push(data);
+                    var options = {
+                        type: 'list',
+                        name: 'result',
+                        message: data.question.question,
+                        choices: list
+                    };
 
-                                                                                                                                ignore = true;
-                                                                                                                } else {
-                                                                                                                                // Si el nodo existe compruebo si su valor aparece dentro de las dependencias necesarias para mostrar la pregunta.
+                    if (data.question.default) {
 
-                                                                                                                                if (_typeof(dependency.value) === 'object') {
-                                                                                                                                                // Si es un objeto doy por hecho que es un array.
+                        options.default = data.question.default;
+                    }
 
-                                                                                                                                                if (dependency.value.indexOf(dependencies[0]) !== -1) {
+                    (0, _inquirer.prompt)([options]).then(function (answer) {
 
-                                                                                                                                                                ignore = false;
+                        // Recupero el valor de la opción que he seleccionado en el listado.
+                        var value = _jspath2.default.apply('.values{.option === "' + answer.result + '"}', data.question);
 
-                                                                                                                                                                break;
-                                                                                                                                                } else {
+                        data.base[data.key] = value[0].value;
 
-                                                                                                                                                                ignore = true;
-                                                                                                                                                }
-                                                                                                                                } else {
-                                                                                                                                                // Si no, es una cadena.
+                        check();
+                    });
+                } else if (data.question.question.indexOf('pass') > -1) {
 
-                                                                                                                                                if (dependency.value !== dependencies[0]) {
+                    var _options = {
+                        type: 'password',
+                        name: 'result',
+                        step: data.question.key,
+                        message: data.question.question
+                    };
 
-                                                                                                                                                                ignore = true;
-                                                                                                                                                } else {
+                    if (data.question.default) {
 
-                                                                                                                                                                ignore = false;
+                        _options.default = data.question.default;
+                    }
 
-                                                                                                                                                                break;
-                                                                                                                                                }
-                                                                                                                                }
-                                                                                                                }
-                                                                                                }
-                                                                                } catch (err) {
-                                                                                                _didIteratorError = true;
-                                                                                                _iteratorError = err;
-                                                                                } finally {
-                                                                                                try {
-                                                                                                                if (!_iteratorNormalCompletion && _iterator.return) {
-                                                                                                                                _iterator.return();
-                                                                                                                }
-                                                                                                } finally {
-                                                                                                                if (_didIteratorError) {
-                                                                                                                                throw _iteratorError;
-                                                                                                                }
-                                                                                                }
-                                                                                }
+                    (0, _inquirer.prompt)([_options]).then(function (answer) {
 
-                                                                                if (ignore) {
+                        data.base[data.key] = answer.result;
 
-                                                                                                check();
+                        check();
+                    });
+                } else {
 
-                                                                                                return;
-                                                                                }
-                                                                }
+                    var _options2 = {
+                        type: 'input',
+                        name: 'result',
+                        step: data.question.key,
+                        message: data.question.question
+                    };
 
-                                                                // Si llego aquí es porque he pasado todos los filtros y puedo hacer la pregunta.
-                                                                if (data.question.values && _typeof(data.question.values) === 'object') {
-                                                                                // Si hay más de una opción, muestro el prompt con el selector.
+                    if (data.question.default) {
 
-                                                                                var list = [];
+                        _options2.default = data.question.default;
+                    }
 
-                                                                                var _iteratorNormalCompletion2 = true;
-                                                                                var _didIteratorError2 = false;
-                                                                                var _iteratorError2 = undefined;
+                    (0, _inquirer.prompt)([_options2]).then(function (answer) {
 
-                                                                                try {
-                                                                                                for (var _iterator2 = data.question.values[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                                                                                                                var value = _step2.value;
+                        data.base[data.key] = answer.result;
 
+                        check();
+                    });
+                }
+            };
 
-                                                                                                                if (list.indexOf(value.option) === -1) {
+            check();
+        }
+    }]);
 
-                                                                                                                                list.push(value.option);
-                                                                                                                }
-                                                                                                }
-                                                                                } catch (err) {
-                                                                                                _didIteratorError2 = true;
-                                                                                                _iteratorError2 = err;
-                                                                                } finally {
-                                                                                                try {
-                                                                                                                if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                                                                                                                                _iterator2.return();
-                                                                                                                }
-                                                                                                } finally {
-                                                                                                                if (_didIteratorError2) {
-                                                                                                                                throw _iteratorError2;
-                                                                                                                }
-                                                                                                }
-                                                                                }
-
-                                                                                var options = {
-                                                                                                type: 'list',
-                                                                                                name: 'result',
-                                                                                                message: data.question.question,
-                                                                                                choices: list
-                                                                                };
-
-                                                                                if (data.question.default) {
-
-                                                                                                options.default = data.question.default;
-                                                                                }
-
-                                                                                (0, _inquirer.prompt)([options]).then(function (answer) {
-
-                                                                                                // Recupero el valor de la opción que he seleccionado en el listado.
-                                                                                                var value = _jspath2.default.apply('.values{.option === "' + answer.result + '"}', data.question);
-
-                                                                                                data.base[data.key] = value[0].value;
-
-                                                                                                check();
-                                                                                });
-                                                                } else if (data.question.question.indexOf('pass') > -1) {
-
-                                                                                var _options = {
-                                                                                                type: 'password',
-                                                                                                name: 'result',
-                                                                                                step: data.question.key,
-                                                                                                message: data.question.question
-                                                                                };
-
-                                                                                if (data.question.default) {
-
-                                                                                                _options.default = data.question.default;
-                                                                                }
-
-                                                                                (0, _inquirer.prompt)([_options]).then(function (answer) {
-
-                                                                                                data.base[data.key] = answer.result;
-
-                                                                                                check();
-                                                                                });
-                                                                } else {
-
-                                                                                var _options2 = {
-                                                                                                type: 'input',
-                                                                                                name: 'result',
-                                                                                                step: data.question.key,
-                                                                                                message: data.question.question
-                                                                                };
-
-                                                                                if (data.question.default) {
-
-                                                                                                _options2.default = data.question.default;
-                                                                                }
-
-                                                                                (0, _inquirer.prompt)([_options2]).then(function (answer) {
-
-                                                                                                data.base[data.key] = answer.result;
-
-                                                                                                check();
-                                                                                });
-                                                                }
-                                                };
-
-                                                check();
-                                }
-                }]);
-
-                return Questions;
+    return Questions;
 }();
 
 exports.default = Questions;

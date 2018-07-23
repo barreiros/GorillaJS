@@ -1,7 +1,7 @@
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-            value: true
+    value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -35,160 +35,171 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Varnish = function () {
-            function Varnish() {
-                        _classCallCheck(this, Varnish);
+    function Varnish() {
+        _classCallCheck(this, Varnish);
 
-                        if (process.platform !== 'win32') {
+        _Events.events.subscribe('BEFORE_REPLACE_VALUES', this.copyTemplate);
+        _Events.events.subscribe('AFTER_REPLACE_VALUES', this.configureEngine);
+        _Events.events.subscribe('PROJECT_BUILT', this.commitSettings);
 
-                                    _Events.events.subscribe('BEFORE_REPLACE_VALUES', this.copyTemplate);
-                                    _Events.events.subscribe('AFTER_REPLACE_VALUES', this.configureEngine);
-                                    _Events.events.subscribe('PROJECT_BUILT', this.commitSettings);
+        this.init();
+    }
 
-                                    this.init();
-                        }
+    _createClass(Varnish, [{
+        key: 'init',
+        value: function init() {
+
+            if (_yargs.argv._[0] === 'varnish') {
+
+                var project = new _Project2.default();
+                var config = project.config[_const.PROJECT_ENV];
+
+                if (_yargs.argv._[1] === 'reload') {
+
+                    this.reloadConfig(config);
+                } else if (_yargs.argv._[1] === 'admin') {
+
+                    this.executeCommand(config.project.domain + '_varnish', 'varnishadm');
+                }
             }
+        }
+    }, {
+        key: 'copyTemplate',
+        value: function copyTemplate(config, templateTarget, proxyTarget) {
 
-            _createClass(Varnish, [{
-                        key: 'init',
-                        value: function init() {
+            // Si Varnish está activado...
+            if (config.varnish.enable === 'yes') {
 
-                                    if (_yargs.argv._[0] === 'varnish') {
+                // Copio los archivos de la plantilla de varnish.
+                (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-varnish.sh'), _path2.default.join(templateTarget, 'entrypoint-varnish.sh'));
+                (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'docker-compose-varnish.yml'), _path2.default.join(templateTarget, 'docker-compose-varnish.yml'));
 
-                                                var project = new _Project2.default();
-                                                var config = project.config[_const.PROJECT_ENV];
+                // Cambio la configuración del virtualhost en el proxy para que apunte al contenedor de Varnish en lugar de al front del proyecto.
+                var proxyFile = void 0;
 
-                                                if (_yargs.argv._[1] === 'reload') {
+                if ((0, _fs.existsSync)(_path2.default.join(proxyTarget, 'apache-proxy.conf'))) {
 
-                                                            this.reloadConfig(config);
-                                                } else if (_yargs.argv._[1] === 'admin') {
+                    proxyFile = (0, _fs.readFileSync)(_path2.default.join(proxyTarget, 'apache-proxy.conf'), 'utf8');
+                    proxyFile = proxyFile.replace(/ProxyPass \/ http:\/\/\{\{project.domain\}\}\//g, 'ProxyPass \/ http:\/\/\{\{project.domain\}\}_varnish\/');
+                    proxyFile = proxyFile.replace(/ProxyPassReverse \/ http:\/\/\{\{project.domain\}\}\//g, 'ProxyPassReverse \/ http:\/\/\{\{project.domain\}\}_varnish\/');
+                    (0, _fs.writeFileSync)(_path2.default.join(proxyTarget, 'apache-proxy.conf'), proxyFile);
+                }
 
-                                                            this.executeCommand(config.project.domain + '_varnish', 'varnishadm');
-                                                }
-                                    }
-                        }
-            }, {
-                        key: 'copyTemplate',
-                        value: function copyTemplate(config, templateTarget, proxyTarget) {
+                if ((0, _fs.existsSync)(_path2.default.join(proxyTarget, 'apache-proxy-ssl.conf'))) {
 
-                                    // Si Varnish está activado...
-                                    if (config.varnish.enable === 'yes') {
+                    proxyFile = (0, _fs.readFileSync)(_path2.default.join(proxyTarget, 'apache-proxy-ssl.conf'), 'utf8');
+                    proxyFile = proxyFile.replace(/ProxyPass \/ http:\/\/\{\{project.domain\}\}\//g, 'ProxyPass \/ http:\/\/\{\{project.domain\}\}_varnish\/');
+                    proxyFile = proxyFile.replace(/ProxyPassReverse \/ http:\/\/\{\{project.domain\}\}\//g, 'ProxyPassReverse \/ http:\/\/\{\{project.domain\}\}_varnish\/');
+                    (0, _fs.writeFileSync)(_path2.default.join(proxyTarget, 'apache-proxy-ssl.conf'), proxyFile);
+                }
+            }
+        }
+    }, {
+        key: 'configureEngine',
+        value: function configureEngine(config, templateTarget) {
 
-                                                // Copio los archivos de la plantilla de varnish.
-                                                (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-varnish.sh'), _path2.default.join(templateTarget, 'entrypoint-varnish.sh'));
-                                                (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'docker-compose-varnish.yml'), _path2.default.join(templateTarget, 'docker-compose-varnish.yml'));
+            if (config.varnish.enable === 'yes') {
 
-                                                // Cambio la configuración del virtualhost en el proxy para que apunte al contenedor de Varnish en lugar de al front del proyecto.
-                                                var proxyFile = void 0;
+                var file = _yamljs2.default.load(_path2.default.join(templateTarget, 'docker-compose.yml'));
 
-                                                if ((0, _fs.existsSync)(_path2.default.join(proxyTarget, 'apache-proxy.conf'))) {
+                var varnishFile = _yamljs2.default.load(_path2.default.join(templateTarget, 'docker-compose-varnish.yml'));
 
-                                                            proxyFile = (0, _fs.readFileSync)(_path2.default.join(proxyTarget, 'apache-proxy.conf'), 'utf8');
-                                                            proxyFile = proxyFile.replace(/ProxyPass \/ http:\/\/\{\{project.domain\}\}\//g, 'ProxyPass \/ http:\/\/\{\{project.domain\}\}_varnish\/');
-                                                            proxyFile = proxyFile.replace(/ProxyPassReverse \/ http:\/\/\{\{project.domain\}\}\//g, 'ProxyPassReverse \/ http:\/\/\{\{project.domain\}\}_varnish\/');
-                                                            (0, _fs.writeFileSync)(_path2.default.join(proxyTarget, 'apache-proxy.conf'), proxyFile);
-                                                }
+                file.services['varnish'] = varnishFile.services.varnish;
+                (0, _fs.writeFileSync)(_path2.default.join(templateTarget, 'docker-compose.yml'), _yamljs2.default.stringify(file, 6));
+            }
+        }
+    }, {
+        key: 'commitSettings',
+        value: function commitSettings(config) {
 
-                                                if ((0, _fs.existsSync)(_path2.default.join(proxyTarget, 'apache-proxy-ssl.conf'))) {
+            // Creo el commit únicamente si todavía no existe la imagen de Docker personalizada o si el usuario ha elegido el parámetro -f (FORCE).
+            if (config.varnish.enable === 'yes') {
 
-                                                            proxyFile = (0, _fs.readFileSync)(_path2.default.join(proxyTarget, 'apache-proxy-ssl.conf'), 'utf8');
-                                                            proxyFile = proxyFile.replace(/ProxyPass \/ http:\/\/\{\{project.domain\}\}\//g, 'ProxyPass \/ http:\/\/\{\{project.domain\}\}_varnish\/');
-                                                            proxyFile = proxyFile.replace(/ProxyPassReverse \/ http:\/\/\{\{project.domain\}\}\//g, 'ProxyPassReverse \/ http:\/\/\{\{project.domain\}\}_varnish\/');
-                                                            (0, _fs.writeFileSync)(_path2.default.join(proxyTarget, 'apache-proxy-ssl.conf'), proxyFile);
-                                                }
-                                    }
-                        }
-            }, {
-                        key: 'configureEngine',
-                        value: function configureEngine(config, templateTarget) {
+                if (!config.services || _const.FORCE) {
+                    // Si no he hecho ningún commit, lo creo para guardar la configuración.
 
-                                    if (config.varnish.enable === 'yes') {
+                    var query = (0, _Tools.execSync)('gorilla6 commit "' + config.project.domain + '" --path "' + _const.PROJECT_PATH + '"');
+                }
+            }
+        }
+    }, {
+        key: 'reloadConfig',
+        value: function reloadConfig(config) {
 
-                                                var file = _yamljs2.default.load(_path2.default.join(templateTarget, 'docker-compose.yml'));
+            if (config.varnish.enable === 'yes') {
 
-                                                var varnishFile = _yamljs2.default.load(_path2.default.join(templateTarget, 'docker-compose-varnish.yml'));
+                var rand = Math.floor(Math.random() * (1000 - 0 + 1) + 0);
 
-                                                file.services['varnish'] = varnishFile.services.varnish;
-                                                (0, _fs.writeFileSync)(_path2.default.join(templateTarget, 'docker-compose.yml'), _yamljs2.default.stringify(file, 6));
-                                    }
-                        }
-            }, {
-                        key: 'commitSettings',
-                        value: function commitSettings(config) {
+                var query = (0, _Tools.execSync)('docker exec ' + config.project.domain + '_varnish varnishadm vcl.load reload_' + rand + ' /etc/varnish/default.vcl');
 
-                                    // Creo el commit únicamente si todavía no existe la imagen de Docker personalizada o si el usuario ha elegido el parámetro -f (FORCE).
-                                    if (config.varnish.enable === 'yes') {
+                if (!query.err) {
 
-                                                if (!config.services || _const.FORCE) {
-                                                            // Si no he hecho ningún commit, lo creo para guardar la configuración.
+                    query = (0, _Tools.execSync)('docker exec ' + config.project.domain + '_varnish varnishadm vcl.use reload_' + rand);
 
-                                                            var query = (0, _Tools.execSync)('gorilla6 commit "' + config.project.domain + '" --path "' + _const.PROJECT_PATH + '"');
-                                                }
-                                    }
-                        }
-            }, {
-                        key: 'reloadConfig',
-                        value: function reloadConfig(config) {
+                    console.log('Varnish caché reloaded!');
+                } else {
 
-                                    if (config.varnish.enable === 'yes') {
+                    console.log(query);
+                }
+            }
+        }
+    }, {
+        key: 'executeCommand',
+        value: function executeCommand(container, type, args) {
 
-                                                var rand = Math.floor(Math.random() * (1000 - 0 + 1) + 0);
+            if (process.platform !== 'win32') {
 
-                                                var query = (0, _Tools.execSync)('docker exec ' + config.project.domain + '_varnish varnishadm vcl.load reload_' + rand + ' /etc/varnish/default.vcl');
+                var pty = require('pty.js');
+                var stdin = process.openStdin();
+                var command = void 0;
 
-                                                if (!query.err) {
+                if (type === 'varnishadm') {
 
-                                                            query = (0, _Tools.execSync)('docker exec ' + config.project.domain + '_varnish varnishadm vcl.use reload_' + rand);
+                    command = ['exec', '-it', container, type];
+                } else {
 
-                                                            console.log('Varnish caché reloaded!');
-                                                } else {
+                    command = ['exec', '-it', container, type].concat(args.split(" "));
+                }
 
-                                                            console.log(query);
-                                                }
-                                    }
-                        }
-            }, {
-                        key: 'executeCommand',
-                        value: function executeCommand(container, type, args) {
+                var term = pty.spawn('docker', command, {
+                    name: 'xterm-color',
+                    cols: 80,
+                    rows: 30,
+                    cwd: process.env.HOME,
+                    env: process.env
+                });
 
-                                    var pty = require('pty.js');
-                                    var stdin = process.openStdin();
-                                    var command = void 0;
+                term.on('data', function (data) {
 
-                                    if (type === 'varnishadm') {
+                    process.stdout.write(data);
+                });
 
-                                                command = ['exec', '-it', container, type];
-                                    } else {
+                term.on('close', function (code) {
 
-                                                command = ['exec', '-it', container, type].concat(args.split(" "));
-                                    }
+                    process.exit();
+                    process.stdin.destroy();
+                });
 
-                                    var term = pty.spawn('docker', command, {
-                                                name: 'xterm-color',
-                                                cols: 80,
-                                                rows: 30,
-                                                cwd: process.env.HOME,
-                                                env: process.env
-                                    });
+                stdin.addListener('data', function (data) {
 
-                                    term.on('data', function (data) {
+                    term.write(data.toString());
+                });
+            } else {
 
-                                                process.stdout.write(data);
-                                    });
+                // Si es Windows le muestro al usuario el comando que debe ejecutar porque no funciona el pseudo terminal.
+                console.log('Sorry, but GorillaJS can\'t execute interactive commands in Windows automatically :-( Please, if your command need\'s to be interactive paste and run the command below in your terminal.');
+                console.log('docker exec -it ' + container + ' ' + type + ' ' + args.split(" "));
 
-                                    term.on('close', function (code) {
+                var query = (0, _Tools.execSync)('docker exec ' + container + ' ' + type + ' ' + args.split(" "));
 
-                                                process.exit();
-                                                process.stdin.destroy();
-                                    });
+                console.log(query.stdout);
 
-                                    stdin.addListener('data', function (data) {
+                process.exit();
+            }
+        }
+    }]);
 
-                                                term.write(data.toString());
-                                    });
-                        }
-            }]);
-
-            return Varnish;
+    return Varnish;
 }();
 
 exports.default = new Varnish();
