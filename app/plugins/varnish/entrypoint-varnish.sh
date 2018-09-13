@@ -7,6 +7,7 @@ echo "vcl 4.1;" > /etc/varnish/default.vcl
 echo "backend default {" >> /etc/varnish/default.vcl 
 echo "  .host = \"{{project.domain}}\";" >> /etc/varnish/default.vcl 
 echo "  .port = \"80\";" >> /etc/varnish/default.vcl 
+echo "  .first_byte_timeout = 600s;" >> /etc/varnish/default.vcl
 echo "}" >> /etc/varnish/default.vcl 
 echo "include \"/etc/varnish_files/default.vcl\";" >> /etc/varnish/default.vcl
 
