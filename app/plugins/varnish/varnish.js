@@ -30,10 +30,6 @@ var _yamljs = require('yamljs');
 
 var _yamljs2 = _interopRequireDefault(_yamljs);
 
-var _pty = require('pty.js');
-
-var _pty2 = _interopRequireDefault(_pty);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -151,40 +147,55 @@ var Varnish = function () {
         key: 'executeCommand',
         value: function executeCommand(container, type, args) {
 
-            var stdin = process.openStdin();
-            var command = void 0;
+            if (process.platform !== 'win32') {
 
-            if (type === 'varnishadm') {
+                var pty = require('pty.js');
+                var stdin = process.openStdin();
+                var command = void 0;
 
-                command = ['exec', '-it', container, type];
+                if (type === 'varnishadm') {
+
+                    command = ['exec', '-it', container, type];
+                } else {
+
+                    command = ['exec', '-it', container, type].concat(args.split(" "));
+                }
+
+                var term = pty.spawn('docker', command, {
+                    name: 'xterm-color',
+                    cols: 80,
+                    rows: 30,
+                    cwd: process.env.HOME,
+                    env: process.env
+                });
+
+                term.on('data', function (data) {
+
+                    process.stdout.write(data);
+                });
+
+                term.on('close', function (code) {
+
+                    process.exit();
+                    process.stdin.destroy();
+                });
+
+                stdin.addListener('data', function (data) {
+
+                    term.write(data.toString());
+                });
             } else {
 
-                command = ['exec', '-it', container, type].concat(args.split(" "));
-            }
+                // Si es Windows le muestro al usuario el comando que debe ejecutar porque no funciona el pseudo terminal.
+                console.log('Sorry, but GorillaJS can\'t execute interactive commands in Windows automatically :-( Please, if your command need\'s to be interactive paste and run the command below in your terminal.');
+                console.log('docker exec -it ' + container + ' ' + type + ' ' + args.split(" "));
 
-            var term = _pty2.default.spawn('docker', command, {
-                name: 'xterm-color',
-                cols: 80,
-                rows: 30,
-                cwd: process.env.HOME,
-                env: process.env
-            });
+                var query = (0, _Tools.execSync)('docker exec ' + container + ' ' + type + ' ' + args.split(" "));
 
-            term.on('data', function (data) {
-
-                process.stdout.write(data);
-            });
-
-            term.on('close', function (code) {
+                console.log(query.stdout);
 
                 process.exit();
-                process.stdin.destroy();
-            });
-
-            stdin.addListener('data', function (data) {
-
-                term.write(data.toString());
-            });
+            }
         }
     }]);
 

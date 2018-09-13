@@ -76,6 +76,20 @@ class Processes{
 
             }
 
+            let docker = new Docker()
+
+            if(docker.check()){
+
+                let composeFile = path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml')
+
+                // Detengo el contenedor del proxy antes de reemplazar los archivos porque si no, en Windows, da error porque la imagen está usando los archivos.
+                docker.stop(path.join(PROXY_PATH, 'template', 'docker-compose.yml'), 'gorillajsproxy')
+
+                // Detengo los contenedores del proyecto.
+                docker.stop(composeFile, project.slug)
+
+            }
+
             // Muevo los archivos de la plantilla y el proxy hasta su destino.
             copySync(proxySource, proxyTarget)
             copySync(templateSource, templateTarget)
@@ -116,8 +130,6 @@ class Processes{
             // Lanzo un evento antes de reemplazar los valores por si algún plugin necesita añadir archivos a la template. Le paso la ruta de la plantilla.
             events.publish('AFTER_REPLACE_VALUES', [config, templateTarget, proxyTarget])
 
-            let docker = new Docker()
-
             if(docker.check()){
 
                 let composeFile = path.join(PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml')
@@ -131,14 +143,9 @@ class Processes{
                 // Asigno los contenedores personalizados que he creado con commit.
                 docker.assignCustomContainers(composeFile, config)
 
-                // Detengo los contenedores del proyecto.
-                docker.stop(composeFile, project.slug)
 
                 // Inicio los contenedores del proyecto.
                 docker.start(composeFile, project.slug)
-
-                // Detengo el contenedor del proxy.
-                docker.stop(path.join(PROXY_PATH, 'template', 'docker-compose.yml'), 'gorillajsproxy')
 
                 // Inicio el contenedor del proxy.
                 docker.start(path.join(PROXY_PATH, 'template', 'docker-compose.yml'), 'gorillajsproxy')

@@ -14,10 +14,6 @@ var _Project2 = _interopRequireDefault(_Project);
 
 var _yargs = require('yargs');
 
-var _pty = require('pty.js');
-
-var _pty2 = _interopRequireDefault(_pty);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -45,41 +41,58 @@ var DjangoManager = function () {
         key: 'executeCommand',
         value: function executeCommand(container, type, args) {
 
-            var stdin = process.openStdin();
+            if (process.platform !== 'win32') {
 
-            var command = void 0;
+                var pty = require('pty.js');
+                var stdin = process.openStdin();
+                var command = void 0;
 
-            if (type === 'django' || type === 'manage.py') {
+                if (type === 'django' || type === 'manage.py') {
 
-                command = ['exec', '-it', container, 'python3', '/var/www/' + container + '/manage.py', args];
+                    command = ['exec', '-it', container, 'python3', '/var/www/' + container + '/manage.py', args];
+                } else {
+
+                    command = ['exec', '-it', container, 'pip3'].concat(args.split(" "));
+                }
+
+                var term = pty.spawn('docker', command, {
+                    name: 'xterm-color',
+                    cols: 80,
+                    rows: 30,
+                    cwd: process.env.HOME,
+                    env: process.env
+                });
+
+                term.on('data', function (data) {
+
+                    process.stdout.write(data);
+                });
+
+                term.on('close', function (code) {
+
+                    process.exit();
+                    process.stdin.destroy();
+                });
+
+                stdin.addListener('data', function (data) {
+
+                    term.write(data.toString());
+                });
             } else {
 
-                command = ['exec', '-it', container, 'pip3'].concat(args.split(" "));
-            }
+                // Si es Windows le muestro al usuario el comando que debe ejecutar porque no funciona el pseudo terminal.
+                console.log('Sorry, but GorillaJS can\'t execute interactive commands in Windows automatically :-( Please, if your command need\'s to be interactive paste and run the command below in your terminal.');
 
-            var term = _pty2.default.spawn('docker', command, {
-                name: 'xterm-color',
-                cols: 80,
-                rows: 30,
-                cwd: process.env.HOME,
-                env: process.env
-            });
+                if (type === 'django' || type === 'manage.py') {
 
-            term.on('data', function (data) {
+                    console.log('docker exec -it ' + container + 'python3 /var/www/' + container + '/manage.py' + args);
+                } else {
 
-                process.stdout.write(data);
-            });
-
-            term.on('close', function (code) {
+                    console.log('docker exec -it ' + container + 'pip3' + args.split(' '));
+                }
 
                 process.exit();
-                process.stdin.destroy();
-            });
-
-            stdin.addListener('data', function (data) {
-
-                term.write(data.toString());
-            });
+            }
         }
     }]);
 

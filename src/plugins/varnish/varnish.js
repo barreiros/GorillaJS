@@ -7,7 +7,6 @@ import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { argv } from 'yargs'
 import path from 'path'
 import yaml from 'yamljs'
-import pty from 'pty.js'
 
 class Varnish{
 
@@ -132,45 +131,62 @@ class Varnish{
 
     executeCommand(container, type, args){
 
-        let stdin = process.openStdin();
-        let command
+        if(process.platform !== 'win32'){
 
-        if(type === 'varnishadm'){
+            let pty = require('pty.js')
+            let stdin = process.openStdin()
+            let command
 
-            command = ['exec', '-it', container, type]
+            if(type === 'varnishadm'){
+
+                command = ['exec', '-it', container, type]
+
+            }else{
+                
+                command = ['exec', '-it', container, type].concat(args.split(" "))
+
+            }
+
+            let term = pty.spawn('docker', command, {
+                name: 'xterm-color',
+                cols: 80,
+                rows: 30,
+                cwd: process.env.HOME,
+                env: process.env
+            })
+
+            term.on('data', function(data) {
+
+                process.stdout.write(data)
+
+            })
+
+            term.on('close', function(code) {
+                
+                process.exit()
+                process.stdin.destroy()
+
+            })
+
+            stdin.addListener('data', function(data){
+
+                term.write(data.toString())
+
+            })
 
         }else{
-            
-            command = ['exec', '-it', container, type].concat(args.split(" "))
+
+            // Si es Windows le muestro al usuario el comando que debe ejecutar porque no funciona el pseudo terminal.
+            console.log('Sorry, but GorillaJS can\'t execute interactive commands in Windows automatically :-( Please, if your command need\'s to be interactive paste and run the command below in your terminal.')
+            console.log('docker exec -it ' + container + ' ' + type + ' ' + args.split(" "))
+        
+            let query = execSync('docker exec ' + container + ' ' + type + ' ' + args.split(" "))
+
+            console.log(query.stdout)
+
+            process.exit();
 
         }
-
-        let term = pty.spawn('docker', command, {
-            name: 'xterm-color',
-            cols: 80,
-            rows: 30,
-            cwd: process.env.HOME,
-            env: process.env
-        })
-
-        term.on('data', function(data) {
-
-            process.stdout.write(data)
-
-        })
-
-        term.on('close', function(code) {
-            
-            process.exit()
-            process.stdin.destroy()
-
-        })
-
-        stdin.addListener('data', function(data){
-
-            term.write(data.toString())
-
-        })
 
     }
 

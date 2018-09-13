@@ -16,9 +16,7 @@ var _yargs = require('yargs');
 
 var _child_process = require('child_process');
 
-var _path = require('path');
-
-var _path2 = _interopRequireDefault(_path);
+var _Tools = require('../../class/Tools.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -56,32 +54,45 @@ var ExtraPackages = function () {
         key: 'executeCommand',
         value: function executeCommand(container, type, args) {
 
-            var stdin = process.openStdin();
+            if (process.platform !== 'win32') {
 
-            var command = ['exec', '-i', container, type].concat(args.split(" "));
+                var pty = require('pty.js');
+                var stdin = process.openStdin();
+                var command = ['exec', '-i', container, type].concat(args.split(" "));
+                var query = (0, _child_process.spawn)('docker', command);
 
-            var query = (0, _child_process.spawn)('docker', command);
+                query.stdout.on('data', function (data) {
 
-            query.stdout.on('data', function (data) {
+                    process.stdout.write(data);
+                });
 
-                process.stdout.write(data);
-            });
+                query.stderr.on('data', function (err) {
 
-            query.stderr.on('data', function (err) {
+                    console.log(err.toString());
+                });
 
-                console.log(err.toString());
-            });
+                query.on('exit', function (code) {
 
-            query.on('exit', function (code) {
+                    process.stdin.destroy();
+                    process.exit();
+                });
 
-                process.stdin.destroy();
+                stdin.addListener('data', function (data) {
+
+                    query.stdin.write(data.toString());
+                });
+            } else {
+
+                // Si es Windows le muestro al usuario el comando que debe ejecutar porque no funciona el pseudo terminal.
+                console.log('Sorry, but GorillaJS can\'t execute interactive commands in Windows automatically :-( Please, if your command need\'s to be interactive paste and run the command below in your terminal.');
+                console.log('docker exec -i ' + container + ' ' + type + ' ' + args.split(" "));
+
+                var _query = (0, _Tools.execSync)('docker exec -i ' + container + ' ' + type + ' ' + args.split(" "));
+
+                console.log(_query.stdout);
+
                 process.exit();
-            });
-
-            stdin.addListener('data', function (data) {
-
-                query.stdin.write(data.toString());
-            });
+            }
         }
     }]);
 

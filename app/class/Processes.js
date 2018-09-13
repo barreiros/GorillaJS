@@ -123,6 +123,19 @@ var Processes = function () {
                     templateSource = (0, _fsExtra.pathExistsSync)(_path2.default.join(_const.PROJECT_TEMPLATES_OFFICIAL, config.docker.template_type)) ? _path2.default.join(_const.PROJECT_TEMPLATES_OFFICIAL, config.docker.template_type) : _path2.default.join(_const.PROJECT_TEMPLATES_CUSTOM, config.docker.template_type);
                 }
 
+                var docker = new _Docker2.default();
+
+                if (docker.check()) {
+
+                    var composeFile = _path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml');
+
+                    // Detengo el contenedor del proxy antes de reemplazar los archivos porque si no, en Windows, da error porque la imagen está usando los archivos.
+                    docker.stop(_path2.default.join(_const.PROXY_PATH, 'template', 'docker-compose.yml'), 'gorillajsproxy');
+
+                    // Detengo los contenedores del proyecto.
+                    docker.stop(composeFile, project.slug);
+                }
+
                 // Muevo los archivos de la plantilla y el proxy hasta su destino.
                 (0, _fsExtra.copySync)(proxySource, proxyTarget);
                 (0, _fsExtra.copySync)(templateSource, templateTarget);
@@ -181,29 +194,21 @@ var Processes = function () {
 
                 _Events.events.publish('AFTER_REPLACE_VALUES', [config, templateTarget, proxyTarget]);
 
-                var docker = new _Docker2.default();
-
                 if (docker.check()) {
 
-                    var composeFile = _path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml');
+                    var _composeFile = _path2.default.join(_const.PROJECT_PATH, '.gorilla', 'template', 'docker-compose.yml');
 
                     // Me aseguro de que existe la red común de GorillaJS.
                     docker.network();
 
                     // Me aseguro de que todos los contenedores tengan nombre.
-                    docker.nameContainers(composeFile, config.project.domain);
+                    docker.nameContainers(_composeFile, config.project.domain);
 
                     // Asigno los contenedores personalizados que he creado con commit.
-                    docker.assignCustomContainers(composeFile, config);
-
-                    // Detengo los contenedores del proyecto.
-                    docker.stop(composeFile, project.slug);
+                    docker.assignCustomContainers(_composeFile, config);
 
                     // Inicio los contenedores del proyecto.
-                    docker.start(composeFile, project.slug);
-
-                    // Detengo el contenedor del proxy.
-                    docker.stop(_path2.default.join(_const.PROXY_PATH, 'template', 'docker-compose.yml'), 'gorillajsproxy');
+                    docker.start(_composeFile, project.slug);
 
                     // Inicio el contenedor del proxy.
                     docker.start(_path2.default.join(_const.PROXY_PATH, 'template', 'docker-compose.yml'), 'gorillajsproxy');
