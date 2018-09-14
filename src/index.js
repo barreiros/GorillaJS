@@ -41,9 +41,12 @@ class Main {
         // Compruebo la entrada del usuario.
         if(process.env.hasOwnProperty('SUDO_USER')){
 
+            console.log('GorillaJS has detect that you are in SUDOERS list. Please, if necessary, configure your system in order to do not use sudo command.')
             // Error: No se puede usar sudo.
             
-        }else if(argv._[0] === 'license'){
+        }
+
+        if(argv._[0] === 'license'){
 
             // Imprimo el logo.
 
