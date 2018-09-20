@@ -1,0 +1,10 @@
+# Este archivo se tiene que ejecutar desde la raíz de GorillaJS.
+# docker build -t gorillajs/postgresql . -f templates/common/dockerfile-postgresql
+
+FROM gorillajs/ubuntu
+
+RUN apt-get update && apt-get -y install postgresql-9.3 postgresql-contrib-9.3 && apt-get autoremove
+
+COPY templates/common/postgresql-supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+CMD ["/usr/bin/supervisord"]

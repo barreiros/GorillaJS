@@ -1,0 +1,65 @@
+{
+  "name": "gorillajs",
+  "author": {
+    "name": "David Barreiros",
+    "email": "hola@davidbarreiros.es",
+    "url": "davidbarreiros.es"
+  },
+  "version": "0.6.0",
+  "description": "A smart development environment designed to easily install and neatly manage web applications. Gorilla JS frees you from the repetitive daily tasks like apps installation, database management, creation of virtual environment, server configuration… And it keeps your projects in order and independents.",
+  "keywords": [
+    "Docker",
+    "templates",
+    "Wordpress",
+    "html5",
+    "productivity"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/barreiros/GorillaJS"
+  },
+  "license": "MIT",
+  "preferGlobal": true,
+  "bin": {
+    "gorilla": "index.js"
+  },
+  "files": [
+    "index.js",
+    "README.md",
+    "lib"
+  ],
+  "dependencies": {
+    "aws-sdk": "^2.52.0",
+    "colors": "^1.1.2",
+    "dateformat": "^1.0.11",
+    "escape-string-regexp": "^1.0.4",
+    "figlet": "^1.2.0",
+    "fs-extra": "^0.26.2",
+    "gulp": "^3.9.0",
+    "gulp-batch-replace": "0.0.0",
+    "gulp-jshint": "^2.0.0",
+    "gulp-rimraf": "^0.2.0",
+    "gulp-using": "^0.1.0",
+    "htmlencode": "0.0.4",
+    "inquirer": "^0.11.4",
+    "ip": "^1.1.0",
+    "is-online": "^5.1.2",
+    "jshint": "^2.9.1",
+    "merge-json": "0.1.0-b.3",
+    "minimist": "^1.2.0",
+    "mkdirp": "^0.5.1",
+    "open": "0.0.5",
+    "openurl": "^1.1.1",
+    "path": "^0.12.7",
+    "portscanner": "^2.1.1",
+    "readline-sync": "^1.2.21",
+    "request": "^2.81.0",
+    "run-sequence": "^1.1.4",
+    "split": "^1.0.0",
+    "ssh2": "^0.4.13",
+    "through2": "^2.0.0",
+    "universal-analytics": "^0.4.15",
+    "uuid": "^3.0.1",
+    "yamljs": "^0.2.8"
+  }
+}

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.GUEST_GORILLAJS_PATH = exports.SOCKET_PORT = exports.SOCKET_HOST = exports.FORCE = exports.DEBUG = exports.SCHEMA_PATH = exports.SYSTEM_HOSTS_FILE = exports.PROJECT_PLUGINS_CUSTOM = exports.PROJECT_PLUGINS_OFFICIAL = exports.PROJECT_TEMPLATES_CUSTOM = exports.PROJECT_TEMPLATES_OFFICIAL = exports.PROJECT_PORT = exports.PROJECT_IS_LOCAL = exports.PROJECT_ENV = exports.LICENSE_PATH = exports.PROJECT_PATH = exports.PROXY_PATH = exports.DATA_PATH = exports.GORILLAJS_PATH = exports.HOME_USER_PATH_FOR_SCRIPTS = exports.HOME_USER_PATH_FOR_BASH = undefined;
+exports.GUEST_GORILLAJS_PATH = exports.SOCKET_PORT = exports.SOCKET_HOST = exports.FORCE = exports.DEBUG = exports.SCHEMA_PATH = exports.SYSTEM_HOSTS_FILE = exports.PROJECT_PLUGINS_CUSTOM = exports.PROJECT_PLUGINS_OFFICIAL = exports.PROJECT_TEMPLATES_CUSTOM = exports.PROJECT_TEMPLATES_OFFICIAL = exports.PROJECT_SSL_PORT = exports.PROJECT_PORT = exports.PROJECT_IS_LOCAL = exports.PROJECT_ENV = exports.LICENSE_PATH = exports.PROJECT_PATH = exports.PROXY_PATH = exports.DATA_PATH = exports.GORILLAJS_PATH = exports.HOME_USER_PATH_FOR_SCRIPTS = exports.HOME_USER_PATH_FOR_BASH = undefined;
 
 var _yargs = require('yargs');
 
@@ -25,6 +25,7 @@ var LICENSE_PATH = exports.LICENSE_PATH = _path2.default.join(HOME_USER_PATH_FOR
 var PROJECT_ENV = exports.PROJECT_ENV = _yargs.argv.env ? _yargs.argv.env : 'local';
 var PROJECT_IS_LOCAL = exports.PROJECT_IS_LOCAL = _yargs.argv.public ? false : true;
 var PROJECT_PORT = exports.PROJECT_PORT = _yargs.argv.port ? _yargs.argv.port : 80;
+var PROJECT_SSL_PORT = exports.PROJECT_SSL_PORT = _yargs.argv.sslport ? _yargs.argv.sslport : 443;
 var PROJECT_TEMPLATES_OFFICIAL = exports.PROJECT_TEMPLATES_OFFICIAL = _path2.default.join(GORILLAJS_PATH, 'templates');
 var PROJECT_TEMPLATES_CUSTOM = exports.PROJECT_TEMPLATES_CUSTOM = _path2.default.join(HOME_USER_PATH_FOR_SCRIPTS, 'gorillajs', 'templates');
 var PROJECT_PLUGINS_OFFICIAL = exports.PROJECT_PLUGINS_OFFICIAL = _path2.default.join(GORILLAJS_PATH, 'plugins');

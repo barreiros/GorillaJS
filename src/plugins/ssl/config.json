@@ -1,0 +1,37 @@
+{
+
+    "plugin": {
+
+        "name": "SSL",
+        "version": "0.0.1",
+        "main": "ssl.js"
+
+    },
+
+    "schema": {
+
+        "ssl": {
+
+            "enable": {
+
+                "question": "Do you want to activate SSL?",
+                "values": [
+
+                    {
+                        "option": "No",
+                        "value": "no"
+                    },
+                    {
+                        "option": "Yes",
+                        "value": "yes"
+                    }
+                ],
+                "default": "yes"
+
+            }
+
+        }
+
+    }
+
+}

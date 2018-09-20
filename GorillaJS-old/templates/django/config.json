@@ -1,0 +1,29 @@
+{
+
+    "messages": {
+
+        "steps": {
+
+            "django_database_config": "Configuring database...",
+            "django_cache_config": "Configuring cache system..."
+
+        },
+
+        "questions": {
+
+            "cache": {
+
+                "engine": "Do you want to use some caching system?"
+
+            },
+            "messages": {
+
+                "engine": "Do you want to use RabbitMQ (with Celery)?"
+
+            }
+
+        }
+
+    }
+
+}

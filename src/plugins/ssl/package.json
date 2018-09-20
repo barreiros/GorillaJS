@@ -1,0 +1,16 @@
+{
+  "name": "ssl_gorillajs_plugin",
+  "version": "0.0.1",
+  "description": "Enable ssl protocol.",
+  "main": "ssl.js",
+  "author": {
+    "name": "David Barreiros",
+    "email": "hola@davidbarreiros.es",
+    "url": "davidbarreiros.es"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "fs-extra": "^0.26.2",
+    "yamljs": "^0.2.8"
+  }
+}

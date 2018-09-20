@@ -1,0 +1,17 @@
+{
+  "name": "db_php7_gorillajs_plugin",
+  "version": "0.0.1",
+  "description": "Add databases to php7 projects.",
+  "main": "db_php7",
+  "author": {
+    "name": "David Barreiros",
+    "email": "hola@davidbarreiros.es",
+    "url": "davidbarreiros.es"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^0.26.2",
+    "minimist": "^1.2.0",
+    "yamljs": "^0.2.8"
+  }
+}
