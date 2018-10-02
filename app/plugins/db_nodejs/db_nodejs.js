@@ -66,6 +66,9 @@ var DBforNodeJS = function () {
                     (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'entrypoint-mongo.sh'), _path2.default.join(templateTarget, 'entrypoint-mongo.sh'));
                     (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'mongo-create-user'), _path2.default.join(templateTarget, 'mongo-create-user'));
                     (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'docker-compose-mongo.yml'), _path2.default.join(templateTarget, 'docker-compose-mongo.yml'));
+                } else if (engine === 'dynamodb') {
+
+                    (0, _fsExtra.copySync)(_path2.default.join(__dirname, 'docker-compose-dynamodb.yml'), _path2.default.join(templateTarget, 'docker-compose-dynamodb.yml'));
                 }
             }
         }
@@ -103,6 +106,13 @@ var DBforNodeJS = function () {
 
                     file.services['mongo'] = _engineFile2.services.mongo;
                     file.services['web'].depends_on.push('mongo');
+                    (0, _fs.writeFileSync)(_path2.default.join(templateTarget, 'docker-compose.yml'), _yamljs2.default.stringify(file, 6));
+                } else if (engine === 'dynamodb') {
+
+                    var _engineFile3 = _yamljs2.default.load(_path2.default.join(templateTarget, 'docker-compose-dynamodb.yml'));
+
+                    file.services['dynamodb'] = _engineFile3.services.dynamodb;
+                    file.services['web'].depends_on.push('dynamodb');
                     (0, _fs.writeFileSync)(_path2.default.join(templateTarget, 'docker-compose.yml'), _yamljs2.default.stringify(file, 6));
                 }
             }

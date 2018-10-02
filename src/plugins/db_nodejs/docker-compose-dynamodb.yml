@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+
+  dynamodb:
+    image: cnadiminti/dynamodb-local 
+    expose: 
+      - 8000
+    volumes:
+      - {{docker.data_path}}/{{project.id}}/dynamodb:/dynamodb_local_db

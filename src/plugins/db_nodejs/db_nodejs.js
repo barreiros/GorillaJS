@@ -46,6 +46,10 @@ class DBforNodeJS{
                 copySync(path.join(__dirname, 'mongo-create-user'), path.join(templateTarget, 'mongo-create-user'));
                 copySync(path.join(__dirname, 'docker-compose-mongo.yml'), path.join(templateTarget, 'docker-compose-mongo.yml'));
 
+            }else if(engine === 'dynamodb'){
+
+                copySync(path.join(__dirname, 'docker-compose-dynamodb.yml'), path.join(templateTarget, 'docker-compose-dynamodb.yml'));
+
             }
 
         }
@@ -87,6 +91,14 @@ class DBforNodeJS{
 
                 file.services['mongo'] = engineFile.services.mongo;
                 file.services['web'].depends_on.push('mongo');
+                writeFileSync(path.join(templateTarget, 'docker-compose.yml'), yaml.stringify(file, 6)); 
+
+            }else if(engine === 'dynamodb'){
+
+                let engineFile = yaml.load(path.join(templateTarget, 'docker-compose-dynamodb.yml'))
+
+                file.services['dynamodb'] = engineFile.services.dynamodb;
+                file.services['web'].depends_on.push('dynamodb');
                 writeFileSync(path.join(templateTarget, 'docker-compose.yml'), yaml.stringify(file, 6)); 
 
             }

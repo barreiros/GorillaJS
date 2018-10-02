@@ -26,6 +26,10 @@
                         "value": "mongodb"
                     },
                     {
+                        "option": "DynamoDB",
+                        "value": "dynamodb"
+                    },
+                    {
                         "option": "PostgreSQL",
                         "value": "postgresql"
                     },

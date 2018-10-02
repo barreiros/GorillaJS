@@ -26,6 +26,10 @@
                         "value": "mongodb"
                     },
                     {
+                        "option": "DynamoDB",
+                        "value": "dynamodb"
+                    },
+                    {
                         "option": "PostgreSQL",
                         "value": "postgresql"
                     },
@@ -52,7 +56,7 @@
                 "depends_on": [{
 
                     "path": ".database.engine_nodejs",
-                    "value": ["mongodb", "postgresql", "mysql"]
+                    "value": ["mongodb", "dynamodb", "postgresql", "mysql"]
 
                 }]
 
@@ -65,7 +69,7 @@
                 "depends_on": {
 
                     "path": ".database.engine_nodejs",
-                    "value": ["mongodb", "postgresql", "mysql"]
+                    "value": ["mongodb", "dynamodb", "postgresql", "mysql"]
 
                 }
 
@@ -78,7 +82,7 @@
                 "depends_on": {
 
                     "path": ".database.engine_nodejs",
-                    "value": ["mongodb", "postgresql", "mysql"]
+                    "value": ["mongodb", "dynamodb", "postgresql", "mysql"]
 
                 }
             }
