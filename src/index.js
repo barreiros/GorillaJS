@@ -19,20 +19,8 @@ class Main {
 
     constructor(){
 
-        // Inicio la licencia.
-        license.check((type) => {
-
-            if(license.type === 'PRO'){
-
-                // Instancio la clase Plugins
-                this.plugins = new Plugins()
-
-            }
-
-            // Continúo 
-            this.router()
-
-        })
+        this.plugins = new Plugins()
+        this.router()
 
     }
 

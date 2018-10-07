@@ -43,22 +43,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Main = function () {
     function Main() {
-        var _this = this;
-
         _classCallCheck(this, Main);
 
-        // Inicio la licencia.
-        _License.license.check(function (type) {
-
-            if (_License.license.type === 'PRO') {
-
-                // Instancio la clase Plugins
-                _this.plugins = new _Plugins2.default();
-            }
-
-            // Continúo 
-            _this.router();
-        });
+        this.plugins = new _Plugins2.default();
+        this.router();
     }
 
     _createClass(Main, [{
