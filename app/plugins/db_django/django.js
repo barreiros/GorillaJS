@@ -105,7 +105,7 @@ var Django = function () {
                 if (!config.services || _const.FORCE) {
                     // Si no he hecho ningún commit, lo creo para guardar la configuración.
 
-                    var query = (0, _Tools.execSync)('gorilla6 commit "' + config.project.domain + '" --path "' + _const.PROJECT_PATH + '"');
+                    var query = (0, _Tools.execSync)('gorilla commit "' + config.project.domain + '" --path "' + _const.PROJECT_PATH + '"');
                 }
             }
         }
