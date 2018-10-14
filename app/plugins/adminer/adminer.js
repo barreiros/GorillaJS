@@ -78,8 +78,6 @@ var Adminer = function () {
             if (!(0, _fsExtra.pathExistsSync)(_path2.default.join(adminerPath, 'public')) || !(0, _fsExtra.pathExistsSync)(_path2.default.join(adminerPath, 'server'))) {
                 // Si los archivos de Adminer no están en la carpeta del proxy, los añado.
 
-                console.log('Ejecuto el archivo');
-
                 (0, _fsExtra.ensureDirSync)(adminerPath);
 
                 // Copio todos los archivos de Adminer en la carpeta de la template del proxy. Esto es nuevo y tengo que rectificar los archivos .sh
@@ -89,7 +87,7 @@ var Adminer = function () {
                 // Ejecuto el script de bash para terminar de configurar Adminer.
                 var query = (0, _Tools.execSync)('docker exec gorillajsproxy /bin/sh /root/templates/adminer/server/adminer.sh');
 
-                _Events.events.subscribe('PROJECT_BUILT', this.commitSettings);
+                this.commitSettings();
             }
         }
     }, {

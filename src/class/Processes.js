@@ -1,4 +1,4 @@
-import { PROJECT_PATH, PROXY_PATH, DATA_PATH, PROJECT_ENV, PROJECT_PORT, PROJECT_IS_LOCAL, PROJECT_TEMPLATES_OFFICIAL, PROJECT_TEMPLATES_CUSTOM, SYSTEM_HOSTS_FILE, HOME_USER_PATH_FOR_BASH } from '../const.js'
+import { PROJECT_PATH, PROXY_PATH, DATA_PATH, PROJECT_ENV, PROJECT_PORT, PROJECT_IS_LOCAL, PROJECT_TEMPLATES_OFFICIAL, PROJECT_TEMPLATES_CUSTOM, SYSTEM_HOSTS_FILE, HOME_USER_PATH_FOR_BASH, DEBUG } from '../const.js'
 import Plugins from './Plugins.js'
 import Schema from './Schema.js'
 import Project from './Project.js'
@@ -102,24 +102,36 @@ class Processes{
 
                 if(!lstatSync(file).isDirectory()){
 
-                    // Cargo el contenido del archivo.
-                    let text = readFileSync(file).toString()
+                    try{
 
-                    let hasChange = false
+                        // Cargo el contenido del archivo.
+                        let text = readFileSync(file).toString()
 
-                    // Creo una expresión regular en lazy mode para que coja todos los valores, aunque haya varios en la misma línea.
-                    text = text.replace(/{{(.*?)}}/g, (search, value) => {
-                    
-                        hasChange = true
-                        // Reemplazo las ocurrencias por su valor correspondiente de la configuración.
-                        return JSPath.apply('.' + value, config)[0]
+                        let hasChange = false
 
-                    })
+                        // Creo una expresión regular en lazy mode para que coja todos los valores, aunque haya varios en la misma línea.
+                        text = text.replace(/{{(.*?)}}/g, (search, value) => {
+                        
+                            hasChange = true
+                            // Reemplazo las ocurrencias por su valor correspondiente de la configuración.
+                            return JSPath.apply('.' + value, config)[0]
 
-                    // Vuelvo a guardar el contenido del archivo con los nuevos valores.
-                    if(hasChange){
+                        })
 
-                        writeFileSync(file, text)
+                        // Vuelvo a guardar el contenido del archivo con los nuevos valores.
+                        if(hasChange){
+
+                            writeFileSync(file, text)
+
+                        }
+
+                    }catch(e){
+
+                        if(DEBUG){
+
+                            console.log(e)
+
+                        }
 
                     }
 

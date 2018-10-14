@@ -97,10 +97,10 @@ var SSL = function () {
             // Creo el commit únicamente si todavía no existe la imagen de Docker personalizada o si el usuario ha elegido el parámetro -f (FORCE).
             if (config.docker.template_type === 'yes') {
 
-                if (!config.services || _const.FORCE) {
-                    // Si no he hecho ningún commit, lo creo para guardar la configuración.
+                if (!config.services || _const.FORCE) {// Si no he hecho ningún commit, lo creo para guardar la configuración.
 
-                    var query = (0, _Tools.execSync)('gorilla commit "' + config.project.domain + '" --path "' + _const.PROJECT_PATH + '"');
+                    // let query = execSync('gorilla commit "' + config.project.domain + '" --path "' + PROJECT_PATH + '"')
+
                 }
             }
         }

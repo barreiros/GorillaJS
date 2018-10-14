@@ -155,23 +155,32 @@ var Processes = function () {
 
                         if (!(0, _fs.lstatSync)(file).isDirectory()) {
 
-                            // Cargo el contenido del archivo.
-                            var text = (0, _fs.readFileSync)(file).toString();
+                            try {
 
-                            var hasChange = false;
+                                // Cargo el contenido del archivo.
+                                var text = (0, _fs.readFileSync)(file).toString();
 
-                            // Creo una expresión regular en lazy mode para que coja todos los valores, aunque haya varios en la misma línea.
-                            text = text.replace(/{{(.*?)}}/g, function (search, value) {
+                                var hasChange = false;
 
-                                hasChange = true;
-                                // Reemplazo las ocurrencias por su valor correspondiente de la configuración.
-                                return _jspath2.default.apply('.' + value, config)[0];
-                            });
+                                // Creo una expresión regular en lazy mode para que coja todos los valores, aunque haya varios en la misma línea.
+                                text = text.replace(/{{(.*?)}}/g, function (search, value) {
 
-                            // Vuelvo a guardar el contenido del archivo con los nuevos valores.
-                            if (hasChange) {
+                                    hasChange = true;
+                                    // Reemplazo las ocurrencias por su valor correspondiente de la configuración.
+                                    return _jspath2.default.apply('.' + value, config)[0];
+                                });
 
-                                (0, _fs.writeFileSync)(file, text);
+                                // Vuelvo a guardar el contenido del archivo con los nuevos valores.
+                                if (hasChange) {
+
+                                    (0, _fs.writeFileSync)(file, text);
+                                }
+                            } catch (e) {
+
+                                if (_const.DEBUG) {
+
+                                    console.log(e);
+                                }
                             }
                         }
                     }

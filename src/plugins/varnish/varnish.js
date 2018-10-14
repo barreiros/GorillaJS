@@ -97,7 +97,7 @@ class Varnish{
 
             if(!config.services || FORCE){ // Si no he hecho ningún commit, lo creo para guardar la configuración.
 
-                let query = execSync('gorilla commit "' + config.project.domain + '" --path "' + PROJECT_PATH + '"')
+                // let query = execSync('gorilla commit "' + config.project.domain + '" --path "' + PROJECT_PATH + '"')
 
             }
 
