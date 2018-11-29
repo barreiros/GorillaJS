@@ -1,5 +1,5 @@
 # Este archivo se tiene que ejecutar desde la raíz de GorillaJS.
-# docker build -t gorillajs/alpine . -f templates/common/dockerfile-alpine
+# docker build -t gorillajs/alpine . -f dockerfiles/dockerfile-alpine
 
 FROM alpine
 
@@ -11,4 +11,5 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" > /etc/apk/repositorie
     && apk update && apk upgrade \
     && apk add curl wget git \
     && apk add inotify-tools \
+    && apk add shadow \
     && rm -rf /var/cache/apk/* 
