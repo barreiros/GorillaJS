@@ -155,7 +155,6 @@ class Processes{
                 // Asigno los contenedores personalizados que he creado con commit.
                 docker.assignCustomContainers(composeFile, config)
 
-
                 // Inicio los contenedores del proyecto.
                 docker.start(composeFile, project.slug)
 

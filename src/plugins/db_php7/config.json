@@ -38,7 +38,7 @@
                 "depends_on": [{
 
                     "path": ".docker.template_type",
-                    "value": "php7"
+                    "value": "php-7"
 
                 }],
                 "default": "no"
@@ -49,12 +49,19 @@
 
                 "question": "Database name",
                 "default": "gorilladb",
-                "depends_on": [{
+                "depends_on": [
+                    {
 
-                    "path": ".database.engine_php7",
-                    "value": ["mongodb", "postgresql", "mysql"]
+                        "path": ".database.engine_php7",
+                        "value": ["mongodb", "postgresql", "mysql"]
 
-                }]
+                    },{
+
+                        "path": ".database_extra.enable",
+                        "value": "yes" 
+
+                    }
+                ]
 
             },
 
@@ -62,12 +69,19 @@
 
                 "question": "Database user name",
                 "default": "gorilla",
-                "depends_on": {
+                "depends_on": [
+                    {
 
-                    "path": ".database.engine_php7",
-                    "value": ["mongodb", "postgresql", "mysql"]
+                        "path": ".database.engine_php7",
+                        "value": ["mongodb", "postgresql", "mysql"]
 
-                }
+                    },{
+
+                        "path": ".database_extra.enable",
+                        "value": "yes" 
+
+                    }
+                ]
 
             },
 
@@ -75,12 +89,20 @@
 
                 "question": "Database password",
                 "default": "gorilla_598565",
-                "depends_on": {
+                "depends_on": [
+                    {
 
-                    "path": ".database.engine_php7",
-                    "value": ["mongodb", "postgresql", "mysql"]
+                        "path": ".database.engine_php7",
+                        "value": ["mongodb", "postgresql", "mysql"]
 
-                }
+                    },{
+
+                        "path": ".database_extra.enable",
+                        "value": "yes" 
+
+                    }
+                ]
+
             }
 
         }

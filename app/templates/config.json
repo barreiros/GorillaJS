@@ -41,7 +41,7 @@
 
             "template_path": {
 
-                "question": "Select your custom template path",
+                "question": "Select your custom template path (relative to your project folder)",
                 "depends_on": {
 
                     "path": ".docker.template_type",

@@ -86,7 +86,7 @@ var Questions = function () {
 
                 if (questions.length) {
 
-                    question(questions.shift());
+                    filter(questions.shift());
                 } else {
 
                     callback(_this.config);
@@ -94,17 +94,9 @@ var Questions = function () {
             };
 
             // Le muestro las preguntas al usuario de forma asíncrona. Así que creo una función que pueda volver a llamar, si es necesario, en el callback de la pregunta. 
-            var question = function question(data) {
+            var filter = function filter(data) {
 
-                // Compruebo si la pregunta ya había sido contestada.
-                if (data.base[data.key]) {
-
-                    check();
-
-                    return;
-                }
-
-                // Compruebo si la pregunta depende de algún otro valor.
+                // Compruego las dependencias de las preguntas para ver cuál hay que mostrar primero o cuál no hay que mostrar.
                 if (data.question.depends_on) {
 
                     if (data.question.depends_on instanceof Array === false) {
@@ -112,7 +104,8 @@ var Questions = function () {
                         data.question.depends_on = [data.question.depends_on];
                     }
 
-                    var ignore = void 0;
+                    var showed = false;
+                    var preserveNodes = []; // Creo un listado con los nodos que todavía no existen.
 
                     var _iteratorNormalCompletion = true;
                     var _didIteratorError = false;
@@ -125,41 +118,32 @@ var Questions = function () {
 
                             var dependencies = _jspath2.default.apply(dependency.path, _this.config);
 
-                            if (!dependencies.length && !data.waiting) {
-                                // Si el nodo no existe en el archivo de configuración...
-
-                                data.waiting = true;
-                                questions.push(data);
-
-                                ignore = true;
-                            } else {
-                                // Si el nodo existe compruebo si su valor aparece dentro de las dependencias necesarias para mostrar la pregunta.
+                            if (dependencies.length) {
+                                // Si el nodo existe en el archivo de configuración compruebo si coincide el filtro.
 
                                 if (_typeof(dependency.value) === 'object') {
                                     // Si es un objeto doy por hecho que es un array.
 
                                     if (dependency.value.indexOf(dependencies[0]) !== -1) {
 
-                                        ignore = false;
+                                        showed = true;
 
                                         break;
-                                    } else {
-
-                                        ignore = true;
                                     }
                                 } else {
                                     // Si no, es una cadena.
 
-                                    if (dependency.value !== dependencies[0]) {
+                                    if (dependency.value === dependencies[0]) {
 
-                                        ignore = true;
-                                    } else {
-
-                                        ignore = false;
+                                        showed = true;
 
                                         break;
                                     }
                                 }
+                            } else {
+                                // Si no existe salgo del bucle para poder aprovecharlo.
+
+                                preserveNodes.push(dependency);
                             }
                         }
                     } catch (err) {
@@ -177,15 +161,29 @@ var Questions = function () {
                         }
                     }
 
-                    if (ignore) {
+                    if (showed) {
+                        // Si la pregunta no puede ser respondida en este momento la devuelvo a la lista.
+
+                        show(data);
+                    } else {
+
+                        if (preserveNodes.length > 0) {
+
+                            data.question.depends_on = preserveNodes;
+                            questions.push(data);
+                        }
 
                         check();
-
-                        return;
                     }
-                }
+                } else {
+                    // Si no hay filtros, muestro la pregunta directamente.
 
-                // Si llego aquí es porque he pasado todos los filtros y puedo hacer la pregunta.
+                    show(data);
+                }
+            };
+
+            var show = function show(data) {
+
                 if (data.question.values && _typeof(data.question.values) === 'object') {
                     // Si hay más de una opción, muestro el prompt con el selector.
 

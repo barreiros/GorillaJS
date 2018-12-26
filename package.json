@@ -31,7 +31,6 @@
         "babel-core": "^6.26.0",
         "babel-preset-env": "^1.6.1",
         "babel-standalone": "^6.26.0",
-        "gulp": "^3.9.1",
         "gulp-babel": "^7.0.1",
         "gulp-param": "^1.0.3",
         "gulp-using": "^0.1.1"

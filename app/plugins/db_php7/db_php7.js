@@ -8,7 +8,13 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _const = require('../../const.js');
 
+var _Project = require('../../class/Project.js');
+
+var _Project2 = _interopRequireDefault(_Project);
+
 var _Events = require('../../class/Events.js');
+
+var _yargs = require('yargs');
 
 var _Tools = require('../../class/Tools.js');
 
@@ -35,14 +41,52 @@ var DBforPHP7 = function () {
         _Events.events.subscribe('BEFORE_REPLACE_VALUES', this.copyTemplate);
         _Events.events.subscribe('AFTER_REPLACE_VALUES', this.configureEngine);
         _Events.events.subscribe('PROJECT_BUILT', this.commitSettings);
+
+        // Configuro la opción de añadir una base de datos extra a cualquier proyecto.
+        if (_yargs.argv._[0] === 'dbx') {
+
+            this.addExtraDB(_yargs.argv._[1]);
+        }
     }
 
     _createClass(DBforPHP7, [{
+        key: 'addExtraDB',
+        value: function addExtraDB(engine) {
+
+            var project = new _Project2.default();
+            var config = project.config;
+
+            var validEngines = ['mysql', 'postgresql', 'mongo'];
+
+            if (validEngines.indexOf(engine) !== -1) {
+
+                if (!config[_const.PROJECT_ENV].hasOwnProperty('database_extra')) {
+
+                    config[_const.PROJECT_ENV].database_extra = {};
+                    config[_const.PROJECT_ENV].database_extra.engines = [];
+                }
+
+                // Solo se permite un engine extra de cada tipo y compartiran las credenciales.
+                if (config[_const.PROJECT_ENV].database_extra.engines.indexOf(engine) === -1) {
+
+                    config[_const.PROJECT_ENV].database_extra.enable = "yes";
+                    config[_const.PROJECT_ENV].database_extra.engines.push(engine);
+
+                    project.saveValue(config);
+                }
+            } else {
+
+                console.log('Error - Missing engine');
+            }
+
+            // Añado una nueva base de datos al archivo de configuración para que en la siguiente ejecución se genere.
+        }
+    }, {
         key: 'copyTemplate',
         value: function copyTemplate(config, templateTarget) {
 
             // Si el proyecto es de PHP7, copio los archivos del motor de base de datos a la carpeta de la plantilla.
-            if (config.docker.template_type === 'php7') {
+            if (config.docker.template_type === 'php-7') {
 
                 var engine = config.database.engine_php7.toLowerCase();
 
@@ -76,7 +120,7 @@ var DBforPHP7 = function () {
         key: 'configureEngine',
         value: function configureEngine(config, templateTarget) {
 
-            if (config.docker.template_type === 'php7') {
+            if (config.docker.template_type === 'php-7') {
 
                 var file = _yamljs2.default.load(_path2.default.join(templateTarget, 'docker-compose.yml'));
                 var engine = config.database.engine_php7.toLowerCase();
@@ -115,7 +159,7 @@ var DBforPHP7 = function () {
         value: function commitSettings(config) {
 
             // Creo el commit únicamente si todavía no existe la imagen de Docker personalizada o si el usuario ha elegido el parámetro -f (FORCE).
-            if (config.docker.template_type === 'php7') {
+            if (config.docker.template_type === 'php-7') {
 
                 if (!config.services || _const.FORCE) {// Si no he hecho ningún commit, lo creo para guardar la configuración.
 
