@@ -4,7 +4,7 @@ import { events } from '../../class/Events.js'
 import { argv } from 'yargs'
 import { execSync } from '../../class/Tools.js'
 import { copySync } from 'fs-extra'
-import { writeFileSync } from 'fs'
+import { readFileSync, writeFileSync } from 'fs'
 import path from 'path'
 import yaml from 'yamljs'
 
@@ -12,8 +12,8 @@ class DBforPHP7{
 
     constructor(){
 
-        events.subscribe('BEFORE_REPLACE_VALUES', this.copyTemplate)
-        events.subscribe('AFTER_REPLACE_VALUES', this.configureEngine)
+        events.subscribe('BEFORE_REPLACE_VALUES', (config, templateTarget) => this.copyTemplate(config, templateTarget))
+        events.subscribe('AFTER_REPLACE_VALUES', (config, templateTarget) => this.configureEngine(config, templateTarget))
         events.subscribe('PROJECT_BUILT', this.commitSettings)
 
         // Configuro la opción de añadir una base de datos extra a cualquier proyecto.
@@ -30,7 +30,7 @@ class DBforPHP7{
         let project = new Project()
         let config = project.config
 
-        let validEngines = ['mysql', 'postgresql', 'mongo']
+        let validEngines = ['mysql', 'postgresql', 'mongodb']
 
         if(validEngines.indexOf(engine) !== -1){
 
@@ -51,48 +51,71 @@ class DBforPHP7{
 
             }
 
+            console.log('Please, rebuild the project to install the new database')
+
         }else{
 
             console.log('Error - Missing engine')
 
         }
 
-        // Añado una nueva base de datos al archivo de configuración para que en la siguiente ejecución se genere.
 
     }
 
     copyTemplate(config, templateTarget){
 
-        // Si el proyecto es de PHP7, copio los archivos del motor de base de datos a la carpeta de la plantilla.
-        if(config.docker.template_type === 'php-7'){
+        let engines = this.getEngines(config)
 
-            let engine = config.database.engine_php7.toLowerCase()
+        if(engines.length > 0){
 
-            if(engine === 'postgresql'){
+            let webFile = path.join(templateTarget, 'entrypoint-web.sh')
 
-                copySync(path.join(__dirname, 'entrypoint-web.sh'), path.join(templateTarget, 'entrypoint-web.sh'))
+            // Cargo el contenido del archivo.
+            let text = readFileSync(webFile).toString()
 
-                copySync(path.join(__dirname, 'entrypoint-postgresql.sh'), path.join(templateTarget, 'entrypoint-postgresql.sh'))
-                copySync(path.join(__dirname, 'postgresql.conf'), path.join(templateTarget, 'postgresql.conf'))
-                copySync(path.join(__dirname, 'index-postgresql.php'), path.join(templateTarget, 'index.php'))
-                copySync(path.join(__dirname, 'docker-compose-postgresql.yml'), path.join(templateTarget, 'docker-compose-postgresql.yml'))
+            let hasChange = false
 
-            }else if(engine === 'mysql'){
+            // Creo una expresión regular en lazy mode para que coja todos los valores, aunque haya varios en la misma línea.
+            text = text.replace(/\n/, (search, value) => {
 
-                copySync(path.join(__dirname, 'entrypoint-web.sh'), path.join(templateTarget, 'entrypoint-web.sh'))
+                hasChange = true
 
-                copySync(path.join(__dirname, 'entrypoint-mysql.sh'), path.join(templateTarget, 'entrypoint-mysql.sh'))
-                copySync(path.join(__dirname, 'index-mysql.php'), path.join(templateTarget, 'index.php'))
-                copySync(path.join(__dirname, 'docker-compose-mysql.yml'), path.join(templateTarget, 'docker-compose-mysql.yml'))
+                // Pendiente optimizar esta parte.
+                // Instalo todas las librerías relacionadas con los motores de base de datos que pueda necesitar.
+                return '\n apk update && apk add --no-cache postgresql postgresql-dev php7-pgsql mariadb-dev mariadb-dev php7-mongodb &&'
 
-            }else if(engine === 'mongodb'){
+            })
 
-                copySync(path.join(__dirname, 'entrypoint-web.sh'), path.join(templateTarget, 'entrypoint-web.sh'))
+            // Vuelvo a guardar el contenido del archivo con los nuevos valores.
+            if(hasChange){
 
-                copySync(path.join(__dirname, 'entrypoint-mongo.sh'), path.join(templateTarget, 'entrypoint-mongo.sh'))
-                copySync(path.join(__dirname, 'mongo-create-user'), path.join(templateTarget, 'mongo-create-user'))
-                copySync(path.join(__dirname, 'index-mongo.php'), path.join(templateTarget, 'index.php'))
-                copySync(path.join(__dirname, 'docker-compose-mongo.yml'), path.join(templateTarget, 'docker-compose-mongo.yml'))
+                writeFileSync(webFile, text)
+
+            }
+
+            for(let engine of engines){
+                
+                if(engine === 'postgresql'){
+
+                    copySync(path.join(__dirname, 'entrypoint-postgresql.sh'), path.join(templateTarget, 'entrypoint-postgresql.sh'))
+                    copySync(path.join(__dirname, 'postgresql.conf'), path.join(templateTarget, 'postgresql.conf'))
+                    copySync(path.join(__dirname, 'docker-compose-postgresql.yml'), path.join(templateTarget, 'docker-compose-postgresql.yml'))
+                    // copySync(path.join(__dirname, 'index-postgresql.php'), path.join(templateTarget, 'test-postgresql.php'))
+
+                }else if(engine === 'mysql'){
+
+                    copySync(path.join(__dirname, 'entrypoint-mysql.sh'), path.join(templateTarget, 'entrypoint-mysql.sh'))
+                    copySync(path.join(__dirname, 'docker-compose-mysql.yml'), path.join(templateTarget, 'docker-compose-mysql.yml'))
+                    // copySync(path.join(__dirname, 'index-mysql.php'), path.join(templateTarget, 'test-mysql.php'))
+
+                }else if(engine === 'mongodb'){
+
+                    copySync(path.join(__dirname, 'entrypoint-mongo.sh'), path.join(templateTarget, 'entrypoint-mongo.sh'))
+                    copySync(path.join(__dirname, 'mongo-create-user'), path.join(templateTarget, 'mongo-create-user'))
+                    copySync(path.join(__dirname, 'docker-compose-mongo.yml'), path.join(templateTarget, 'docker-compose-mongo.yml'))
+                    // copySync(path.join(__dirname, 'index-mongo.php'), path.join(templateTarget, 'test-mongo.php'))
+
+                }
 
             }
 
@@ -102,10 +125,11 @@ class DBforPHP7{
 
     configureEngine(config, templateTarget){
 
-        if(config.docker.template_type === 'php-7'){
+        let engines = this.getEngines(config)
+
+        if(engines.length > 0){
 
             let file = yaml.load(path.join(templateTarget, 'docker-compose.yml'))
-            let engine = config.database.engine_php7.toLowerCase()
 
             if(!file.services['web'].dependes_on){
 
@@ -113,33 +137,76 @@ class DBforPHP7{
 
             }
 
-            if(engine === 'postgresql'){
+            for(let engine of engines){
 
-                let engineFile = yaml.load(path.join(templateTarget, 'docker-compose-postgresql.yml'))
+                if(engine === 'postgresql'){
 
-                file.services['postgresql'] = engineFile.services.postgresql;
-                file.services['web'].depends_on.push('postgresql');
-                writeFileSync(path.join(templateTarget, 'docker-compose.yml'), yaml.stringify(file, 6))
+                    let engineFile = yaml.load(path.join(templateTarget, 'docker-compose-postgresql.yml'))
 
-            }else if(engine === 'mysql'){
+                    file.services['postgresql'] = engineFile.services.postgresql;
+                    file.services['web'].depends_on.push('postgresql');
+                    writeFileSync(path.join(templateTarget, 'docker-compose.yml'), yaml.stringify(file, 6))
 
-                let engineFile = yaml.load(path.join(templateTarget, 'docker-compose-mysql.yml'))
+                }else if(engine === 'mysql'){
 
-                file.services['mysql'] = engineFile.services.mysql;
-                file.services['web'].depends_on.push('mysql');
-                writeFileSync(path.join(templateTarget, 'docker-compose.yml'), yaml.stringify(file, 6))
+                    let engineFile = yaml.load(path.join(templateTarget, 'docker-compose-mysql.yml'))
 
-            }else if(engine === 'mongodb'){
+                    file.services['mysql'] = engineFile.services.mysql;
+                    file.services['web'].depends_on.push('mysql');
+                    writeFileSync(path.join(templateTarget, 'docker-compose.yml'), yaml.stringify(file, 6))
 
-                let engineFile = yaml.load(path.join(templateTarget, 'docker-compose-mongo.yml'))
+                }else if(engine === 'mongodb'){
 
-                file.services['mongo'] = engineFile.services.mongo;
-                file.services['web'].depends_on.push('mongo');
-                writeFileSync(path.join(templateTarget, 'docker-compose.yml'), yaml.stringify(file, 6))
+                    let engineFile = yaml.load(path.join(templateTarget, 'docker-compose-mongo.yml'))
+
+                    file.services['mongo'] = engineFile.services.mongo;
+                    file.services['web'].depends_on.push('mongo');
+                    writeFileSync(path.join(templateTarget, 'docker-compose.yml'), yaml.stringify(file, 6))
+
+                }
 
             }
 
         }
+
+    }
+
+    getEngines(config){
+
+        // Compruebo si la template es php 7 o si hay instalaciones extra de bases de datos.
+        let engines = []
+
+        // Compruebo si la plantilla es de tipo php 7 y si tiene un engine asociado.
+        if(config.docker.template_type === 'php-7'){
+
+            if(config.database.hasOwnProperty('engine_php7')){
+
+                engines.push(config.database.engine_php7.toLowerCase())
+
+            }
+            
+        }
+
+        // Compruebo si el proyecto tiene algún engine extra. Esto puede tenerlo cualquier proyecto, no solo los que usen la template de php 7.
+        if(config.hasOwnProperty('database_extra')){
+
+            if(config.database_extra.hasOwnProperty('engines')){
+
+                for(let engine of config.database_extra.engines){
+
+                    if(engines.indexOf(engine) === -1){
+
+                        engines.push(engine)
+
+                    }
+                    
+                }
+
+            }
+
+        }
+
+        return engines
 
     }
 

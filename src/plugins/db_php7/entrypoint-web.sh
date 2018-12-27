@@ -1,10 +1,6 @@
-#!/bin/sh -l
+# Código incrustado por el plugin DB PHP-7
 
 ENGINE="{{database.engine_php7}}"
-
-cp /root/templates/apache-vhost.conf /etc/apache2/sites-available/{{project.domain}}.conf &&
-
-ln -s /etc/apache2/sites-available/{{project.domain}}.conf /etc/apache2/sites-enabled/{{project.domain}}.conf || true &&
 
 if [ "$ENGINE" == "postgresql" ]; then
 
@@ -38,11 +34,4 @@ elif [ "$ENGINE" == "mongodb" ]; then
 
 fi
 
-
-if [ ! -e /var/www/{{project.domain}}/application/index.php ]; then
-
-    cp /root/templates/index.php /var/www/{{project.domain}}/application/index.php
-
-fi
-
-apachectl start -D FOREGROUND
+# FIN Código incrustado por el plugin DB PHP-7
