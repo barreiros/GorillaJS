@@ -55,7 +55,7 @@ class DBforPHP7{
 
         }else{
 
-            console.log('Error - Missing engine')
+            console.log('Error - Missing or invalid engine. Valid engines are mysql, postgresql and mongodb.')
 
         }
 

@@ -84,7 +84,7 @@ var DBforPHP7 = function () {
                 console.log('Please, rebuild the project to install the new database');
             } else {
 
-                console.log('Error - Missing engine');
+                console.log('Error - Missing or invalid engine. Valid engines are mysql, postgresql and mongodb.');
             }
         }
     }, {
