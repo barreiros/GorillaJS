@@ -67,11 +67,61 @@ var DBManager = function () {
 
                     (0, _fsExtra.ensureFileSync)(_yargs.argv._[2]);
                     this.export(_yargs.argv._[2]);
+                } else if (_yargs.argv._[1] === 'extra') {
+
+                    this.extra(_yargs.argv._[2]);
+                } else if (_yargs.argv._[1] === 'show') {
+
+                    this.show();
                 }
             } else if (_yargs.argv._[1] === 'clone') {
 
                 // Routemap
 
+            }
+        }
+    }, {
+        key: 'extra',
+        value: function extra(name) {
+
+            var project = new _Project2.default();
+            var config = project.config[_const.PROJECT_ENV];
+
+            // Como de momento solo es compatible con MySQL, busco el valor en el archivo de configuracion.
+            var engine = _jspath2.default.apply('..config.ase.engine', config);
+
+            if (engine.indexOf('mysql'.toLowerCase())) {
+
+                var command = 'docker exec -i ' + config.project.domain + '_mysql mysql -u' + config.database.username + ' -p' + config.database.password + ' -e "CREATE DATABASE ' + name + '" ';
+
+                var query = (0, _Tools.execSync)(command);
+
+                if (!query.err) {
+
+                    console.log('Done! Extra database created');
+                }
+            }
+        }
+    }, {
+        key: 'show',
+        value: function show() {
+
+            var project = new _Project2.default();
+            var config = project.config[_const.PROJECT_ENV];
+
+            // Como de momento solo es compatible con MySQL, busco el valor en el archivo de configuracion.
+            var engine = _jspath2.default.apply('..config.ase.engine', config);
+
+            if (engine.indexOf('mysql'.toLowerCase())) {
+
+                var command = 'docker exec -i ' + config.project.domain + '_mysql mysql -u' + config.database.username + ' -p' + config.database.password + ' -e "SHOW DATABASES" ';
+
+                var query = (0, _Tools.execSync)(command);
+
+                if (!query.err) {
+
+                    console.log(query.stdout);
+                }
             }
         }
     }, {

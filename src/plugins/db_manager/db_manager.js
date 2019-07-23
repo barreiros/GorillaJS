@@ -47,11 +47,69 @@ class DBManager{
                 ensureFileSync(argv._[2])
                 this.export(argv._[2])
 
+            }else if(argv._[1] === 'extra'){
+
+                this.extra( argv._[2] );
+
+            }else if(argv._[1] === 'show'){
+
+                this.show( );
+
             }
 
         }else if(argv._[1] === 'clone'){
 
             // Routemap
+
+        }
+
+    }
+
+    extra( name ) {
+
+        let project = new Project()
+        let config = project.config[PROJECT_ENV]
+
+
+        // Como de momento solo es compatible con MySQL, busco el valor en el archivo de configuracion.
+        let engine = JSPath.apply('..config.ase.engine', config)
+
+        if(engine.indexOf('mysql'.toLowerCase())){
+
+            let command = 'docker exec -i ' + config.project.domain + '_mysql mysql -u' + config.database.username + ' -p' + config.database.password + ' -e "CREATE DATABASE ' + name + '" '
+
+            let query = execSync(command)
+
+            if(!query.err){
+
+                console.log( 'Done! Extra database created' );
+
+            }
+
+        }
+
+    }
+
+    show( ) {
+
+        let project = new Project()
+        let config = project.config[PROJECT_ENV]
+
+
+        // Como de momento solo es compatible con MySQL, busco el valor en el archivo de configuracion.
+        let engine = JSPath.apply('..config.ase.engine', config)
+
+        if(engine.indexOf('mysql'.toLowerCase())){
+
+            let command = 'docker exec -i ' + config.project.domain + '_mysql mysql -u' + config.database.username + ' -p' + config.database.password + ' -e "SHOW DATABASES" '
+
+            let query = execSync(command)
+
+            if(!query.err){
+
+                console.log( query.stdout );
+
+            }
 
         }
 
