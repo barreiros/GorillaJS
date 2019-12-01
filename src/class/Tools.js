@@ -4,7 +4,7 @@ import { prompt } from 'inquirer'
 import { execSync as nativeExecSync } from 'child_process'
 import request from 'request'
 
-export const addToHosts = (domain, callback) => {
+export const addToHosts = (domain, callback ) => {
 
     let file = readFileSync(SYSTEM_HOSTS_FILE).toString()
     let text = '127.0.0.1 ' + domain + ' #GorillaJS';
@@ -55,7 +55,7 @@ export const addToHosts = (domain, callback) => {
 
                     }else{
 
-                        callback()
+                        if( callback ) callback()
 
                     }
 
@@ -69,7 +69,7 @@ export const addToHosts = (domain, callback) => {
         
     }else{
 
-        callback()
+        if( callback ) callback()
 
     }
 

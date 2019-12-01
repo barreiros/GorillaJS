@@ -67,7 +67,7 @@ var addToHosts = exports.addToHosts = function addToHosts(domain, callback) {
                         attempt();
                     } else {
 
-                        callback();
+                        if (callback) callback();
                     }
                 });
             };
@@ -76,7 +76,7 @@ var addToHosts = exports.addToHosts = function addToHosts(domain, callback) {
         }
     } else {
 
-        callback();
+        if (callback) callback();
     }
 };
 

@@ -1,0 +1,11 @@
+{
+
+    "plugin": {
+
+        "name": "Extra domains",
+        "version": "0.0.1",
+        "main": "extra_domains.js"
+
+    }
+
+}
