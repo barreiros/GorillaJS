@@ -54,9 +54,9 @@ done
 replace_domain || true &&
 
 
-mkdir -p /var/www/{{project.domain}}/ &&
-chown -R 1000:1000 /var/www/ &&
-chmod -R g+s /var/www/ &&
+# mkdir -p /var/www/{{project.domain}}/ &&
+# chown -R 1000:1000 /var/www/ &&
+# chmod -R g+s /var/www/ &&
 
 usermod -u 1000 apache
 groupmod -g 1000 apache 
